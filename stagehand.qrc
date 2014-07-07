@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/stagehand">
+        <file>background.png</file>
+        <file>file.png</file>
+        <file>folder_invisible.png</file>
+        <file>folder_visible.png</file>
+        <file>folder.png</file>
+        <file>invisible.png</file>
+        <file>leaf_invisible.png</file>
+        <file>leaf_visible.png</file>
+        <file>visible.png</file>
+        <file>qt.png</file>
+    </qresource>
+</RCC>
