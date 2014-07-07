@@ -39,6 +39,8 @@ public slots:
 
 protected:
     void inputFiles(QString jsonFile, QString screenShotFile);
+    void updateTableView(const QModelIndex &index);
+    void updateGLView(const QModelIndex &index);
 private slots:
     void on_treeView_clicked(const QModelIndex &index);
 

@@ -71,6 +71,8 @@ public:
 
     void showScreenShot(bool show){mShowScreenShot=show;update();}
 
+    void setSelection(int id);
+
 signals:
     void selectedId(int id);
 

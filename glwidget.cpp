@@ -105,6 +105,14 @@ void GLWidget::setScreenShot(QImage img)
     mScreenShot = img;
 }
 
+void GLWidget::setSelection(int id)
+{
+    mSelectedIds.clear();
+    mSelectedIds.push_back(id);
+    mSelectionIndex=0;
+    update();
+}
+
 void GLWidget::paintTexturedCube()
 {
     glBindTexture(GL_TEXTURE_2D, m_uiTexture);
@@ -392,11 +400,8 @@ void GLWidget::select(float x, float y) {
         QVector3D br(0.5, -0.5,0.0);
         tl = objectMatrix*tl;
         br = objectMatrix*br;
-        //qDebug() << tl.x() << " " << tl.y();
-        //qDebug() << br.x() << " " << br.y();
         if (x >= tl.x() && y >= tl.y() &&
             x <= br.x() && y <= br.y()) {
-            qWarning() << "found " << (*iter).first ;
             ids.insert(ids.begin(), (*iter).first);
         }
 

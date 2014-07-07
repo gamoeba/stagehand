@@ -136,11 +136,9 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
 
 void MainWindow::selectedId(int id)
 {
-   qDebug() << "selected : " << id;
-   //mTreeModel->findChild()
    QModelIndex index = mTreeModel->getIndex(id);
    ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect) ;
-   on_treeView_clicked(index);
+   updateTableView(index);
 }
 
 void MainWindow::showScreenShot(bool show)
@@ -221,15 +219,8 @@ QJsonDocument MainWindow::readJson(QString& fileName)
 
 void MainWindow::on_treeView_clicked(const QModelIndex &index)
 {
-    QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
-    QJsonObject obj = var.toJsonObject();
-
-    //delete mTableModel;
-    mTableModel = new TableModel(ui->tableView);
-    mTableModel->setTableData(obj);
-    ui->tableView->setModel(mTableModel->model());
-    ui->tableView->resizeColumnsToContents();
-    ui->tableView->resizeRowsToContents();
+    updateTableView(index);
+    updateGLView(index);
 
 //    QTableWidget* tw = new QTableWidget;
 //    tw->setRowCount(4);
@@ -237,3 +228,25 @@ void MainWindow::on_treeView_clicked(const QModelIndex &index)
 //    ui->treeView->setIndexWidget(index, tw);
 
 }
+
+void MainWindow::updateGLView(const QModelIndex &index)
+{
+    QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
+    QJsonObject obj = var.toJsonObject();
+    int id = obj.value(settings.mNodeID).toInt();
+    mGLWidget->setSelection(id);
+}
+
+void MainWindow::updateTableView(const QModelIndex &index)
+{
+    QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
+    QJsonObject obj = var.toJsonObject();
+
+    delete mTableModel;
+    mTableModel = new TableModel(ui->tableView);
+    mTableModel->setTableData(obj);
+    ui->tableView->setModel(mTableModel->model());
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->resizeRowsToContents();
+}
+
