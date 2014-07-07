@@ -7,7 +7,7 @@ JsonItem::JsonItem(QJsonObject object)
     mObject = object;
     QJsonValue value = mObject.value(QString("Name"));
     QJsonValue id = mObject.value(QString("id"));
-    mDisplayName = value.toString() + " ("+ QString::number(id.toInt()) + ")";
+    mDisplayName = "("+ QString::number(id.toInt()) + ") " + value.toString() ;
 }
 
 QVariant JsonItem::data(int role) const

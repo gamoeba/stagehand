@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->setAlternatingRowColors(true);
     ui->tableView->horizontalHeader()->setVisible(false);
     ui->tableView->verticalHeader()->setVisible(false);
+    ui->treeView->setAutoScroll(true);
 
 
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
