@@ -45,10 +45,6 @@
 #include <math.h>
 #include <map>
 
-#include "bubble.h"
-
-const int bubbleNum = 8;
-
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
@@ -57,7 +53,6 @@ GLWidget::GLWidget(QWidget *parent)
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_NoSystemBackground);
     setAutoBufferSwap(false);
-    m_showBubbles = true;
     setMinimumSize(700, 500);
 
     mTranslateX = 0;
@@ -289,8 +284,6 @@ void GLWidget::initializeGL ()
 
 
     m_fAngle = 0;
-    createGeometry();
-    createBubbles(bubbleNum - bubbles.count());
 }
 
 void GLWidget::paintGL()
@@ -356,133 +349,6 @@ void GLWidget::paintGL()
     painter.end();
 
     swapBuffers();
-}
-
-void GLWidget::createBubbles(int number)
-{
-    for (int i = 0; i < number; ++i) {
-        QPointF position(width()*(0.1 + (0.8*qrand()/(RAND_MAX+1.0))),
-                        height()*(0.1 + (0.8*qrand()/(RAND_MAX+1.0))));
-        qreal radius = qMin(width(), height())*(0.0175 + 0.0875*qrand()/(RAND_MAX+1.0));
-        QPointF velocity(width()*0.0175*(-0.5 + qrand()/(RAND_MAX+1.0)),
-                        height()*0.0175*(-0.5 + qrand()/(RAND_MAX+1.0)));
-
-        bubbles.append(new Bubble(position, radius, velocity));
-    }
-}
-
-void GLWidget::createGeometry()
-{
-    vertices.clear();
-    normals.clear();
-
-    qreal x1 = +0.06f;
-    qreal y1 = -0.14f;
-    qreal x2 = +0.14f;
-    qreal y2 = -0.06f;
-    qreal x3 = +0.08f;
-    qreal y3 = +0.00f;
-    qreal x4 = +0.30f;
-    qreal y4 = +0.22f;
-
-    quad(x1, y1, x2, y2, y2, x2, y1, x1);
-    quad(x3, y3, x4, y4, y4, x4, y3, x3);
-
-    extrude(x1, y1, x2, y2);
-    extrude(x2, y2, y2, x2);
-    extrude(y2, x2, y1, x1);
-    extrude(y1, x1, x1, y1);
-    extrude(x3, y3, x4, y4);
-    extrude(x4, y4, y4, x4);
-    extrude(y4, x4, y3, x3);
-
-    const qreal Pi = 3.14159f;
-    const int NumSectors = 100;
-
-    for (int i = 0; i < NumSectors; ++i) {
-        qreal angle1 = (i * 2 * Pi) / NumSectors;
-        qreal x5 = 0.30 * sin(angle1);
-        qreal y5 = 0.30 * cos(angle1);
-        qreal x6 = 0.20 * sin(angle1);
-        qreal y6 = 0.20 * cos(angle1);
-
-        qreal angle2 = ((i + 1) * 2 * Pi) / NumSectors;
-        qreal x7 = 0.20 * sin(angle2);
-        qreal y7 = 0.20 * cos(angle2);
-        qreal x8 = 0.30 * sin(angle2);
-        qreal y8 = 0.30 * cos(angle2);
-
-        quad(x5, y5, x6, y6, x7, y7, x8, y8);
-
-        extrude(x6, y6, x7, y7);
-        extrude(x8, y8, x5, y5);
-    }
-
-    for (int i = 0;i < vertices.size();i++)
-        vertices[i] *= 2.0f;
-}
-
-void GLWidget::quad(qreal x1, qreal y1, qreal x2, qreal y2, qreal x3, qreal y3, qreal x4, qreal y4)
-{
-    vertices << QVector3D(x1, y1, -0.05f);
-    vertices << QVector3D(x2, y2, -0.05f);
-    vertices << QVector3D(x4, y4, -0.05f);
-
-    vertices << QVector3D(x3, y3, -0.05f);
-    vertices << QVector3D(x4, y4, -0.05f);
-    vertices << QVector3D(x2, y2, -0.05f);
-
-    QVector3D n = QVector3D::normal
-        (QVector3D(x2 - x1, y2 - y1, 0.0f), QVector3D(x4 - x1, y4 - y1, 0.0f));
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    vertices << QVector3D(x4, y4, 0.05f);
-    vertices << QVector3D(x2, y2, 0.05f);
-    vertices << QVector3D(x1, y1, 0.05f);
-
-    vertices << QVector3D(x2, y2, 0.05f);
-    vertices << QVector3D(x4, y4, 0.05f);
-    vertices << QVector3D(x3, y3, 0.05f);
-
-    n = QVector3D::normal
-        (QVector3D(x2 - x4, y2 - y4, 0.0f), QVector3D(x1 - x4, y1 - y4, 0.0f));
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    normals << n;
-    normals << n;
-    normals << n;
-}
-
-void GLWidget::extrude(qreal x1, qreal y1, qreal x2, qreal y2)
-{
-    vertices << QVector3D(x1, y1, +0.05f);
-    vertices << QVector3D(x2, y2, +0.05f);
-    vertices << QVector3D(x1, y1, -0.05f);
-
-    vertices << QVector3D(x2, y2, -0.05f);
-    vertices << QVector3D(x1, y1, -0.05f);
-    vertices << QVector3D(x2, y2, +0.05f);
-
-    QVector3D n = QVector3D::normal
-        (QVector3D(x2 - x1, y2 - y1, 0.0f), QVector3D(0.0f, 0.0f, -0.1f));
-
-    normals << n;
-    normals << n;
-    normals << n;
-
-    normals << n;
-    normals << n;
-    normals << n;
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent* event) {

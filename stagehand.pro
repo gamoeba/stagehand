@@ -18,7 +18,6 @@ SOURCES += main.cpp\
     jsonitem.cpp \
     tablemodel.cpp \
     dataobject.cpp \
-    bubble.cpp \
     glwidget.cpp \
     nodeobject.cpp \
     sceneobject.cpp \
@@ -29,7 +28,6 @@ HEADERS  += mainwindow.h \
     jsonitem.h \
     tablemodel.h \
     dataobject.h \
-    bubble.h \
     glwidget.h \
     nodeobject.h \
     sceneobject.h \
