@@ -300,9 +300,9 @@ void GLWidget::paintGL()
         tl = objectMatrix*tl;
         br = objectMatrix*br;
         float xpixels = (float)width() * (br.x()-tl.x())/2.0;
-        float xthreshold = 2.0/xpixels;
+        float xthreshold = 1.0/xpixels;
         float ypixels = (float)height() * (br.y()-tl.y())/2.0;
-        float ythreshold = 2.0/ypixels;
+        float ythreshold = 1.0/ypixels;
 
         program.setUniformValue(drawTextureUniform, mShowScreenShot && (*iter).first == 1);
         program.setUniformValue(matrixUniform, objectMatrix);
