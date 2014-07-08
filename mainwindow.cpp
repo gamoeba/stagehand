@@ -1,9 +1,37 @@
+/****************************************************************************
+Copyright (C) 2014 Gamoeba Ltd
+All rights reserved
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or other
+materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.
+
+****************************************************************************/
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "jsonitem.h"
 #include "glwidget.h"
 #include "nodeobject.h"
 #include "sceneobject.h"
+#include "socketclient.h"
 
 #include <QStandardItemModel>
 #include <QFileDialog>
@@ -101,30 +129,22 @@ void MainWindow::zoomOut()
 
 void MainWindow::updateScene()
 {
-    QProcess process1, process2;
-    qDebug() << QDir::tempPath();
-    QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
+    SocketClient client;
+    QString json = client.sendCommand(settings.mHostName, settings.mPortNumber.toUInt(), "dump_scene\n");
+    mDoc = QJsonDocument::fromJson(json.toUtf8());
+
+    QProcess process;
     QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
 
-    qDebug() << settings.mHostName;
-    qDebug() << settings.mPortNumber;
-    qDebug() << jsonFile;
-    qDebug() << screenShotFile;
-    process1.execute("bash", QStringList() << "dump_scene" << settings.mHostName << settings.mPortNumber << jsonFile);
-    process2.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
+    process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
 
-    inputFiles(jsonFile, screenShotFile);
+    inputFiles(QString(""), screenShotFile);
 }
 
 void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
-    if (QFile::exists(jsonFile)) {
+    if (jsonFile.length()>0 && QFile::exists(jsonFile)) {
         mDoc = readJson(jsonFile);
-        QFile::remove(jsonFile);
-
-        mTreeModel->setTreeData(mDoc);
-        ui->treeView->setModel(mTreeModel->model());
-
-        addObjects();
+        QFile::remove(jsonFile);       
     }
     if (QFile::exists(screenShotFile))
     {
@@ -132,6 +152,11 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
         QFile::remove(screenShotFile);
         mGLWidget->setScreenShot(img);
     }
+
+    mTreeModel->setTreeData(mDoc);
+    ui->treeView->setModel(mTreeModel->model());
+
+    addObjects();
 
     mGLWidget->repaint();
 }

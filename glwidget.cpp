@@ -1,41 +1,28 @@
 /****************************************************************************
-**
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
+Copyright (C) 2014 Gamoeba Ltd
+All rights reserved
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or other
+materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.
+
 ****************************************************************************/
 
 #include "glwidget.h"
@@ -86,7 +73,7 @@ void GLWidget::setAspectRatio(double aspectRatio) {
     mAspectRatio = aspectRatio;
 }
 
-void GLWidget::addObject(int id, SceneObject so, bool selected)
+void GLWidget::addObject(int id, SceneObject so, bool /*selected*/)
 {
     mObjects[id] = so;
 }
@@ -142,76 +129,39 @@ void GLWidget::animate()
     update();
 }
 
-void GLWidget::paintTexturedCube()
+void GLWidget::drawRect()
 {
     glBindTexture(GL_TEXTURE_2D, m_uiTexture);
     GLfloat afVertices[] = {
         -0.5, 0.5, 0.5, 0.5,-0.5,0.5,-0.5,-0.5,0.5,
-        0.5, -0.5, 0.5, -0.5,0.5,0.5,0.5,0.5,0.5 /*,
-        -0.5, -0.5, -0.5, 0.5,-0.5,-0.5,-0.5,0.5,-0.5,
-        0.5, 0.5, -0.5, -0.5,0.5,-0.5,0.5,-0.5,-0.5,
-
-        0.5, -0.5, -0.5, 0.5,-0.5,0.5,0.5,0.5,-0.5,
-        0.5, 0.5, 0.5, 0.5,0.5,-0.5,0.5,-0.5,0.5,
-        -0.5, 0.5, -0.5, -0.5,-0.5,0.5,-0.5,-0.5,-0.5,
-        -0.5, -0.5, 0.5, -0.5,0.5,-0.5,-0.5,0.5,0.5,
-
-        0.5, 0.5,  -0.5, -0.5, 0.5,  0.5,  -0.5,  0.5,  -0.5,
-        -0.5,  0.5,  0.5,  0.5,  0.5,  -0.5, 0.5, 0.5,  0.5,
-        -0.5,  -0.5, -0.5, -0.5, -0.5, 0.5,  0.5, -0.5, -0.5,
-        0.5, -0.5, 0.5,  0.5,  -0.5, -0.5, -0.5,  -0.5, 0.5
-            */
+        0.5, -0.5, 0.5, -0.5,0.5,0.5,0.5,0.5,0.5
     };
-    program2.setAttributeArray(vertexAttr2, afVertices, 3);
+    program.setAttributeArray(vertexAttr, afVertices, 3);
 
     GLfloat afTexCoord[] = {
         0.0f,0.0f, 1.0f,1.0f, 0.0f,1.0f,
-        1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f/*,
-        1.0f,1.0f, 1.0f,0.0f, 0.0f,1.0f,
-        0.0f,0.0f, 0.0f,1.0f, 1.0f,0.0f,
-
-        1.0f,1.0f, 1.0f,0.0f, 0.0f,1.0f,
-        0.0f,0.0f, 0.0f,1.0f, 1.0f,0.0f,
-        0.0f,0.0f, 1.0f,1.0f, 1.0f,0.0f,
-        1.0f,1.0f, 0.0f,0.0f, 0.0f,1.0f,
-
-        0.0f,1.0f, 1.0f,0.0f, 1.0f,1.0f,
-        1.0f,0.0f, 0.0f,1.0f, 0.0f,0.0f,
-        1.0f,0.0f, 1.0f,1.0f, 0.0f,0.0f,
-        0.0f,1.0f, 0.0f,0.0f, 1.0f,1.0f*/
+        1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f
     };
-    program2.setAttributeArray(texCoordAttr2, afTexCoord, 2);
+    program.setAttributeArray(texCoordAttr, afTexCoord, 2);
 
     GLfloat afNormals[] = {
 
         0,0,-1, 0,0,-1, 0,0,-1,
-        0,0,-1, 0,0,-1, 0,0,-1/*,
-        0,0,1, 0,0,1, 0,0,1,
-        0,0,1, 0,0,1, 0,0,1,
-
-        -1,0,0, -1,0,0, -1,0,0,
-        -1,0,0, -1,0,0, -1,0,0,
-        1,0,0, 1,0,0, 1,0,0,
-        1,0,0, 1,0,0, 1,0,0,
-
-        0,-1,0, 0,-1,0, 0,-1,0,
-        0,-1,0, 0,-1,0, 0,-1,0,
-        0,1,0, 0,1,0, 0,1,0,
-        0,1,0, 0,1,0, 0,1,0*/
+        0,0,-1, 0,0,-1, 0,0,-1
     };
-    program2.setAttributeArray(normalAttr2, afNormals, 3);
+    program.setAttributeArray(normalAttr, afNormals, 3);
 
-    program2.setUniformValue(textureUniform2, 0);    // use texture unit 0
+    program.setUniformValue(textureUniform, 0);    // use texture unit 0
 
-    program2.enableAttributeArray(vertexAttr2);
-    program2.enableAttributeArray(normalAttr2);
-    program2.enableAttributeArray(texCoordAttr2);
+    program.enableAttributeArray(vertexAttr);
+    program.enableAttributeArray(normalAttr);
+    program.enableAttributeArray(texCoordAttr);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    program2.disableAttributeArray(vertexAttr2);
-    program2.disableAttributeArray(normalAttr2);
-    program2.disableAttributeArray(texCoordAttr2);
+    program.disableAttributeArray(vertexAttr);
+    program.disableAttributeArray(normalAttr);
+    program.disableAttributeArray(texCoordAttr);
 }
 
 void GLWidget::initializeGL ()
@@ -220,11 +170,8 @@ void GLWidget::initializeGL ()
 
     glGenTextures(1, &m_uiTexture);
 
-
-
-
-    QGLShader *vshader2 = new QGLShader(QGLShader::Vertex);
-    const char *vsrc2 =
+    QGLShader *vshader = new QGLShader(QGLShader::Vertex);
+    const char *vsrc =
         "attribute highp vec4 vertex;\n"
         "attribute highp vec4 texCoord;\n"
         "attribute mediump vec3 normal;\n"
@@ -243,19 +190,19 @@ void GLWidget::initializeGL ()
         "    gl_Position = matrix * vertex;\n"
         "    texc = texCoord;\n"
         "}\n";
-    vshader2->compileSourceCode(vsrc2);
+    vshader->compileSourceCode(vsrc);
 
-    QGLShader *fshader1 = new QGLShader(QGLShader::Fragment);
+    QGLShader *fshader = new QGLShader(QGLShader::Fragment);
 
-    QGLShader *fshader2 = new QGLShader(QGLShader::Fragment);
-
-    const char *fsrc2 =
+    const char *fsrc =
         "varying highp vec4 texc;\n"
         "int multiplicationFactor = 8;\n"
-        "float threshold = 0.01;\n"
         "uniform sampler2D tex;\n"
         "uniform bool selected;\n"
         "uniform bool screenshot;\n"
+        "uniform bool drawTexture;\n"
+        "uniform float xthreshold;\n"
+        "uniform float ythreshold;\n"
         "varying mediump float angle;\n"
         "varying mediump float of;\n"
 
@@ -264,11 +211,12 @@ void GLWidget::initializeGL ()
 
             // multiplicationFactor scales the number of stripes
             "mediump vec2 t = texc.st;\n"
-
+            "if (drawTexture)\n"
+            "    gl_FragColor = texture2D(tex, texc.st);\n"
             // the threshold constant defines the with of the lines
-            "if (fract(t.s) < threshold  || fract(t.t) < threshold )\n"
+            "else if (fract(t.s) < xthreshold  || fract(t.t) < ythreshold )\n"
                 "gl_FragColor = vec4(0.8, 1.0, 1.0, 1.0);\n"
-            "else if (fract(t.s) > (1.0 - threshold)  || fract(t.t) > (1.0 - threshold) )\n"
+            "else if (fract(t.s) > (1.0 - xthreshold)  || fract(t.t) > (1.0 - ythreshold) )\n"
                 "gl_FragColor = vec4(0.8, 1.0, 1.0, 1.0);\n"
             "else\n"
                 "if (selected){"
@@ -280,41 +228,23 @@ void GLWidget::initializeGL ()
                 "  else\n"
                 "       discard;}\n"
         "}\n";
-    const char *fsrc1 =
-        "varying highp vec4 texc;\n"
-        "int multiplicationFactor = 8;\n"
-        "float threshold = 0.01;\n"
-        "uniform sampler2D tex;\n"
-        "uniform bool selected;\n"
-        "varying mediump float angle;\n"
-        "varying mediump float of;\n"
+    fshader->compileSourceCode(fsrc);
 
-        "void main(void)\n"
-        "{\n"
+    program.addShader(vshader);
+    program.addShader(fshader);
+    program.link();
 
-            // multiplicationFactor scales the number of stripes
-            "mediump vec2 t = texc.st;\n"
-        "    highp vec4 color = texture2D(tex, texc.st);\n"
-        "    gl_FragColor = color;\n"
-        "}\n";
-    fshader1->compileSourceCode(fsrc1);
-    fshader2->compileSourceCode(fsrc2);
+    vertexAttr = program.attributeLocation("vertex");
+    normalAttr = program.attributeLocation("normal");
+    texCoordAttr = program.attributeLocation("texCoord");
+    matrixUniform = program.uniformLocation("matrix");
+    textureUniform = program.uniformLocation("tex");
+    selectedUniform = program.uniformLocation("selected");
+    screenShotUniform = program.uniformLocation("screenshot");
+    drawTextureUniform = program.uniformLocation("drawTexture");
+    xthresholdUniform = program.uniformLocation("xthreshold");
+    ythresholdUniform = program.uniformLocation("ythreshold");
 
-    program1.addShader(vshader2);
-    program1.addShader(fshader1);
-    program1.link();
-
-    program2.addShader(vshader2);
-    program2.addShader(fshader2);
-    program2.link();
-
-    vertexAttr2 = program2.attributeLocation("vertex");
-    normalAttr2 = program2.attributeLocation("normal");
-    texCoordAttr2 = program2.attributeLocation("texCoord");
-    matrixUniform2 = program2.uniformLocation("matrix");
-    textureUniform2 = program2.uniformLocation("tex");
-    selectedUniform2 = program2.uniformLocation("selected");
-    screenShotUniform2 = program2.uniformLocation("screenshot");
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -348,7 +278,7 @@ void GLWidget::paintGL()
     mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
     mModelView.scale(mAspectRatio, 1.0, 1.0);
     mModelView.scale(m_fScale,m_fScale,1.0);
-    //program2.bind();
+    program.bind();
 
     int selectionId = 0;
     if (mSelectionIndex < mSelectedIds.size()) {
@@ -365,19 +295,26 @@ void GLWidget::paintGL()
         objectMatrix = mModelView * objectMatrix;
         objectMatrix.scale(1.0f, 1.0f, 0.05f);
 
-        if (mShowScreenShot && (*iter).first == 1) {
-            program1.bind();
-        } else {
-            program2.bind();
-        }
-        program2.setUniformValue(matrixUniform2, objectMatrix);
-        program2.setUniformValue(selectedUniform2, (*iter).first == selectionId);
-        program2.setUniformValue(screenShotUniform2, mShowScreenShot);
+        QVector3D tl(-0.5, 0.5,0.0);
+        QVector3D br(0.5, -0.5,0.0);
+        tl = objectMatrix*tl;
+        br = objectMatrix*br;
+        float xpixels = (float)width() * (br.x()-tl.x())/2.0;
+        float xthreshold = 2.0/xpixels;
+        float ypixels = (float)height() * (br.y()-tl.y())/2.0;
+        float ythreshold = 2.0/ypixels;
 
-        paintTexturedCube();
+        program.setUniformValue(drawTextureUniform, mShowScreenShot && (*iter).first == 1);
+        program.setUniformValue(matrixUniform, objectMatrix);
+        program.setUniformValue(selectedUniform, (*iter).first == selectionId);
+        program.setUniformValue(screenShotUniform, mShowScreenShot);
+        program.setUniformValue(xthresholdUniform, xthreshold);
+        program.setUniformValue(ythresholdUniform, ythreshold);
+
+        drawRect();
 
     }
-    program2.release();
+    program.release();
 
     glDisable(GL_CULL_FACE);
 
@@ -436,7 +373,7 @@ void GLWidget::select(float x, float y) {
 
     }
     bool is_equal = false;
-    if ( ids.size() == mSelectedIds.size() )
+    if ( ids.size() > 0 && ids.size() == mSelectedIds.size() )
         is_equal = std::equal ( ids.begin(), ids.end(), mSelectedIds.begin() );
 
     if (is_equal) {

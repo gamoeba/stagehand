@@ -24,35 +24,51 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 
 ****************************************************************************/
+#include "socketclient.h"
 
-#ifndef TABLEMODEL_H
-#define TABLEMODEL_H
-
-#include <QObject>
-#include <QStandardItemModel>
-#include <QJsonObject>
-#include <QTableView>
-
-
-class TableModel : public QObject
+SocketClient::SocketClient(QObject* parent): QObject(parent)
 {
-    Q_OBJECT
-public:
-    explicit TableModel(QTableView *table);
+  connect(&client, SIGNAL(connected()),
+    this, SLOT(startTransfer()));
+}
 
-    void setTableData(QJsonObject obj);
+SocketClient::~SocketClient()
+{
+  client.close();
+}
 
-    QStandardItemModel* model() {return mModel;}
-    void addChildren(QJsonArray array);
-signals:
+QString SocketClient::sendCommand(QString& address, quint16 port, QString command)
+{
+    QString resp;
+    QHostAddress addr(address);
+    client.connectToHost(addr, port);
+    bool conn = client.waitForConnected();
+    mCommand = command;
+    if (conn) {
+        client.write(command.toUtf8().data(), command.length());
+        client.flush();
+        client.waitForReadyRead();
+        QString r1 = client.readLine(32);
+        int len = r1.toInt();
+        char* buf = new char[len];
+        char* ptr = buf;
 
-public slots:
+        int read = -1;
+        while (len > 0 && read !=0) {
+            client.waitForReadyRead();
+            read = client.read(ptr, len);
 
+            len -= read;
+            ptr += read;
+        }
+        resp = QString(buf);
+        delete [] buf;
+    }
+    return resp;
 
-private:
-    QStandardItemModel* mModel;
-    QTableView* mTable;
-    QJsonObject mJsonObject;
-};
+}
 
-#endif // TREEMODEL_H
+void SocketClient::startTransfer()
+{
+}
+

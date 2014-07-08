@@ -25,34 +25,28 @@ OF SUCH DAMAGE.
 
 ****************************************************************************/
 
-#ifndef TABLEMODEL_H
-#define TABLEMODEL_H
+#ifndef SOCKETCLIENT_H
+#define SOCKETCLIENT_H
 
+
+// client.h
+#include <QtNetwork>
 #include <QObject>
-#include <QStandardItemModel>
-#include <QJsonObject>
-#include <QTableView>
+#include <QString>
+#include <QTcpSocket>
 
-
-class TableModel : public QObject
+class SocketClient : public QObject
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    explicit TableModel(QTableView *table);
-
-    void setTableData(QJsonObject obj);
-
-    QStandardItemModel* model() {return mModel;}
-    void addChildren(QJsonArray array);
-signals:
-
+    SocketClient(QObject* parent = 0);
+    QString sendCommand(QString &address, quint16 port, QString command);
+    ~SocketClient();
 public slots:
-
-
+    void startTransfer();
 private:
-    QStandardItemModel* mModel;
-    QTableView* mTable;
-    QJsonObject mJsonObject;
+    QString mCommand;
+    QTcpSocket client;
 };
 
-#endif // TREEMODEL_H
+#endif // SOCKETCLIENT_H

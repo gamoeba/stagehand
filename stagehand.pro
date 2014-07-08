@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui opengl network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     glwidget.cpp \
     nodeobject.cpp \
     sceneobject.cpp \
-    settings.cpp
+    settings.cpp \
+    socketclient.cpp
 
 HEADERS  += mainwindow.h \
     treemodel.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     glwidget.h \
     nodeobject.h \
     sceneobject.h \
-    settings.h
+    settings.h \
+    socketclient.h
 
 FORMS    += mainwindow.ui
 
