@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->treeView->setHeaderHidden(true);
     ui->treeView->setAlternatingRowColors(true);
+    ui->tableViewUpdate->setHidden(true);
     ui->tableView->setAlternatingRowColors(true);
     ui->tableView->horizontalHeader()->setVisible(false);
     ui->tableView->verticalHeader()->setVisible(false);
@@ -147,6 +148,11 @@ void MainWindow::showScreenShot(bool show)
     mGLWidget->showScreenShot(show);
 }
 
+void MainWindow::tableItemChanged(QStandardItem * item)
+{
+    qDebug() << item->data(Qt::DisplayRole);
+}
+
 void MainWindow::addObjects() {
     QJsonObject obj = mDoc.object();
     addNodeObject(obj);
@@ -249,5 +255,6 @@ void MainWindow::updateTableView(const QModelIndex &index)
     ui->tableView->setModel(mTableModel->model());
     ui->tableView->resizeColumnsToContents();
     ui->tableView->resizeRowsToContents();
-}
+    QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
 
+}

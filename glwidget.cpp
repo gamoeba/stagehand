@@ -61,6 +61,9 @@ GLWidget::GLWidget(QWidget *parent)
     mDragY = 0;
     mSelectionIndex=0;
     mShowScreenShot = false;
+
+    connect(&mAnimationTimer,SIGNAL(timeout()),SLOT(animate()));
+
 }
 
 GLWidget::~GLWidget()
@@ -90,14 +93,30 @@ void GLWidget::addObject(int id, SceneObject so, bool selected)
 
 void GLWidget::zoomIn()
 {
-    m_fScale *= 2.0;
-    update();
+    if (mAnimationTimer.isActive()) {
+        mAnimationTimer.stop();
+        m_fScale = mEndScale;
+        update();
+    }
+    mStartScale = m_fScale;
+    mEndScale = m_fScale * 2;
+    mSteps = 20;
+    mCurrentStep = 0;
+    mAnimationTimer.start(30);
 }
 
 void GLWidget::zoomOut()
 {
-    m_fScale /= 2.0;
-    update();
+    if (mAnimationTimer.isActive()) {
+        mAnimationTimer.stop();
+        m_fScale = mEndScale;
+        update();
+    }
+    mStartScale = m_fScale;
+    mEndScale = m_fScale / 2.0;
+    mSteps = 20;
+    mCurrentStep = 0;
+    mAnimationTimer.start(30);
 }
 
 void GLWidget::setScreenShot(QImage img)
@@ -110,6 +129,16 @@ void GLWidget::setSelection(int id)
     mSelectedIds.clear();
     mSelectedIds.push_back(id);
     mSelectionIndex=0;
+    update();
+}
+
+void GLWidget::animate()
+{
+    float step = mEndScale - mStartScale;
+    mCurrentStep++;
+    m_fScale = mStartScale + ((float)mCurrentStep/(float)mSteps)*step;
+    if (mCurrentStep>=mSteps)
+        mAnimationTimer.stop();
     update();
 }
 

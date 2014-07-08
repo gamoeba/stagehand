@@ -36,6 +36,7 @@ public slots:
     void updateScene();
     void selectedId(int id);
     void showScreenShot(bool show);
+    void tableItemChanged(QStandardItem*);
 
 protected:
     void inputFiles(QString jsonFile, QString screenShotFile);

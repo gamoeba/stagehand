@@ -47,6 +47,7 @@
 #include <QtOpenGL/qglshaderprogram.h>
 #include <QTime>
 #include <QVector>
+#include <QTimer>
 #include <map>
 
 #include "sceneobject.h"
@@ -72,6 +73,8 @@ public:
     void showScreenShot(bool show){mShowScreenShot=show;update();}
 
     void setSelection(int id);
+public slots:
+    void animate();
 
 signals:
     void selectedId(int id);
@@ -122,5 +125,10 @@ private:
     int mDragY;
     bool mShowScreenShot;
     void select(float x, float y);
+    QTimer mAnimationTimer;
+    float mStartScale;
+    float mEndScale;
+    float mSteps;
+    float mCurrentStep;
 };
 #endif
