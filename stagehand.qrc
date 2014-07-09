@@ -10,5 +10,11 @@
         <file>leaf_visible.png</file>
         <file>visible.png</file>
         <file>qt.png</file>
+        <file>ZoomIn.png</file>
+        <file>ZoomOut.png</file>
+        <file>Screenshot.png</file>
+        <file>Refresh.png</file>
+        <file>Save.png</file>
+        <file>Open.png</file>
     </qresource>
 </RCC>
