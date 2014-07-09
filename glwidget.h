@@ -35,6 +35,7 @@ OF SUCH DAMAGE.
 #include <QTime>
 #include <QVector>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <map>
 
 #include "sceneobject.h"
@@ -115,9 +116,9 @@ private:
     bool mShowScreenShot;
     void select(float x, float y);
     QTimer mAnimationTimer;
+    QElapsedTimer mElapsedTimer;
     float mStartScale;
     float mEndScale;
-    float mSteps;
-    float mCurrentStep;
+    qint64 mAnimationLengthms;
 };
 #endif

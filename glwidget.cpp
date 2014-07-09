@@ -85,11 +85,11 @@ void GLWidget::zoomIn()
         m_fScale = mEndScale;
         update();
     }
+    mAnimationLengthms = 500;
     mStartScale = m_fScale;
     mEndScale = m_fScale * 2;
-    mSteps = 20;
-    mCurrentStep = 0;
-    mAnimationTimer.start(30);
+    mElapsedTimer.start();
+    mAnimationTimer.start(10);
 }
 
 void GLWidget::zoomOut()
@@ -99,11 +99,12 @@ void GLWidget::zoomOut()
         m_fScale = mEndScale;
         update();
     }
+
+    mAnimationLengthms = 500;
     mStartScale = m_fScale;
     mEndScale = m_fScale / 2.0;
-    mSteps = 20;
-    mCurrentStep = 0;
-    mAnimationTimer.start(30);
+    mElapsedTimer.start();
+    mAnimationTimer.start(10);
 }
 
 void GLWidget::setScreenShot(QImage img)
@@ -122,10 +123,13 @@ void GLWidget::setSelection(int id)
 void GLWidget::animate()
 {
     float step = mEndScale - mStartScale;
-    mCurrentStep++;
-    m_fScale = mStartScale + ((float)mCurrentStep/(float)mSteps)*step;
-    if (mCurrentStep>=mSteps)
+    qint64 elapsedTimems = mElapsedTimer.nsecsElapsed()/1000000;
+    float scalefac = ((float)(elapsedTimems)/(float)mAnimationLengthms);
+    m_fScale = mStartScale + scalefac*step;
+    if (mElapsedTimer.hasExpired(mAnimationLengthms)) {
+        m_fScale = mEndScale;
         mAnimationTimer.stop();
+    }
     update();
 }
 
