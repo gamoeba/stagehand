@@ -55,7 +55,13 @@
         <enum>QAbstractItemView::ScrollPerItem</enum>
        </property>
       </widget>
-      <widget class="QWidget" name="gridLayoutWidget">
+      <widget class="QWidget" name="gridWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
        <layout class="QGridLayout" name="glWidget"/>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
@@ -63,12 +69,21 @@
         <property name="topMargin">
          <number>0</number>
         </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QFrame" name="updatePanel">
+         <widget class="QWidget" name="updatePanel" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>200</height>
+            <height>100</height>
            </size>
           </property>
           <widget class="QWidget" name="verticalLayoutWidget_2">
@@ -95,11 +110,11 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>251</width>
+             <width>301</width>
              <height>51</height>
             </rect>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
             <item>
              <widget class="QPushButton" name="clearButton">
               <property name="text">
@@ -116,6 +131,10 @@
             </item>
            </layout>
           </widget>
+          <zorder>verticalLayoutWidget_2</zorder>
+          <zorder>horizontalLayoutWidget</zorder>
+          <zorder>tableView</zorder>
+          <zorder>tableView</zorder>
          </widget>
         </item>
         <item>
@@ -123,7 +142,7 @@
           <property name="minimumSize">
            <size>
             <width>300</width>
-            <height>0</height>
+            <height>500</height>
            </size>
           </property>
          </widget>
