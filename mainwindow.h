@@ -33,6 +33,7 @@ OF SUCH DAMAGE.
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
+#include "delegate.h"
 
 class GLWidget;
 
@@ -72,6 +73,8 @@ protected:
 private slots:
     void on_treeView_clicked(const QModelIndex &index);
 
+
+    void on_clearButton_clicked();
 
 private:
     Ui::MainWindow *ui;

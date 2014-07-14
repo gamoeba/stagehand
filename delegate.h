@@ -25,38 +25,35 @@ OF SUCH DAMAGE.
 
 ****************************************************************************/
 
-#ifndef TABLEMODEL_H
-#define TABLEMODEL_H
+#ifndef DELEGATE_H
+#define DELEGATE_H
 
-#include <QObject>
-#include <QStandardItemModel>
-#include <QJsonObject>
-#include <QTableView>
+#include <QStyledItemDelegate>
+#include <QTableWidget>
 
-
-class TableModel : public QObject
+class TableDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+
 public:
-    explicit TableModel(QTableView *table);
+    TableDelegate(QObject *parent = 0);
 
-    void setTableData(QJsonObject obj);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
 
-    QStandardItemModel* model() {return mModel;}
-    void addChildren(QJsonArray array);
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
 
-    int getObjectId() {return mObjectId;}
-    void setObjectId(int id) {mObjectId = id;}
-signals:
+    void updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-public slots:
+    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const ;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-
+    QTableWidget* getTableWidget(QString str) const;
 private:
-    QStandardItemModel* mModel;
-    QTableView* mTable;
-    QJsonObject mJsonObject;
-    int mObjectId;
 };
 
-#endif // TREEMODEL_H
+
+#endif

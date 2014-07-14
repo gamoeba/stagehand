@@ -64,13 +64,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->treeView->setHeaderHidden(true);
     ui->treeView->setAlternatingRowColors(true);
-    ui->tableViewUpdate->setHidden(true);
+    ui->updatePanel->setHidden(true);
     ui->tableView->setAlternatingRowColors(true);
     ui->tableView->horizontalHeader()->setVisible(false);
     ui->tableView->verticalHeader()->setVisible(false);
     ui->treeView->setAutoScroll(true);
 
+    ui->tableViewUpdate->setModel(new QStandardItemModel());
+    ui->tableViewUpdate->setAlternatingRowColors(true);
+    ui->tableViewUpdate->horizontalHeader()->setVisible(false);
+    ui->tableViewUpdate->verticalHeader()->setVisible(false);
 
+    TableDelegate* delegate = new TableDelegate();
+    ui->tableView->setItemDelegateForColumn(1, delegate);
+    TableDelegate* delegateUpdate = new TableDelegate();
+    ui->tableViewUpdate->setItemDelegateForColumn(2, delegateUpdate);
+
+    QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
 }
 
@@ -158,6 +168,7 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
 
     addObjects();
 
+
     mGLWidget->repaint();
 }
 
@@ -171,11 +182,6 @@ void MainWindow::selectedId(int id)
 void MainWindow::showScreenShot(bool show)
 {
     mGLWidget->showScreenShot(show);
-}
-
-void MainWindow::tableItemChanged(QStandardItem * item)
-{
-    qDebug() << item->data(Qt::DisplayRole);
 }
 
 void MainWindow::addObjects() {
@@ -254,11 +260,6 @@ void MainWindow::on_treeView_clicked(const QModelIndex &index)
     updateTableView(index);
     updateGLView(index);
 
-//    QTableWidget* tw = new QTableWidget;
-//    tw->setRowCount(4);
-//    tw->setColumnCount(4);
-//    ui->treeView->setIndexWidget(index, tw);
-
 }
 
 void MainWindow::updateGLView(const QModelIndex &index)
@@ -274,12 +275,37 @@ void MainWindow::updateTableView(const QModelIndex &index)
     QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
     QJsonObject obj = var.toJsonObject();
 
-    delete mTableModel;
-    mTableModel = new TableModel(ui->tableView);
+    //delete mTableModel;
+    //mTableModel = new TableModel(ui->tableView);
     mTableModel->setTableData(obj);
     ui->tableView->setModel(mTableModel->model());
     ui->tableView->resizeColumnsToContents();
     ui->tableView->resizeRowsToContents();
-    QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
 
+}
+
+void MainWindow::tableItemChanged(QStandardItem * item)
+{
+    QString valueStr = item->data(Qt::DisplayRole).toString();
+    QModelIndex ind = item->index();
+    QString nameStr =  mTableModel->model()->itemFromIndex(ind.sibling(ind.row(),0))->data(Qt::DisplayRole).toString();
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
+    int idval = mTableModel->getObjectId();
+    qDebug() << idval;
+    QStandardItem* id = new QStandardItem(QString::number(idval));
+    QStandardItem* name = new QStandardItem(nameStr);
+    QStandardItem* value = new QStandardItem(valueStr);
+    QList<QStandardItem*> items;
+    items.append(id);
+    items.append(name);
+    items.append(value);
+    model->appendRow(items);
+    ui->updatePanel->setHidden(false);
+}
+
+void MainWindow::on_clearButton_clicked()
+{
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
+    model->clear();
+    ui->updatePanel->setHidden(true);
 }

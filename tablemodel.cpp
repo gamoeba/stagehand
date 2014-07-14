@@ -50,14 +50,36 @@ void TableModel::setTableData(QJsonObject obj)
 {
     mJsonObject = obj;
 
+    mModel->clear();
+
     QJsonValue value = obj.value(QString("Name"));
     QJsonValue id = obj.value(QString("id"));
+
+    setObjectId((int)id.toDouble());
 
     QJsonValue children =  obj.value(QString("properties"));
     if (children.isArray()) {
         addChildren(children.toArray());
     }
 
+ /*   QModelIndex mi = mModel->index(1,1);
+    mModel->setData(mi, QVariant("test"));
+
+    QStandardItem* item = mModel->itemFromIndex(mi);
+
+    QTableWidget* tw = new QTableWidget(mTable);
+    tw->setRowCount(4);
+    tw->setColumnCount(4);
+    tw->horizontalHeader()->setVisible(false);
+    tw->verticalHeader()->setVisible(false);
+    tw->setVisible(true);
+//            mTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+//            //mTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+//            mTable->verticalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+//            //mTable->verticalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+
+    mTable->setIndexWidget(mi, tw);
+*/
 }
 
 void TableModel::addChildren( QJsonArray array) {
@@ -68,7 +90,7 @@ void TableModel::addChildren( QJsonArray array) {
         if (val.isArray()) {
             QJsonArray arr = val.toArray();
             QString valStr = arr.at(1).toString();
-            valStr.replace(QRegExp("\\] *, *\\["),"],\n[");
+            //valStr.replace(QRegExp("\\] *, *\\["),"],\n[");
             QStandardItem* name = new QStandardItem(arr.at(0).toString());
             QStandardItem* value = new QStandardItem(valStr);
             QList<QStandardItem*> items;
@@ -82,17 +104,6 @@ void TableModel::addChildren( QJsonArray array) {
 
 //            QModelIndex mi = mModel->indexFromItem(value);
 
-//            QTableWidget* tw = new QTableWidget;
-//            tw->setRowCount(4);
-//            tw->setColumnCount(4);
-//            tw->horizontalHeader()->setVisible(false);
-//            tw->verticalHeader()->setVisible(false);
-//            mTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-//            //mTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-//            mTable->verticalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-//            //mTable->verticalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-
-//            mTable->setIndexWidget(mi, tw);
 
         }
     }
