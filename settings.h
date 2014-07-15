@@ -55,6 +55,7 @@ public:
     QString mPortNumber;
     QString mCmdGetScene;
     QString mCmdSetProperties;
+    QString mAdbForwardPort;
 };
 
 #endif // SETTINGS_H

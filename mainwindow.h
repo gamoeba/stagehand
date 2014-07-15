@@ -58,6 +58,7 @@ public:
 
     static Settings settings;
 
+    void adbForward();
 public slots:
     void loadFile();
     void saveFile();
