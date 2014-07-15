@@ -27,11 +27,17 @@ OF SUCH DAMAGE.
 
 #include "mainwindow.h"
 #include <QApplication>
+#include <QDebug>
+#include <QFileInfo>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    QFileInfo fileInfo(argv[0]);
+    w.setAppNameAndDirectory(fileInfo.baseName(), fileInfo.absoluteDir());
+
     if (argc>1) {
         QString hostName(argv[1]);
         w.setHostName(hostName);

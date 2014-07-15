@@ -30,6 +30,7 @@ OF SUCH DAMAGE.
 
 #include <QMainWindow>
 #include <QSettings>
+#include <QDir>
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
@@ -49,6 +50,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void setAppNameAndDirectory(QString appName, QDir directory);
     void setHostName(QString hostName);
     void setPortNumber(QString portNumber);
 

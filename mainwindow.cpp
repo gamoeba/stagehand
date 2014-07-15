@@ -43,6 +43,7 @@ OF SUCH DAMAGE.
 #include <QSettings>
 #include <QProcess>
 #include <QDir>
+#include <QMessageBox>
 
 Settings MainWindow::settings;
 
@@ -52,7 +53,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    settings.loadSettings();
 
     mGLWidget = new GLWidget();
 
@@ -87,6 +87,14 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::setAppNameAndDirectory(QString appName, QDir directory)
+{
+    setWindowTitle(appName);
+    QString settingsFile = directory.filePath(appName+".ini");
+    settings.loadSettings(settingsFile);
+
 }
 
 void MainWindow::setHostName(QString hostName)
@@ -140,14 +148,24 @@ void MainWindow::updateScene()
 {
     SocketClient client;
     QString json = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
-    mDoc = QJsonDocument::fromJson(json.toUtf8());
 
-    QProcess process;
-    QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
+    if (json.length() > 0 ) {
+        mDoc = QJsonDocument::fromJson(json.toUtf8());
 
-    process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
+        QProcess process;
+        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
 
-    inputFiles(QString(""), screenShotFile);
+        process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
+
+        inputFiles(QString(""), screenShotFile);
+    } else {
+        QMessageBox msgBox;
+        msgBox.setText("Error");
+        msgBox.setInformativeText("Connection to device failed");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+    }
 }
 
 void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {

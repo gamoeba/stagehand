@@ -35,10 +35,8 @@ class Settings
 {
 public:
     Settings();
-    void loadSettings();
+    void loadSettings(QString fileName);
     QString updateSetting(QSettings &settings, QString settingName, QString defaultValue);
-
-    QString m_sSettingsFile;
 
     QString mNodeName;
     QString mNodeID;

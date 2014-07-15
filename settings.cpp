@@ -45,12 +45,11 @@ const QString KCmdSetProperties("SetProperties");
 
 Settings::Settings()
 {
-    m_sSettingsFile = "stagehand.ini";
 }
 
-void Settings::loadSettings()
+void Settings::loadSettings(QString fileName)
 {
-    QSettings settings(m_sSettingsFile, QSettings::IniFormat);
+    QSettings settings(fileName, QSettings::IniFormat);
     mNodeName = updateSetting(settings, KNodeName, "Name");
     mNodeID = updateSetting(settings, KNodeId, "id");
     mNodeVisible = updateSetting(settings, KNodeVisible, "visible");
