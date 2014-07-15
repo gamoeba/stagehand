@@ -40,6 +40,8 @@ const QString KNodeWorldMatrixName("NodeWorldMatrixName");
 const QString KNodeSizeName("NodeSizeName");
 const QString KHostName("HostName");
 const QString KPortNumber("PortNumber");
+const QString KCmdGetScene("GetScene");
+const QString KCmdSetProperties("SetProperties");
 
 Settings::Settings()
 {
@@ -62,6 +64,8 @@ void Settings::loadSettings()
     mPropNodeSizeName = updateSetting(settings, KNodeSizeName, "size");
     mHostName = updateSetting(settings, KHostName, "127.0.0.1");
     mPortNumber = updateSetting(settings, KPortNumber, "5001");
+    mCmdGetScene = updateSetting(settings, KCmdGetScene, "get_scene");
+    mCmdSetProperties = updateSetting(settings, KCmdSetProperties, "set_properties");
     settings.sync();
 }
 

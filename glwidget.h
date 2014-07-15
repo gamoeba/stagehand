@@ -53,6 +53,7 @@ public:
     void setViewMatrix(QMatrix4x4 viewMatrix);
     void addObject(int id, SceneObject so, bool = false);
 
+    void clear();
     void zoomIn();
     void zoomOut();
 

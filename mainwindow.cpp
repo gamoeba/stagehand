@@ -113,7 +113,6 @@ void MainWindow::loadFile() {
                                                      QFileDialog::DontUseNativeDialog);
 
     QProcess process;
-    qDebug() << QDir::tempPath();
     process.execute("unzip", QStringList() << "-o" << "-d" << QDir::tempPath() << fileName);
     process.waitForFinished();
 
@@ -140,7 +139,7 @@ void MainWindow::zoomOut()
 void MainWindow::updateScene()
 {
     SocketClient client;
-    QString json = client.sendCommand(settings.mHostName, settings.mPortNumber.toUInt(), "dump_scene\n");
+    QString json = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
     mDoc = QJsonDocument::fromJson(json.toUtf8());
 
     QProcess process;
@@ -185,9 +184,10 @@ void MainWindow::showScreenShot(bool show)
 }
 
 void MainWindow::addObjects() {
+    mGLWidget->clear();
     QJsonObject obj = mDoc.object();
     addNodeObject(obj);
-    QJsonValue children = obj.value(QString("children"));
+    QJsonValue children = obj.value(settings.mNodeChildrenName);
     if (children.isArray()) {
         QJsonArray array = children.toArray();
         addObjects2(array);
@@ -291,16 +291,33 @@ void MainWindow::tableItemChanged(QStandardItem * item)
     QString nameStr =  mTableModel->model()->itemFromIndex(ind.sibling(ind.row(),0))->data(Qt::DisplayRole).toString();
     QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
     int idval = mTableModel->getObjectId();
-    qDebug() << idval;
-    QStandardItem* id = new QStandardItem(QString::number(idval));
-    QStandardItem* name = new QStandardItem(nameStr);
-    QStandardItem* value = new QStandardItem(valueStr);
-    QList<QStandardItem*> items;
-    items.append(id);
-    items.append(name);
-    items.append(value);
-    model->appendRow(items);
+    int rows = model->rowCount();
+    bool found = false;
+    for (int i=0;i<rows &&!found;i++) {
+
+        int currid = model->data(model->index(i,0), Qt::DisplayRole).toInt();
+        QString currname = model->data(model->index(i,1), Qt::DisplayRole).toString();
+        if (currid==idval && currname == nameStr) {
+            found = true;
+            //model->setData(model->index(i,2), QVariant(valueStr),Qt::DisplayRole);
+            // SetItem force repaint but for some reason setData doesn't?
+            QStandardItem* value = new QStandardItem(valueStr);
+            model->setItem(i,2, value);
+        }
+    }
+    if (!found) {
+        QStandardItem* id = new QStandardItem(QString::number(idval));
+        QStandardItem* name = new QStandardItem(nameStr);
+        QStandardItem* value = new QStandardItem(valueStr);
+        QList<QStandardItem*> items;
+        items.append(id);
+        items.append(name);
+        items.append(value);
+        model->appendRow(items);
+    }
     ui->updatePanel->setHidden(false);
+    ui->tableViewUpdate->resizeColumnsToContents();
+    ui->tableViewUpdate->resizeRowsToContents();
 }
 
 void MainWindow::on_clearButton_clicked()
@@ -308,4 +325,25 @@ void MainWindow::on_clearButton_clicked()
     QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
     model->clear();
     ui->updatePanel->setHidden(true);
+}
+
+void MainWindow::on_sendButton_clicked()
+{
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
+    int rows = model->rowCount();
+    QString command = " |";
+    for (int i=0;i<rows;i++) {
+        int currid = model->data(model->index(i,0), Qt::DisplayRole).toInt();
+        QString currname = model->data(model->index(i,1), Qt::DisplayRole).toString();
+        QString currvalue = model->data(model->index(i,2), Qt::DisplayRole).toString();
+        command += QString::number(currid) + ";" + currname + ";" + currvalue;
+        if (i!= rows -1) {
+            command += "|";
+        }
+    }
+    SocketClient client;
+    client.sendCommand(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdSetProperties + command);
+
+    // after sending, clear the data
+    on_clearButton_clicked();
 }

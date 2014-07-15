@@ -40,8 +40,9 @@ class SocketClient : public QObject
 Q_OBJECT
 public:
     SocketClient(QObject* parent = 0);
-    QString sendCommand(QString &address, quint16 port, QString command);
+    QString sendCommandSizedReturn(QString &address, quint16 port, QString command);
     ~SocketClient();
+    void sendCommand(QString &address, quint16 port, QString command);
 public slots:
     void startTransfer();
 private:

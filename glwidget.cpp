@@ -60,13 +60,11 @@ GLWidget::~GLWidget()
 void GLWidget::setProjectionMatrix(QMatrix4x4 projMatrix)
 {
     mProjectionMatrix = projMatrix;
-    qDebug() << mProjectionMatrix;
 }
 
 void GLWidget::setViewMatrix(QMatrix4x4 viewMatrix)
 {
     mViewMatrix = viewMatrix;
-    qDebug() << mViewMatrix;
 }
 
 void GLWidget::setAspectRatio(double aspectRatio) {
@@ -76,6 +74,11 @@ void GLWidget::setAspectRatio(double aspectRatio) {
 void GLWidget::addObject(int id, SceneObject so, bool /*selected*/)
 {
     mObjects[id] = so;
+}
+
+void GLWidget::clear()
+{
+    mObjects.clear();
 }
 
 void GLWidget::zoomIn()

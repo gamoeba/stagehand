@@ -55,6 +55,8 @@ public:
     QString mPropNodeSizeName;
     QString mHostName;
     QString mPortNumber;
+    QString mCmdGetScene;
+    QString mCmdSetProperties;
 };
 
 #endif // SETTINGS_H

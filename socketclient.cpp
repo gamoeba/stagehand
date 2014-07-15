@@ -37,7 +37,7 @@ SocketClient::~SocketClient()
   client.close();
 }
 
-QString SocketClient::sendCommand(QString& address, quint16 port, QString command)
+QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QString command)
 {
     QString resp;
     QHostAddress addr(address);
@@ -66,6 +66,19 @@ QString SocketClient::sendCommand(QString& address, quint16 port, QString comman
     }
     return resp;
 
+}
+
+void SocketClient::sendCommand(QString& address, quint16 port, QString command)
+{
+    QString resp;
+    QHostAddress addr(address);
+    client.connectToHost(addr, port);
+    bool conn = client.waitForConnected();
+    mCommand = command;
+    if (conn) {
+        client.write(command.toUtf8().data(), command.length());
+        client.flush();
+    }
 }
 
 void SocketClient::startTransfer()

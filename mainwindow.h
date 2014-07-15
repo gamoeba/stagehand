@@ -76,6 +76,8 @@ private slots:
 
     void on_clearButton_clicked();
 
+    void on_sendButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     TreeModel* mTreeModel;
