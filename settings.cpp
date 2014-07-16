@@ -43,6 +43,7 @@ const QString KPortNumber("PortNumber");
 const QString KAdbDestPortNumber("AdbDestPortNumber");
 const QString KCmdGetScene("GetScene");
 const QString KCmdSetProperties("SetProperties");
+const QString KFontPointSize("FontPointSize");
 
 Settings::Settings()
 {
@@ -67,6 +68,7 @@ void Settings::loadSettings(QString fileName)
     mAdbForwardPort = updateSetting(settings, KAdbDestPortNumber, "");
     mCmdGetScene = updateSetting(settings, KCmdGetScene, "get_scene");
     mCmdSetProperties = updateSetting(settings, KCmdSetProperties, "set_properties");
+    mFontPointSize = updateSetting(settings, KFontPointSize, "10");
     settings.sync();
 }
 

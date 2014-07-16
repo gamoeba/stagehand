@@ -27,6 +27,7 @@ OF SUCH DAMAGE.
 
 #include "delegate.h"
 #include "dataobject.h"
+#include "mainwindow.h"
 
 #include <QTableWidget>
 #include <QHeaderView>
@@ -102,8 +103,9 @@ QSize TableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIn
     QString str = index.data(Qt::DisplayRole).toString();
     QTableWidget* tw = getTableWidget(str);
     if (tw) {
+        int w = tw->columnCount() * tw->columnWidth(0);
         int h = tw->rowCount() * tw->rowHeight(0);
-        return QSize(option.rect.width(),h);
+        return QSize(w,h);
     } else {
         return QStyledItemDelegate::sizeHint(option, index);
     }
@@ -141,6 +143,15 @@ QTableWidget* TableDelegate::getTableWidget(QString str) const{
                 }
             }
         }
+        QFont font;
+        int pointSize = MainWindow::settings.mFontPointSize.toInt();
+        font.setPointSize(pointSize);
+        tw->setFont(font);
+        tw->setStyleSheet("QTableWidget {background-color: transparent;}"
+                                        "QHeaderView::section {background-color: transparent;}"
+                                        "QHeaderView {background-color: transparent;}"
+                                        "QTableCornerButton::section {background-color: transparent;}");
+
         tw->resizeRowsToContents();
         tw->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
         tw->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);

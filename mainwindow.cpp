@@ -44,6 +44,7 @@ OF SUCH DAMAGE.
 #include <QProcess>
 #include <QDir>
 #include <QMessageBox>
+#include <QDesktopWidget>
 
 Settings MainWindow::settings;
 
@@ -52,8 +53,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    QDesktopWidget desktop;
+    QRect screenSize = desktop.availableGeometry(this);
+    QSize sz(screenSize.width() * 0.8f, screenSize.height() * 0.8f);
+
     ui->setupUi(this);
 
+    resize(sz);
     mGLWidget = new GLWidget();
 
     mGLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -62,13 +68,15 @@ MainWindow::MainWindow(QWidget *parent) :
     mTreeModel = new TreeModel;
     mTableModel = new TableModel(ui->tableView);
 
-    ui->treeView->setHeaderHidden(true);
-    ui->treeView->setAlternatingRowColors(true);
+    ui->treeView->setAlternatingRowColors(false);
     ui->updatePanel->setHidden(true);
     ui->tableView->setAlternatingRowColors(true);
     ui->tableView->horizontalHeader()->setVisible(false);
     ui->tableView->verticalHeader()->setVisible(false);
-    ui->treeView->setAutoScroll(true);
+    ui->treeView->header()->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeView->header()->setStretchLastSection(false);
+    ui->treeView->setHeaderHidden(true);
 
     ui->tableViewUpdate->setModel(new QStandardItemModel());
     ui->tableViewUpdate->setAlternatingRowColors(true);
@@ -94,6 +102,13 @@ void MainWindow::setAppNameAndDirectory(QString appName, QDir directory)
     setWindowTitle(appName);
     QString settingsFile = directory.filePath(appName+".ini");
     settings.loadSettings(settingsFile);
+
+    QFont font;
+    int pointSize = settings.mFontPointSize.toInt();
+    font.setPointSize(pointSize);
+    ui->tableView->setFont(font);
+    ui->tableViewUpdate->setFont(font);
+    ui->treeView->setFont(font);
 
 }
 

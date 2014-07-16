@@ -56,6 +56,7 @@ public:
     QString mCmdGetScene;
     QString mCmdSetProperties;
     QString mAdbForwardPort;
+    QString mFontPointSize;
 };
 
 #endif // SETTINGS_H
