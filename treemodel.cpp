@@ -62,15 +62,16 @@ void TreeModel::addChildren(QStandardItem* parent, QJsonArray array, bool visibl
             QJsonValue value = obj.value(settings.mNodeName);
             QJsonValue id = obj.value(settings.mNodeID);
             bool nodeVisible = obj.value(settings.mNodeVisible).toInt()==1;
-            if (visible) {
-                visible = nodeVisible;
+
+            QStandardItem* itemx = new JsonItem(obj, nodeVisible);
+            if (nodeVisible) {
+                nodeVisible = visible;
             }
-            QStandardItem* itemx = new JsonItem(obj, visible);
             mIndices[id.toInt()] = itemx;
             parent->appendRow(itemx);
             QJsonValue children = obj.value(settings.mNodeChildrenName);
             if (children.isArray()) {
-                addChildren(itemx, children.toArray(), visible);
+                addChildren(itemx, children.toArray(), nodeVisible);
             }
         }
     }
