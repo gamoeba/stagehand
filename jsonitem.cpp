@@ -26,14 +26,17 @@ OF SUCH DAMAGE.
 ****************************************************************************/
 
 #include "jsonitem.h"
+#include "mainwindow.h"
 
 #include <QIcon>
 
-JsonItem::JsonItem(QJsonObject object)
+JsonItem::JsonItem(QJsonObject object, bool overallVisible)
 {
     mObject = object;
-    QJsonValue value = mObject.value(QString("Name"));
-    QJsonValue id = mObject.value(QString("id"));
+    mOverallVisible = overallVisible;
+    QJsonValue value = mObject.value(MainWindow::settings.mNodeName);
+    QJsonValue id = mObject.value(MainWindow::settings.mNodeID);
+    QJsonValue isVisible = mObject.value(MainWindow::settings.mNodeVisible);
     mDisplayName = "("+ QString::number(id.toInt()) + ") " + value.toString() ;
 }
 
@@ -44,7 +47,22 @@ QVariant JsonItem::data(int role) const
             return QVariant(mDisplayName);
 
         case Qt::DecorationRole:
-            return QVariant(QIcon(":/stagehand/leaf_visible.png"));
+        {
+            int isVisible = mObject.value(MainWindow::settings.mNodeVisible).toInt();
+            if (isVisible==1) {
+                return QVariant(QIcon(":/stagehand/leaf_visible.png"));
+            } else {
+                return QVariant(QIcon(":/stagehand/leaf_invisible.png"));
+            }
+        }
+        case Qt::ForegroundRole:
+        {
+            if (mOverallVisible) {
+                return QVariant(QColor(Qt::black));
+            } else {
+                return QVariant(QColor(Qt::lightGray));
+            }
+        }
         case JsonRole:
             return QVariant(mObject);
         default:

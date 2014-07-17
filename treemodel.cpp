@@ -52,16 +52,17 @@ void TreeModel::setTreeData(QJsonDocument doc)
     QJsonObject obj = jsonDoc.object();
     QJsonValue value = obj.value(settings.mNodeName);
     QJsonValue id = obj.value(settings.mNodeID);
-    QStandardItem* itemx = new JsonItem(obj);
+    bool visible = obj.value(settings.mNodeVisible).toInt()==1;
+    QStandardItem* itemx = new JsonItem(obj, visible);
     mModel->appendRow(itemx);
     mIndices[id.toInt()] = itemx;
     QJsonValue children = obj.value(settings.mNodeChildrenName);
     if (children.isArray()) {
-        addChildren(itemx, children.toArray());
+        addChildren(itemx, children.toArray(), visible);
     }
 }
 
-void TreeModel::addChildren(QStandardItem* parent, QJsonArray array) {
+void TreeModel::addChildren(QStandardItem* parent, QJsonArray array, bool visible) {
     QJsonArray::iterator iter;
 
     for (iter = array.begin(); iter !=array.end();iter++) {
@@ -70,12 +71,16 @@ void TreeModel::addChildren(QStandardItem* parent, QJsonArray array) {
             QJsonObject obj = val.toObject();
             QJsonValue value = obj.value(settings.mNodeName);
             QJsonValue id = obj.value(settings.mNodeID);
-            QStandardItem* itemx = new JsonItem(obj);
+            bool nodeVisible = obj.value(settings.mNodeVisible).toInt()==1;
+            if (visible) {
+                visible = nodeVisible;
+            }
+            QStandardItem* itemx = new JsonItem(obj, visible);
             mIndices[id.toInt()] = itemx;
             parent->appendRow(itemx);
             QJsonValue children = obj.value(settings.mNodeChildrenName);
             if (children.isArray()) {
-                addChildren(itemx, children.toArray());
+                addChildren(itemx, children.toArray(), visible);
             }
         }
     }

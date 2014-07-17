@@ -44,7 +44,7 @@ public:
     void setTreeData(QJsonDocument doc);
 
     QStandardItemModel* model() {return mModel;}
-    void addChildren(QStandardItem* parent, QJsonArray array);
+    void addChildren(QStandardItem* parent, QJsonArray array, bool visible);
 
     QModelIndex getIndex(int id) {return mIndices[id]->index();}
 signals:

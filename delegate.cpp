@@ -155,6 +155,7 @@ QTableWidget* TableDelegate::getTableWidget(QString str) const{
         //tw->setLineWidth(10);
         tw->setGridStyle(Qt::DotLine);
         tw->resizeRowsToContents();
+        tw->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
 
         return tw;

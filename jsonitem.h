@@ -36,7 +36,7 @@ class JsonItem : public QStandardItem
 public:
     static const int JsonRole = Qt::UserRole +1;
 
-    explicit JsonItem(QJsonObject object);
+    explicit JsonItem(QJsonObject object, bool overallVisible);
     QVariant data(int role) const;
 
 signals:
@@ -47,6 +47,7 @@ public slots:
 private:
     QJsonObject mObject;
     QString mDisplayName;
+    bool mOverallVisible;
 };
 
 #endif // JSONITEM_H
