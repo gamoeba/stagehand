@@ -117,8 +117,6 @@ QTableWidget* TableDelegate::getTableWidget(QString str) const{
         QTableWidget* tw = new QTableWidget();
         tw->horizontalHeader()->setHidden(true);
         tw->verticalHeader()->setHidden(true);
-        tw->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-        tw->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
         if (dobj.isVector()) {
             std::vector<double> arr = dobj.getVector();
             int cols = arr.size();
@@ -127,6 +125,7 @@ QTableWidget* TableDelegate::getTableWidget(QString str) const{
             for (int i=0;i<cols;i++) {
                 QTableWidgetItem* item = new QTableWidgetItem();
                 item->setText(QString::number(arr[i]));
+                item->setTextAlignment(Qt::AlignRight);
                 tw->setItem(0,i,item);
             }
         } else if (dobj.is4x4Matrix()) {
@@ -139,6 +138,7 @@ QTableWidget* TableDelegate::getTableWidget(QString str) const{
                 for (int j=0;j<cols;j++) {
                     QTableWidgetItem* item = new QTableWidgetItem();
                     item->setText(QString::number(matrix(i,j)));
+                    item->setTextAlignment(Qt::AlignRight);
                     tw->setItem(j,i,item);
                 }
             }
@@ -147,14 +147,15 @@ QTableWidget* TableDelegate::getTableWidget(QString str) const{
         int pointSize = MainWindow::settings.mFontPointSize.toInt();
         font.setPointSize(pointSize);
         tw->setFont(font);
-        tw->setStyleSheet("QTableWidget {background-color: transparent;}"
-                                        "QHeaderView::section {background-color: transparent;}"
-                                        "QHeaderView {background-color: transparent;}"
-                                        "QTableCornerButton::section {background-color: transparent;}");
-
-        tw->resizeRowsToContents();
-        tw->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+        tw->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         tw->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
+        tw->setFrameShape(QFrame::StyledPanel);
+        tw->setFrameShadow(QFrame::Sunken);
+        //tw->setLineWidth(10);
+        tw->setGridStyle(Qt::DotLine);
+        tw->resizeRowsToContents();
+
 
         return tw;
     }
@@ -167,8 +168,15 @@ void TableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     QString str = index.data(Qt::DisplayRole).toString();
     QTableWidget* tw = getTableWidget(str);
     if (tw) {
-        tw->resizeRowsToContents();
-        tw->resizeColumnsToContents();
+
+        tw->setStyleSheet("QTableWidget {background-color: transparent;}"
+                                        "QHeaderView::section {background-color: transparent;}"
+                                        "QHeaderView {background-color: transparent;}"
+                                        "QTableCornerButton::section {background-color: transparent;}");
+
+        tw->resize(option.rect.size());
+
+
         painter->save();
         painter->translate(option.rect.topLeft());
         tw->render(painter);
