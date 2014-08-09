@@ -16,5 +16,8 @@
         <file>Refresh.png</file>
         <file>Save.png</file>
         <file>Open.png</file>
+        <file>splash.png</file>
+        <file>icon.png</file>
+        <file>stagehand.icns</file>
     </qresource>
 </RCC>

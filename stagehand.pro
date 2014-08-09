@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = stagehand
 TEMPLATE = app
 
+ICON = stagehand.icns
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -50,3 +51,5 @@ OTHER_FILES += \
 
 RESOURCES += \
     stagehand.qrc
+
+

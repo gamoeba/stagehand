@@ -84,11 +84,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
+
+    QPixmap pixmap(":/stagehand/splash.png");
+    mSplash = new QSplashScreen(pixmap);
+
+}
+
+void MainWindow::showSplashScreen()
+{
+    mSplash->show();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete mSplash;
+    delete mGLWidget;
+    delete mTreeModel;
+    delete mTableModel;
 }
 
 void MainWindow::setAppNameAndDirectory(QString appName, QDir directory)
@@ -121,21 +134,30 @@ QString appendPath(const QString& path1, const QString& path2)
     return QDir::cleanPath(path1 + QDir::separator() + path2);
 }
 
+void MainWindow::dismissSplashScreen() {
+    if (mSplash) {
+        mSplash->finish(this);
+        delete mSplash;
+        mSplash = NULL;
+    }
+}
+
 void MainWindow::loadFile() {
-
-
+    dismissSplashScreen();
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                      "",
                                                      tr("Files (*.zip)"),NULL,
                                                      QFileDialog::DontUseNativeDialog);
 
     QProcess process;
-    process.execute("unzip", QStringList() << "-o" << "-d" << QDir::tempPath() << fileName);
-    process.waitForFinished();
+    if (!fileName.isEmpty()) {
+        process.execute("unzip", QStringList() << "-o" << "-d" << QDir::tempPath() << fileName);
+        process.waitForFinished();
 
-    QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
-    QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
-    inputFiles(jsonFile, screenShotFile);
+        QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
+        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
+        inputFiles(jsonFile, screenShotFile);
+    }
 }
 
 void MainWindow::saveFile()
@@ -155,6 +177,7 @@ void MainWindow::zoomOut()
 
 void MainWindow::updateScene()
 {
+    dismissSplashScreen();
     adbForward();
     SocketClient client;
     QString json = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
@@ -190,13 +213,13 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
         mGLWidget->setScreenShot(img);
     }
 
-    mTreeModel->setTreeData(mDoc);
-    ui->treeView->setModel(mTreeModel->model());
-
-    addObjects();
-
-
-    mGLWidget->repaint();
+    if (! (mDoc.isNull() || mDoc.isEmpty()) )
+    {
+        mTreeModel->setTreeData(mDoc);
+        ui->treeView->setModel(mTreeModel->model());
+        addObjects();
+        mGLWidget->repaint();
+    }
 }
 
 void MainWindow::selectedId(int id)

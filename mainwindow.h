@@ -22,6 +22,7 @@
 #include <QSettings>
 #include <QDir>
 #include <QLabel>
+#include <QSplashScreen>
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
@@ -51,6 +52,8 @@ public:
 
     void adbForward();
     void nextSelection();
+    void dismissSplashScreen();
+    void showSplashScreen();
 public slots:
     void loadFile();
     void saveFile();
@@ -92,6 +95,7 @@ private:
 
     QJsonDocument mDoc;
     QLabel* mSBLabel;
+    QSplashScreen* mSplash;
 
     void addObjects();
     void addObjects2(QJsonArray array);
