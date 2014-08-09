@@ -38,8 +38,10 @@ GLWidget::GLWidget(QWidget *parent)
     mDragY = 0;
     mSelectionIndex=0;
     mShowScreenShot = false;
+    mDragging = false;
 
     connect(&mAnimationTimer,SIGNAL(timeout()),SLOT(animate()));
+    setMouseTracking(true);
 
 }
 
@@ -324,14 +326,50 @@ void GLWidget::paintGL()
 
 void GLWidget::mouseMoveEvent(QMouseEvent* event) {
     QPoint currpoint = event->pos();
-    currpoint -= mStartPoint;
-    mDragX = currpoint.x();
-    mDragY = currpoint.y();
-    update();
+    if (mDragging) {
+        currpoint -= mStartPoint;
+        mDragX = currpoint.x();
+        mDragY = currpoint.y();
+        update();
+    } else {
+        // assume that the first node has the screen size
+
+       if (mObjects.size()>0) {
+           float x = (float)event->pos().x()/(float)width()*2.0f -1.0f;
+           float y = (float)event->pos().y()/(float)height()*-2.0f + 1.0f;
+           SceneObject so = mObjects[1];
+
+           QMatrix4x4 objectMatrix = so.mWorldMatrix;
+
+           QVector3D size = so.mSize;
+           objectMatrix.scale(size);
+           objectMatrix = mModelView * objectMatrix;
+           objectMatrix.scale(1.0f, 1.0f, 0.05f);
+           QVector3D tl(-0.5, 0.5,0.0);
+           QVector3D br(0.5, -0.5,0.0);
+           tl = objectMatrix*tl;
+           br = objectMatrix*br;
+           if (x >= tl.x() && y >= tl.y() &&
+                   x <= br.x() && y <= br.y()) {
+               x-= tl.x();
+               y-= tl.y();
+               x /= br.x() - tl.x();
+               y /= br.y() - tl.y();
+               y = 1 - y; //flip axis
+               mousePosition((int)(x*size.x()), (int)(y*size.y()));
+           } else {
+               mousePosition(-1, -1);
+           }
+
+        }
+
+
+    }
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *eventPress){
     mStartPoint = eventPress->pos();
+    mDragging = true;
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *releaseEvent){
@@ -345,6 +383,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *releaseEvent){
         float y = (float)pos.y()/(float)height()*-2.0f + 1.0f;
         select(x,y);
     }
+    mDragging = false;
     update();
 }
 

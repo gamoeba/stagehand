@@ -37,6 +37,7 @@ public:
     void addChildren(QStandardItem* parent, QJsonArray array, bool visible);
 
     QModelIndex getIndex(int id) {return mIndices[id]->index();}
+    QModelIndexList search(const QString& strSearch);
 signals:
 
 public slots:

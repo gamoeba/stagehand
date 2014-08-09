@@ -57,6 +57,7 @@ public slots:
 
 signals:
     void selectedId(int id);
+    void mousePosition(int x, int y);
 
 protected:
     void paintGL ();
@@ -99,6 +100,7 @@ private:
     int ythresholdUniform;
 
     QPoint mStartPoint;
+    bool mDragging;
     QImage mScreenShot;
     int mTranslateX;
     int mTranslateY;

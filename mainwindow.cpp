@@ -80,6 +80,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
+    QObject::connect(mGLWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
+
+    mSBLabel = new QLabel();
+    ui->statusBar->addWidget(mSBLabel);
 }
 
 MainWindow::~MainWindow()
@@ -200,6 +204,18 @@ void MainWindow::selectedId(int id)
    QModelIndex index = mTreeModel->getIndex(id);
    ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect) ;
    updateTableView(index);
+}
+
+void MainWindow::mousePositionChanged(int x, int y)
+{
+    QString lb = "Cursor Pos: ";
+    if (x == -1 && y == -1) {
+        lb += "Offscreen";
+    } else {
+        lb += "( %1 , %2 )";
+        lb = lb.arg(QString::number(x),QString::number(y));
+    }
+    mSBLabel->setText(lb);
 }
 
 void MainWindow::showScreenShot(bool show)
@@ -379,4 +395,41 @@ void MainWindow::adbForward() {
         process.execute("adb", QStringList() << "forward" << "tcp:"+settings.mPortNumber << "tcp:"+settings.mAdbForwardPort);
         process.waitForFinished();
     }
+}
+
+void MainWindow::nextSelection() {
+    if (mCurrentTreeSearchResults.size()>0) {
+        const QModelIndex& index = mCurrentTreeSearchResults[mCurrentTreeSearchIndex];
+        ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
+        updateTableView(index);
+        updateGLView(index);
+
+        mCurrentTreeSearchIndex++;
+        mCurrentTreeSearchIndex %= mCurrentTreeSearchResults.size();
+    }
+
+}
+
+void MainWindow::on_treeSearch_textEdited(const QString &strSearch)
+{
+    if (strSearch.size()>0) {
+        if (mCurrentTreeSearch != strSearch) {
+            mCurrentTreeSearchResults = mTreeModel->search(strSearch);
+            mCurrentTreeSearchIndex = 0;
+        }
+        nextSelection();
+    }
+}
+
+void MainWindow::on_treeSearch_editingFinished()
+{
+    //qDebug() << "edit finished";
+    //ui->treeView->selectionModel()->select(;
+
+}
+
+void MainWindow::on_treeSearch_returnPressed()
+{
+    qDebug() << "return Pressed";
+    nextSelection();
 }

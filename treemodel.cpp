@@ -77,3 +77,14 @@ void TreeModel::addChildren(QStandardItem* parent, QJsonArray array, bool visibl
     }
 }
 
+QModelIndexList TreeModel::search(const QString &strSearch) {
+    QModelIndexList items = mModel->match(
+                mModel->index(0, 0),
+                Qt::DisplayRole,
+                QVariant::fromValue(strSearch),
+                -1, // no maximum hit count
+                Qt::MatchRecursive|Qt::MatchContains);
+    qDebug() << strSearch << " matches: " << items.size();
+    return items;
+}
+

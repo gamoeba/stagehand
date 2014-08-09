@@ -21,6 +21,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QDir>
+#include <QLabel>
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
@@ -49,6 +50,7 @@ public:
     static Settings settings;
 
     void adbForward();
+    void nextSelection();
 public slots:
     void loadFile();
     void saveFile();
@@ -56,6 +58,7 @@ public slots:
     void zoomOut();
     void updateScene();
     void selectedId(int id);
+    void mousePositionChanged(int x, int y);
     void showScreenShot(bool show);
     void tableItemChanged(QStandardItem*);
 
@@ -71,13 +74,24 @@ private slots:
 
     void on_sendButton_clicked();
 
+    void on_treeSearch_textEdited(const QString &strSearch);
+
+    void on_treeSearch_editingFinished();
+
+    void on_treeSearch_returnPressed();
+
 private:
     Ui::MainWindow *ui;
     TreeModel* mTreeModel;
     TableModel* mTableModel;
     GLWidget* mGLWidget;
 
+    QString mCurrentTreeSearch;
+    QModelIndexList mCurrentTreeSearchResults;
+    int mCurrentTreeSearchIndex;
+
     QJsonDocument mDoc;
+    QLabel* mSBLabel;
 
     void addObjects();
     void addObjects2(QJsonArray array);

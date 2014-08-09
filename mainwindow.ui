@@ -56,6 +56,9 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLineEdit" name="treeSearch"/>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="gridWidget" native="true">
