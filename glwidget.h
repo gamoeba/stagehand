@@ -102,6 +102,7 @@ private:
     QPoint mStartPoint;
     bool mDragging;
     QImage mScreenShot;
+    QPixmap mLogo;
     int mTranslateX;
     int mTranslateY;
     int mDragX;
@@ -113,5 +114,6 @@ private:
     float mStartScale;
     float mEndScale;
     qint64 mAnimationLengthms;
+    void drawLogo();
 };
 #endif

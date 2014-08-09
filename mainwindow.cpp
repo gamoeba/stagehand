@@ -84,21 +84,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
-
-    QPixmap pixmap(":/stagehand/splash.png");
-    mSplash = new QSplashScreen(pixmap);
-
-}
-
-void MainWindow::showSplashScreen()
-{
-    mSplash->show();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete mSplash;
     delete mGLWidget;
     delete mTreeModel;
     delete mTableModel;
@@ -134,16 +124,7 @@ QString appendPath(const QString& path1, const QString& path2)
     return QDir::cleanPath(path1 + QDir::separator() + path2);
 }
 
-void MainWindow::dismissSplashScreen() {
-    if (mSplash) {
-        mSplash->finish(this);
-        delete mSplash;
-        mSplash = NULL;
-    }
-}
-
 void MainWindow::loadFile() {
-    dismissSplashScreen();
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                      "",
                                                      tr("Files (*.zip)"),NULL,
@@ -177,7 +158,6 @@ void MainWindow::zoomOut()
 
 void MainWindow::updateScene()
 {
-    dismissSplashScreen();
     adbForward();
     SocketClient client;
     QString json = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");

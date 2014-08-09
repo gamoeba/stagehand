@@ -52,8 +52,6 @@ public:
 
     void adbForward();
     void nextSelection();
-    void dismissSplashScreen();
-    void showSplashScreen();
 public slots:
     void loadFile();
     void saveFile();
@@ -95,7 +93,6 @@ private:
 
     QJsonDocument mDoc;
     QLabel* mSBLabel;
-    QSplashScreen* mSplash;
 
     void addObjects();
     void addObjects2(QJsonArray array);

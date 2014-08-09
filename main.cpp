@@ -37,8 +37,6 @@ int main(int argc, char *argv[])
         QString port(argv[2]);
         w.setPortNumber(port);
     }
-//    a.setWindowIcon(QPixmap(":/stagehand/icon.png"));
     w.show();
-    w.showSplashScreen();
     return a.exec();
 }

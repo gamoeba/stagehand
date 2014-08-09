@@ -43,6 +43,8 @@ GLWidget::GLWidget(QWidget *parent)
     connect(&mAnimationTimer,SIGNAL(timeout()),SLOT(animate()));
     setMouseTracking(true);
 
+    mLogo = QPixmap(":/stagehand/splash.png");
+
 }
 
 GLWidget::~GLWidget()
@@ -258,7 +260,6 @@ void GLWidget::paintGL()
     painter.begin(this);
 
     painter.beginNativePainting();
-    m_uiTexture = bindTexture(mScreenShot);
     glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -268,52 +269,61 @@ void GLWidget::paintGL()
 
     glFrontFace(GL_CW);
     glCullFace(GL_FRONT);
-    glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-    mModelView = mProjectionMatrix * mViewMatrix;
-    mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
-    mModelView.scale(mAspectRatio, 1.0, 1.0);
-    mModelView.scale(m_fScale,m_fScale,1.0);
-    program.bind();
 
-    int selectionId = 0;
-    if (mSelectionIndex < mSelectedIds.size()) {
-        selectionId = mSelectedIds[mSelectionIndex];
+
+    if (mObjects.size()>0) {
+
+        m_uiTexture = bindTexture(mScreenShot);
+        program.bind();
+        mModelView = mProjectionMatrix * mViewMatrix;
+        mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
+        mModelView.scale(mAspectRatio, 1.0, 1.0);
+        mModelView.scale(m_fScale,m_fScale,1.0);
+
+        int selectionId = 0;
+        if (mSelectionIndex < mSelectedIds.size()) {
+            selectionId = mSelectedIds[mSelectionIndex];
+        }
+
+        std::map<int, SceneObject>::iterator iter;
+        for (iter = mObjects.begin();iter != mObjects.end();iter++) {
+            SceneObject so = (*iter).second;
+            QMatrix4x4 objectMatrix = so.mWorldMatrix;
+
+            QVector3D size = so.mSize;
+            objectMatrix.scale(size);
+            objectMatrix = mModelView * objectMatrix;
+            objectMatrix.scale(1.0f, 1.0f, 0.05f);
+
+            QVector3D tl(-0.5, 0.5,0.0);
+            QVector3D br(0.5, -0.5,0.0);
+            tl = objectMatrix*tl;
+            br = objectMatrix*br;
+            float xpixels = (float)width() * (br.x()-tl.x())/2.0;
+            float xthreshold = 1.0/xpixels;
+            float ypixels = (float)height() * (br.y()-tl.y())/2.0;
+            float ythreshold = 1.0/ypixels;
+
+            program.setUniformValue(drawTextureUniform, mShowScreenShot && (*iter).first == 1);
+            program.setUniformValue(matrixUniform, objectMatrix);
+            program.setUniformValue(selectedUniform, (*iter).first == selectionId);
+            program.setUniformValue(screenShotUniform, mShowScreenShot);
+            program.setUniformValue(xthresholdUniform, xthreshold);
+            program.setUniformValue(ythresholdUniform, ythreshold);
+
+            drawRect();
+
+        }
+        program.release();
+    } else {
+        drawLogo();
     }
 
-    std::map<int, SceneObject>::iterator iter;
-    for (iter = mObjects.begin();iter != mObjects.end();iter++) {
-        SceneObject so = (*iter).second;
-        QMatrix4x4 objectMatrix = so.mWorldMatrix;
-
-        QVector3D size = so.mSize;
-        objectMatrix.scale(size);
-        objectMatrix = mModelView * objectMatrix;
-        objectMatrix.scale(1.0f, 1.0f, 0.05f);
-
-        QVector3D tl(-0.5, 0.5,0.0);
-        QVector3D br(0.5, -0.5,0.0);
-        tl = objectMatrix*tl;
-        br = objectMatrix*br;
-        float xpixels = (float)width() * (br.x()-tl.x())/2.0;
-        float xthreshold = 1.0/xpixels;
-        float ypixels = (float)height() * (br.y()-tl.y())/2.0;
-        float ythreshold = 1.0/ypixels;
-
-        program.setUniformValue(drawTextureUniform, mShowScreenShot && (*iter).first == 1);
-        program.setUniformValue(matrixUniform, objectMatrix);
-        program.setUniformValue(selectedUniform, (*iter).first == selectionId);
-        program.setUniformValue(screenShotUniform, mShowScreenShot);
-        program.setUniformValue(xthresholdUniform, xthreshold);
-        program.setUniformValue(ythresholdUniform, ythreshold);
-
-        drawRect();
-
-    }
-    program.release();
 
     glDisable(GL_CULL_FACE);
 
@@ -322,6 +332,23 @@ void GLWidget::paintGL()
     painter.end();
 
     swapBuffers();
+}
+
+void GLWidget::drawLogo() {
+    QMatrix4x4 objectMatrix;
+    float ratio = (float)mLogo.height()/(float)mLogo.width();
+    objectMatrix.scale(1.0f, -ratio, 1.0f);
+    m_uiTexture = bindTexture(mLogo);
+    program.bind();
+    program.setUniformValue(drawTextureUniform, true);
+    program.setUniformValue(matrixUniform, objectMatrix);
+    program.setUniformValue(selectedUniform, false);
+    program.setUniformValue(screenShotUniform, true);
+    program.setUniformValue(xthresholdUniform, 0.2f);
+    program.setUniformValue(ythresholdUniform, 0.2f);
+
+    drawRect();
+    program.release();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent* event) {
