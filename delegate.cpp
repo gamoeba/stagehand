@@ -23,8 +23,8 @@
 #include <QHeaderView>
 #include <QPainter>
 
-TableDelegate::TableDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
+TableDelegate::TableDelegate(int editableCol, QObject *parent)
+    : QStyledItemDelegate(parent), mEditableCol(editableCol)
 {
 }
 
@@ -33,10 +33,14 @@ QWidget *TableDelegate::createEditor(QWidget *parent,
     const QModelIndex & index ) const
 {
     QString str = index.data(Qt::DisplayRole).toString();
-
+    if (index.column()!=mEditableCol) {
+        return NULL;
+    }
     QTableWidget* tw = getTableWidget(str);
     if (tw != NULL) {
         tw->setParent(parent);
+        tw->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        tw->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         return tw;
     } else {
         return QStyledItemDelegate::createEditor(parent, option, index);
@@ -93,8 +97,14 @@ QSize TableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIn
     QString str = index.data(Qt::DisplayRole).toString();
     QTableWidget* tw = getTableWidget(str);
     if (tw) {
-        int w = tw->columnCount() * tw->columnWidth(0);
-        int h = tw->rowCount() * tw->rowHeight(0);
+        int cc = tw->colorCount();
+        int w = 0;
+        for (int i=0;i<cc;i++)
+            w += tw->columnWidth(i);
+        int h = 0;
+        int rc = tw->rowCount();
+        for (int i=0;i<rc;i++)
+            h += tw->rowHeight(i);
         return QSize(w,h);
     } else {
         return QStyledItemDelegate::sizeHint(option, index);

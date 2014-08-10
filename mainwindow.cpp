@@ -73,10 +73,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableViewUpdate->horizontalHeader()->setVisible(false);
     ui->tableViewUpdate->verticalHeader()->setVisible(false);
 
-    TableDelegate* delegate = new TableDelegate();
-    ui->tableView->setItemDelegateForColumn(1, delegate);
-    TableDelegate* delegateUpdate = new TableDelegate();
-    ui->tableViewUpdate->setItemDelegateForColumn(2, delegateUpdate);
+    TableDelegate* delegate = new TableDelegate(1);
+    ui->tableView->setItemDelegate(delegate);
+    TableDelegate* delegateUpdate = new TableDelegate(2);
+    ui->tableViewUpdate->setItemDelegate(delegateUpdate);
 
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
