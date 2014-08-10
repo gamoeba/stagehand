@@ -1,0 +1,4 @@
+#!/bin/bash
+export DESKTOP_FILE=~/.local/share/applications/stagehand.desktop
+echo -e "[Desktop Entry]\nType=Application\nName=Stagehand\nIcon=stagehand.png" > $DESKTOP_FILE
+echo "Exec="`pwd`"/stagehand" >> $DESKTOP_FILE
