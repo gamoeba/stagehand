@@ -30,7 +30,6 @@ GLWidget::GLWidget(QWidget *parent)
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_NoSystemBackground);
     setAutoBufferSwap(false);
-    setMinimumSize(700, 500);
 
     mTranslateX = 0;
     mTranslateY = 0;
