@@ -74,9 +74,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableViewUpdate->verticalHeader()->setVisible(false);
 
     TableDelegate* delegate = new TableDelegate(1);
-    ui->tableView->setItemDelegate(delegate);
+    ui->tableView->setItemDelegateForColumn(1, delegate);
     TableDelegate* delegateUpdate = new TableDelegate(2);
-    ui->tableViewUpdate->setItemDelegate(delegateUpdate);
+    ui->tableViewUpdate->setItemDelegateForColumn(2 ,delegateUpdate);
 
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
@@ -350,7 +350,9 @@ void MainWindow::tableItemChanged(QStandardItem * item)
     }
     if (!found) {
         QStandardItem* id = new QStandardItem(QString::number(idval));
+        id->setFlags(id->flags() ^ Qt::ItemIsEditable);
         QStandardItem* name = new QStandardItem(nameStr);
+        name->setFlags(name->flags() ^ Qt::ItemIsEditable);
         QStandardItem* value = new QStandardItem(valueStr);
         QList<QStandardItem*> items;
         items.append(id);

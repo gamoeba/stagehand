@@ -82,6 +82,7 @@ void TableModel::addChildren( QJsonArray array) {
             QString valStr = arr.at(1).toString();
             //valStr.replace(QRegExp("\\] *, *\\["),"],\n[");
             QStandardItem* name = new QStandardItem(arr.at(0).toString());
+            name->setFlags(name->flags() ^ Qt::ItemIsEditable);
             QStandardItem* value = new QStandardItem(valStr);
             QList<QStandardItem*> items;
             items.append(name);

@@ -27,6 +27,9 @@
     </sizepolicy>
    </property>
    <layout class="QFormLayout" name="formLayout">
+    <property name="verticalSpacing">
+     <number>3</number>
+    </property>
     <item row="0" column="0" colspan="2">
      <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
@@ -43,6 +46,12 @@
       </property>
       <widget class="QWidget" name="verticalLayoutWidget_3">
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>3</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="treeSearch"/>
+        </item>
         <item>
          <widget class="QTreeView" name="treeView">
           <property name="minimumSize">
@@ -55,9 +64,6 @@
            <enum>QAbstractItemView::ScrollPerItem</enum>
           </property>
          </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="treeSearch"/>
         </item>
        </layout>
       </widget>
@@ -174,9 +180,6 @@
              <property name="horizontalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOn</enum>
              </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QAbstractScrollArea::AdjustToContents</enum>
-             </property>
              <property name="showGrid">
               <bool>true</bool>
              </property>
@@ -189,9 +192,6 @@
             </widget>
            </item>
           </layout>
-          <zorder>horizontalLayoutWidget</zorder>
-          <zorder>tableViewUpdate</zorder>
-          <zorder>tableView</zorder>
          </widget>
         </item>
         <item>
