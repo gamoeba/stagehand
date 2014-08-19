@@ -47,7 +47,9 @@ OTHER_FILES += \
     invisible.png \
     leaf_invisible.png \
     leaf_visible.png \
-    visible.png
+    visible.png \
+    shader.fsh \
+    shader.vsh
 
 RESOURCES += \
     stagehand.qrc

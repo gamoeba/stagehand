@@ -172,64 +172,10 @@ void GLWidget::initializeGL ()
     glGenTextures(1, &m_uiTexture);
 
     QGLShader *vshader = new QGLShader(QGLShader::Vertex);
-    const char *vsrc =
-        "attribute highp vec4 vertex;\n"
-        "attribute highp vec4 texCoord;\n"
-        "attribute mediump vec3 normal;\n"
-        "uniform mediump mat4 matrix;\n"
-        "varying highp vec4 texc;\n"
-        "varying mediump vec4 color;\n"
-        "varying mediump float angle;\n"
-        "varying mediump float of;\n"
-        "void main(void)\n"
-        "{\n"
-        "    vec3 toLight = normalize(vec3(0.0, 0.3, 1.0));\n"
-        "    angle = max(dot(normal, toLight), 0.0);\n"
-        "    mediump vec4 norm = (vec4(normal, 1.0));\n"
-        "    norm = matrix * norm;\n"
-        "    of = /*exp*/(dot(norm.rgb, vec3(0.0,0.0,1.0)));\n"
-        "    gl_Position = matrix * vertex;\n"
-        "    texc = texCoord;\n"
-        "}\n";
-    vshader->compileSourceCode(vsrc);
+    vshader->compileSourceFile(":/stagehand/shader.vsh");
 
     QGLShader *fshader = new QGLShader(QGLShader::Fragment);
-
-    const char *fsrc =
-        "varying highp vec4 texc;\n"
-        "int multiplicationFactor = 8;\n"
-        "uniform sampler2D tex;\n"
-        "uniform bool selected;\n"
-        "uniform bool screenshot;\n"
-        "uniform bool drawTexture;\n"
-        "uniform float xthreshold;\n"
-        "uniform float ythreshold;\n"
-        "varying mediump float angle;\n"
-        "varying mediump float of;\n"
-
-        "void main(void)\n"
-        "{\n"
-
-            // multiplicationFactor scales the number of stripes
-            "mediump vec2 t = texc.st;\n"
-            "if (drawTexture)\n"
-            "    gl_FragColor = texture2D(tex, texc.st);\n"
-            // the threshold constant defines the with of the lines
-            "else if (fract(t.s) < xthreshold  || fract(t.t) < ythreshold )\n"
-                "gl_FragColor = vec4(0.8, 1.0, 1.0, 1.0);\n"
-            "else if (fract(t.s) > (1.0 - xthreshold)  || fract(t.t) > (1.0 - ythreshold) )\n"
-                "gl_FragColor = vec4(0.8, 1.0, 1.0, 1.0);\n"
-            "else\n"
-                "if (selected){"
-                "   gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);\n"
-
-                "}else{ \n"
-                   " if (!screenshot)\n"
-                   "   gl_FragColor = vec4(0.8, 1.0, 1.0, 0.1);\n"
-                "  else\n"
-                "       discard;}\n"
-        "}\n";
-    fshader->compileSourceCode(fsrc);
+    fshader->compileSourceFile(":/stagehand/shader.fsh");
 
     program.addShader(vshader);
     program.addShader(fshader);

@@ -19,5 +19,7 @@
         <file>splash.png</file>
         <file>icon.png</file>
         <file>stagehand.icns</file>
+        <file>shader.fsh</file>
+        <file>shader.vsh</file>
     </qresource>
 </RCC>
