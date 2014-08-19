@@ -26,7 +26,7 @@ class TableDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    TableDelegate(QObject *parent = 0);
+    TableDelegate(int editable, QObject *parent = 0);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
@@ -43,6 +43,7 @@ public:
 
     QTableWidget* getTableWidget(QString str) const;
 private:
+    int mEditableCol;
 };
 
 

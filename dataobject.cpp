@@ -18,6 +18,7 @@
 #include "dataobject.h"
 
 #include <QString>
+#include <QStringList>
 #include <QRegExp>
 #include <QDebug>
 #include <vector>
