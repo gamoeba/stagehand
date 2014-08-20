@@ -309,7 +309,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event) {
        if (mObjects.size()>0) {
            float x = (float)event->pos().x()/(float)width()*2.0f -1.0f;
            float y = (float)event->pos().y()/(float)height()*-2.0f + 1.0f;
-           SceneObject so = mObjects[1];
+
+           SceneObject so = mObjects.begin()->second;
 
            QMatrix4x4 objectMatrix = so.mWorldMatrix;
 
