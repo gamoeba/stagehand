@@ -82,8 +82,6 @@ private:
     std::map<int, SceneObject> mObjects;
     std::vector<int> mSelectedIds;
     unsigned int mSelectionIndex;
-    bool qtLogo;
-    QList<Bubble*> bubbles;
     int frames;
     QTime time;
 

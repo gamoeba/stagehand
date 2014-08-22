@@ -49,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
-    resize(sz);
     mGLWidget = new GLWidget();
 
     mGLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -84,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
+    resize(sz);
 }
 
 MainWindow::~MainWindow()

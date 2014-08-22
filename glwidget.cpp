@@ -25,10 +25,7 @@
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
-    qtLogo = true;
     m_fScale = 1.0;
-    setAttribute(Qt::WA_PaintOnScreen);
-    setAttribute(Qt::WA_NoSystemBackground);
     setAutoBufferSwap(false);
 
     mTranslateX = 0;

@@ -252,6 +252,9 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <property name="floatable">
     <bool>false</bool>
    </property>
@@ -331,6 +334,9 @@
    </property>
    <property name="text">
     <string>Screenshot</string>
+   </property>
+   <property name="toolTip">
+    <string>Show/Hide Screenshot</string>
    </property>
   </action>
  </widget>
