@@ -63,6 +63,9 @@
           <property name="verticalScrollMode">
            <enum>QAbstractItemView::ScrollPerItem</enum>
           </property>
+          <property name="indentation">
+           <number>10</number>
+          </property>
          </widget>
         </item>
        </layout>

@@ -97,6 +97,7 @@ private:
     void addObjects();
     void addObjects2(QJsonArray array);
     bool addNodeObject(QJsonObject obj);
+    void resetSearch();
 };
 
 #endif // MAINWINDOW_H

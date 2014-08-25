@@ -197,8 +197,10 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
     {
         mTreeModel->setTreeData(mDoc);
         ui->treeView->setModel(mTreeModel->model());
+        ui->treeView->expandAll();
         addObjects();
         mGLWidget->repaint();
+        resetSearch();
     }
 }
 
@@ -421,8 +423,21 @@ void MainWindow::on_treeSearch_textEdited(const QString &strSearch)
         if (mCurrentTreeSearch != strSearch) {
             mCurrentTreeSearchResults = mTreeModel->search(strSearch);
             mCurrentTreeSearchIndex = 0;
+            mCurrentTreeSearch = strSearch;
         }
         nextSelection();
+    }
+}
+
+void MainWindow::resetSearch()
+{
+    if (mCurrentTreeSearch.length()>0) {
+        mCurrentTreeSearchResults = mTreeModel->search(mCurrentTreeSearch);
+        mCurrentTreeSearchIndex = 0;
+        nextSelection();
+    } else {
+        mCurrentTreeSearchResults.clear();
+        mCurrentTreeSearchIndex = 0;
     }
 }
 
