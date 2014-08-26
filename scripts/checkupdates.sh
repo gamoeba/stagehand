@@ -1,9 +1,9 @@
 #!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 UPDATE_URL="http://www.gamoeba.com/stagehand_updates"
 PLATFORM=`uname`
 AVAIL_VERSION=`wget -qO- $UPDATE_URL/version_$PLATFORM.txt`
-CURRENT_VERSION=`cat $DIR/CURRENT_VERSION`
+CURRENT_VERSION=`cat $SCRIPT_DIR/CURRENT_VERSION`
 NEWVER=`echo $AVAIL_VERSION'>'$CURRENT_VERSION | bc -l`
 
 if (( $NEWVER == 1 ));then
@@ -12,6 +12,6 @@ if (( $NEWVER == 1 ));then
 	zenity --question --text "$PROMPT" 
 	if [ $? -eq 0 ]
 	then 
-		wget $UPDATE_URL/$UPDATE_FILE -O $DIR/$UPDATE_FILE && unzip -o $DIR/$UPDATE_FILE && rm $DIR/$UPDATE_FILE
+		wget $UPDATE_URL/$UPDATE_FILE -O $SCRIPT_DIR/$UPDATE_FILE && unzip -d $SCRIPT_DIR -o $SCRIPT_DIR/$UPDATE_FILE && rm $SCRIPT_DIR/$UPDATE_FILE
 	fi
 fi
