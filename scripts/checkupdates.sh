@@ -7,7 +7,11 @@ CURRENT_VERSION=`cat $DIR/CURRENT_VERSION`
 NEWVER=`echo $AVAIL_VERSION'>'$CURRENT_VERSION | bc -l`
 
 if (( $NEWVER == 1 ));then
-	echo "update available. fetching $AVAIL_VERSION"
+	PROMPT="Update available. Download new version $AVAIL_VERSION?"
 	UPDATE_FILE=$PLATFORM"_update"$AVAIL_VERSION".zip"
-	wget $UPDATE_URL/$UPDATE_FILE -O $DIR/$UPDATE_FILE && unzip -o $DIR/$UPDATE_FILE && rm $DIR/$UPDATE_FILE
+	zenity --question --text "$PROMPT" 
+	if [ $? -eq 0 ]
+	then 
+		wget $UPDATE_URL/$UPDATE_FILE -O $DIR/$UPDATE_FILE && unzip -o $DIR/$UPDATE_FILE && rm $DIR/$UPDATE_FILE
+	fi
 fi
