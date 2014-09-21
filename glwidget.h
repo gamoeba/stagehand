@@ -29,6 +29,7 @@
 #include <map>
 
 #include "sceneobject.h"
+#include "frame.h"
 
 class Bubble;
 class GLWidget : public QGLWidget {
@@ -37,17 +38,14 @@ class GLWidget : public QGLWidget {
 public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
-    void setAspectRatio(double aspectRatio);
 public:
-    void setProjectionMatrix(QMatrix4x4 projMatrix);
-    void setViewMatrix(QMatrix4x4 viewMatrix);
+    void setFrame(Frame* frame) {mFrame = frame;}
     void addObject(int id, SceneObject so, bool = false);
 
     void clear();
     void zoomIn();
     void zoomOut();
 
-    void setScreenShot(QImage img);
 
     void showScreenShot(bool show){mShowScreenShot=show;update();}
 
@@ -71,14 +69,12 @@ private:
     float   m_fScale;
     bool m_showBubbles;
     void drawRect();
+    QMatrix4x4 mModelView;
 
     QVector<QVector3D> vertices;
     QVector<QVector3D> normals;
 
-    QMatrix4x4 mProjectionMatrix;
-    QMatrix4x4 mViewMatrix;
-    QMatrix4x4 mModelView;
-    double mAspectRatio;
+    Frame* mFrame;
     std::map<int, SceneObject> mObjects;
     std::vector<int> mSelectedIds;
     unsigned int mSelectionIndex;

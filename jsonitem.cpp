@@ -17,6 +17,7 @@
 
 #include "jsonitem.h"
 #include "mainwindow.h"
+#include "nodeobject.h"
 
 #include <QIcon>
 
@@ -26,7 +27,6 @@ JsonItem::JsonItem(QJsonObject object, bool overallVisible)
     mOverallVisible = overallVisible;
     QJsonValue value = mObject.value(MainWindow::settings.mNodeName);
     QJsonValue id = mObject.value(MainWindow::settings.mNodeID);
-    QJsonValue isVisible = mObject.value(MainWindow::settings.mNodeVisible);
     mDisplayName = "("+ QString::number(id.toInt()) + ") " + value.toString() ;
 }
 
@@ -38,7 +38,8 @@ QVariant JsonItem::data(int role) const
 
         case Qt::DecorationRole:
         {
-            int isVisible = mObject.value(MainWindow::settings.mNodeVisible).toInt();
+            NodeObject node(mObject, MainWindow::settings.mNodePropertiesName);
+            int isVisible = node.getProperty(MainWindow::settings.mNodeVisible).toInt();
             if (isVisible==1) {
                 return QVariant(QIcon(":/stagehand/leaf_visible.png"));
             } else {

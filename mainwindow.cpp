@@ -22,6 +22,7 @@
 #include "nodeobject.h"
 #include "sceneobject.h"
 #include "socketclient.h"
+#include "treemodel.h"
 
 #include <QStandardItemModel>
 #include <QFileDialog>
@@ -80,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
     QObject::connect(mGLWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
+
+    mCurrentFrameIndex = 0;
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
@@ -163,7 +166,8 @@ void MainWindow::updateScene()
     QString json = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
 
     if (json.length() > 0 ) {
-        mDoc = QJsonDocument::fromJson(json.toUtf8());
+        QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
+        Frame* frame = new Frame(doc);
 
         QProcess process;
         QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
@@ -182,25 +186,26 @@ void MainWindow::updateScene()
 }
 
 void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
+    Frame* frame = NULL;
     if (jsonFile.length()>0 && QFile::exists(jsonFile)) {
-        mDoc = readJson(jsonFile);
+        frame = new Frame(readJson(jsonFile));
+        mFrames.push_back(frame);
         QFile::remove(jsonFile);       
     }
-    if (QFile::exists(screenShotFile))
+/*    if (QFile::exists(screenShotFile))
     {
         QImage img(screenShotFile);
         QFile::remove(screenShotFile);
         mGLWidget->setScreenShot(img);
     }
-
-    if (! (mDoc.isNull() || mDoc.isEmpty()) )
+*/
+    if (frame )
     {
-        mTreeModel->setTreeData(mDoc);
-        ui->treeView->setModel(mTreeModel->model());
+        ui->treeView->setModel(frame->getTreeModel().model());
         ui->treeView->expandAll();
-        addObjects();
+        mFrames.push_back(frame);
         mGLWidget->repaint();
-        resetSearch();
+        //resetSearch();
     }
 }
 
@@ -228,62 +233,6 @@ void MainWindow::showScreenShot(bool show)
     mGLWidget->showScreenShot(show);
 }
 
-void MainWindow::addObjects() {
-    mGLWidget->clear();
-    QJsonObject obj = mDoc.object();
-    addNodeObject(obj);
-    QJsonValue children = obj.value(settings.mNodeChildrenName);
-    if (children.isArray()) {
-        QJsonArray array = children.toArray();
-        addObjects2(array);
-    }
-}
-
-bool MainWindow::addNodeObject(QJsonObject obj) {
-    QJsonValue value = obj.value(settings.mNodeName);
-    QJsonValue id = obj.value(settings.mNodeID);
-    QJsonValue isVis = obj.value(settings.mNodeVisible);
-    bool vis = isVis.toInt() == 1;
-    int idVal = (int)id.toInt();
-
-    NodeObject node(obj, settings.mNodePropertiesName);
-    if (value == settings.mCameraNodeName) {
-        DataObject pm = node.getProperty(settings.mPropProjectionMatrixName);
-        mGLWidget->setProjectionMatrix(pm.get4x4Matrix());
-        DataObject vm = node.getProperty(settings.mPropViewMatrixName);
-        mGLWidget->setViewMatrix(vm.get4x4Matrix());
-
-        double aspectRatio = node.getProperty(settings.mPropAspectRatioName).toDouble();
-        mGLWidget->setAspectRatio(aspectRatio);
-    } else {
-
-        QMatrix4x4 wm = node.getProperty(settings.mPropNodeWorldMatrixName).get4x4Matrix();
-        std::vector<double> size = node.getProperty(settings.mPropNodeSizeName).getVector();
-        QVector3D qsize(size[0], size[1], size[2]);
-        if (vis) {
-            mGLWidget->addObject(idVal, SceneObject(wm, qsize));
-        }
-    }
-    return vis;
-}
-
-void MainWindow::addObjects2(QJsonArray array) {
-    QJsonArray::iterator iter;
-    QMatrix4x4 projectionMatrix, viewMatrix;
-
-
-    for (iter = array.begin(); iter !=array.end();iter++) {
-        QJsonValue val = *iter;
-        if (val.isObject()) {
-            QJsonObject obj = val.toObject();
-            bool vis = addNodeObject(obj);
-            QJsonValue children = obj.value(settings.mNodeChildrenName);
-            if (vis && children.isArray()) {
-                addObjects2(children.toArray());
-            }
-        }
-    }
-}
 
 
 QJsonDocument MainWindow::readJson(QString& fileName)

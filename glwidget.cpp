@@ -21,6 +21,7 @@
 #include <QMouseEvent>
 #include <math.h>
 #include <map>
+#include "frame.h"
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
@@ -45,20 +46,6 @@ GLWidget::GLWidget(QWidget *parent)
 
 GLWidget::~GLWidget()
 {
-}
-
-void GLWidget::setProjectionMatrix(QMatrix4x4 projMatrix)
-{
-    mProjectionMatrix = projMatrix;
-}
-
-void GLWidget::setViewMatrix(QMatrix4x4 viewMatrix)
-{
-    mViewMatrix = viewMatrix;
-}
-
-void GLWidget::setAspectRatio(double aspectRatio) {
-    mAspectRatio = aspectRatio;
 }
 
 void GLWidget::addObject(int id, SceneObject so, bool /*selected*/)
@@ -98,11 +85,6 @@ void GLWidget::zoomOut()
     mEndScale = m_fScale / 2.0;
     mElapsedTimer.start();
     mAnimationTimer.start(10);
-}
-
-void GLWidget::setScreenShot(QImage img)
-{
-    mScreenShot = img;
 }
 
 void GLWidget::setSelection(int id)
@@ -222,9 +204,9 @@ void GLWidget::paintGL()
 
         m_uiTexture = bindTexture(mScreenShot);
         program.bind();
-        mModelView = mProjectionMatrix * mViewMatrix;
+        mModelView = mFrame->getProjectionMatrix() * mFrame->getViewMatrix();
         mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
-        mModelView.scale(mAspectRatio, 1.0, 1.0);
+        mModelView.scale(mFrame->getAspectRatio(), 1.0, 1.0);
         mModelView.scale(m_fScale,m_fScale,1.0);
 
         int selectionId = 0;

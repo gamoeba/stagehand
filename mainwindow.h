@@ -23,10 +23,12 @@
 #include <QDir>
 #include <QLabel>
 #include <QSplashScreen>
+#include <list>
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
 #include "delegate.h"
+#include "frame.h"
 
 class GLWidget;
 
@@ -91,13 +93,12 @@ private:
     QModelIndexList mCurrentTreeSearchResults;
     int mCurrentTreeSearchIndex;
 
-    QJsonDocument mDoc;
     QLabel* mSBLabel;
 
-    void addObjects();
-    void addObjects2(QJsonArray array);
-    bool addNodeObject(QJsonObject obj);
     void resetSearch();
+
+    std::list<Frame*> mFrames;
+    int mCurrentFrameIndex;
 };
 
 #endif // MAINWINDOW_H
