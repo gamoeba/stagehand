@@ -23,12 +23,14 @@
 #include <QDir>
 #include <QLabel>
 #include <QSplashScreen>
-#include <list>
+#include <vector>
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
 #include "delegate.h"
 #include "frame.h"
+#include "messagereceived.h"
+#include "recordthread.h"
 
 class GLWidget;
 
@@ -36,7 +38,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public IMessageReceived
 {
     Q_OBJECT
 
@@ -60,11 +62,15 @@ public slots:
     void zoomIn();
     void zoomOut();
     void updateScene();
+    void nextFrame();
+    void prevFrame();
     void selectedId(int id);
     void mousePositionChanged(int x, int y);
     void showScreenShot(bool show);
     void tableItemChanged(QStandardItem*);
 
+    void recordFrame();
+    void stopRecord();
 protected:
     void inputFiles(QString jsonFile, QString screenShotFile);
     void updateTableView(const QModelIndex &index);
@@ -83,9 +89,10 @@ private slots:
 
     void on_treeSearch_returnPressed();
 
+    void newRecordedFrame();
+
 private:
     Ui::MainWindow *ui;
-    TreeModel* mTreeModel;
     TableModel* mTableModel;
     GLWidget* mGLWidget;
 
@@ -97,8 +104,15 @@ private:
 
     void resetSearch();
 
-    std::list<Frame*> mFrames;
+    std::vector<Frame*> mFrames;
     int mCurrentFrameIndex;
+    void updateFrame();
+
+    // IMessageReceived interface
+public:
+    void MessageReceived(std::string recv);
+
+    RecordThread mRecordThread;
 };
 
 #endif // MAINWINDOW_H

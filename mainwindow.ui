@@ -273,6 +273,10 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionScreenshot"/>
+   <addaction name="actionPrevFrame"/>
+   <addaction name="actionNextFrame"/>
+   <addaction name="actionRecord"/>
+   <addaction name="actionStop"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoad">
@@ -340,6 +344,26 @@
    </property>
    <property name="toolTip">
     <string>Show/Hide Screenshot</string>
+   </property>
+  </action>
+  <action name="actionPrevFrame">
+   <property name="text">
+    <string>PrevFrame</string>
+   </property>
+  </action>
+  <action name="actionNextFrame">
+   <property name="text">
+    <string>NextFrame</string>
+   </property>
+  </action>
+  <action name="actionRecord">
+   <property name="text">
+    <string>Record</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="text">
+    <string>Stop</string>
    </property>
   </action>
  </widget>
@@ -444,6 +468,70 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPrevFrame</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>prevFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNextFrame</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>nextFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRecord</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>recordFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionStop</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>stopRecord()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadFile()</slot>
@@ -452,5 +540,9 @@
   <slot>zoomIn()</slot>
   <slot>zoomOut()</slot>
   <slot>showScreenShot(bool)</slot>
+  <slot>nextFrame()</slot>
+  <slot>prevFrame()</slot>
+  <slot>recordFrame()</slot>
+  <slot>stopRecord()</slot>
  </slots>
 </ui>

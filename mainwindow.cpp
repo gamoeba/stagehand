@@ -55,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mGLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->glWidget->addWidget(mGLWidget);
 
-    mTreeModel = new TreeModel;
     mTableModel = new TableModel(ui->tableView);
 
     ui->treeView->setAlternatingRowColors(false);
@@ -81,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
     QObject::connect(mGLWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
+    QObject::connect(&mRecordThread, SIGNAL(frameAvailable()), this, SLOT(newRecordedFrame()));
 
     mCurrentFrameIndex = 0;
 
@@ -93,7 +93,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete mGLWidget;
-    delete mTreeModel;
+    //delete mTreeModel;
     delete mTableModel;
 }
 
@@ -168,13 +168,17 @@ void MainWindow::updateScene()
     if (json.length() > 0 ) {
         QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
         Frame* frame = new Frame(doc);
+        mFrames.push_back(frame);
 
-        QProcess process;
-        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
+        //QProcess process;
+        //QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
 
-        process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
+        //process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
 
-        inputFiles(QString(""), screenShotFile);
+        mCurrentFrameIndex = mFrames.size()-1;
+        updateFrame();
+        //resetSearch();
+
     } else {
         QMessageBox msgBox;
         msgBox.setText("Error");
@@ -183,6 +187,63 @@ void MainWindow::updateScene()
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
     }
+}
+
+void MainWindow::recordFrame()
+{
+    adbForward();
+    mRecordThread.startRecord();
+}
+
+void MainWindow::stopRecord()
+{
+    mRecordThread.stopRecord();
+}
+
+void MainWindow::updateFrame()
+{
+    Frame* frame = mFrames[mCurrentFrameIndex];
+    QStandardItemModel* model = frame->getTreeModel().model();
+    ui->treeView->setModel(model);
+    ui->treeView->expandAll();
+    mGLWidget->setFrame(frame);
+    mGLWidget->repaint();
+}
+
+void MainWindow::MessageReceived(std::string recv)
+{
+    Frame* newFrame = NULL;
+    if (mFrames.size()>0)
+    {
+        Frame* currentFrame = mFrames[mFrames.size()-1];
+        newFrame = new Frame(*currentFrame);
+
+        newFrame->updateProperties(recv);
+        mGLWidget->setFrame(newFrame);
+        mFrames.push_back(newFrame);
+        mCurrentFrameIndex = mFrames.size()-1;
+    }
+}
+
+void MainWindow::nextFrame()
+{
+    mCurrentFrameIndex++;
+    int size = mFrames.size();
+    if (mCurrentFrameIndex >= size)
+    {
+        mCurrentFrameIndex = size-1;
+    }
+    updateFrame();
+}
+
+void MainWindow::prevFrame()
+{
+    mCurrentFrameIndex--;
+    if (mCurrentFrameIndex < 0)
+    {
+        mCurrentFrameIndex = 0;
+    }
+    updateFrame();
 }
 
 void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
@@ -199,9 +260,11 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
         mGLWidget->setScreenShot(img);
     }
 */
+    frame = mFrames[mCurrentFrameIndex];
     if (frame )
     {
-        ui->treeView->setModel(frame->getTreeModel().model());
+        QStandardItemModel* model = frame->getTreeModel().model();
+        ui->treeView->setModel(model);
         ui->treeView->expandAll();
         mFrames.push_back(frame);
         mGLWidget->repaint();
@@ -211,9 +274,9 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
 
 void MainWindow::selectedId(int id)
 {
-   QModelIndex index = mTreeModel->getIndex(id);
-   ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect) ;
-   updateTableView(index);
+//   QModelIndex index = mTreeModel->getIndex(id);
+//   ui->treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect) ;
+//   updateTableView(index);
 }
 
 void MainWindow::mousePositionChanged(int x, int y)
@@ -368,26 +431,26 @@ void MainWindow::nextSelection() {
 
 void MainWindow::on_treeSearch_textEdited(const QString &strSearch)
 {
-    if (strSearch.size()>0) {
-        if (mCurrentTreeSearch != strSearch) {
-            mCurrentTreeSearchResults = mTreeModel->search(strSearch);
-            mCurrentTreeSearchIndex = 0;
-            mCurrentTreeSearch = strSearch;
-        }
-        nextSelection();
-    }
+//    if (strSearch.size()>0) {
+//        if (mCurrentTreeSearch != strSearch) {
+//            mCurrentTreeSearchResults = mTreeModel->search(strSearch);
+//            mCurrentTreeSearchIndex = 0;
+//            mCurrentTreeSearch = strSearch;
+//        }
+//        nextSelection();
+//    }
 }
 
 void MainWindow::resetSearch()
 {
-    if (mCurrentTreeSearch.length()>0) {
-        mCurrentTreeSearchResults = mTreeModel->search(mCurrentTreeSearch);
-        mCurrentTreeSearchIndex = 0;
-        nextSelection();
-    } else {
-        mCurrentTreeSearchResults.clear();
-        mCurrentTreeSearchIndex = 0;
-    }
+//    if (mCurrentTreeSearch.length()>0) {
+//        mCurrentTreeSearchResults = mTreeModel->search(mCurrentTreeSearch);
+//        mCurrentTreeSearchIndex = 0;
+//        nextSelection();
+//    } else {
+//        mCurrentTreeSearchResults.clear();
+//        mCurrentTreeSearchIndex = 0;
+//    }
 }
 
 void MainWindow::on_treeSearch_editingFinished()
@@ -401,4 +464,15 @@ void MainWindow::on_treeSearch_returnPressed()
 {
     qDebug() << "return Pressed";
     nextSelection();
+}
+
+void MainWindow::newRecordedFrame()
+{
+    while (mRecordThread.hasMoreFrames())
+    {
+        std::string frame = mRecordThread.getFrame();
+        MessageReceived(frame);
+    }
+    mGLWidget->repaint();
+
 }

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     settings.cpp \
     socketclient.cpp \
     delegate.cpp \
-    frame.cpp
+    frame.cpp \
+    recordthread.cpp
 
 HEADERS  += mainwindow.h \
     treemodel.h \
@@ -38,7 +39,9 @@ HEADERS  += mainwindow.h \
     settings.h \
     socketclient.h \
     delegate.h \
-    frame.h
+    frame.h \
+    messagereceived.h \
+    recordthread.h
 
 FORMS    += mainwindow.ui
 

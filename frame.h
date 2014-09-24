@@ -12,8 +12,11 @@
 class Frame
 {
 public:
+    Frame();
     Frame(QJsonDocument doc);
-    Frame(Frame& prevFrame, std::list<std::string>& updatedProperties);
+    Frame(const Frame&f);
+
+    void updateProperties(std::string proplist);
 
     TreeModel& getTreeModel();
     std::map<int, SceneObject>& getSceneObjects();
@@ -31,7 +34,6 @@ private:
 
     // source information
     QJsonDocument mDoc;
-    std::list<std::string> mUpdatedProperties;
     TreeModel* mTreeModel;
     std::map<int, SceneObject> mObjects;
 

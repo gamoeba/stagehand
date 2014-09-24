@@ -39,6 +39,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     connect(&mAnimationTimer,SIGNAL(timeout()),SLOT(animate()));
     setMouseTracking(true);
+    mFrame = new Frame();
 
     mLogo = QPixmap(":/stagehand/splash.png");
 
@@ -50,12 +51,12 @@ GLWidget::~GLWidget()
 
 void GLWidget::addObject(int id, SceneObject so, bool /*selected*/)
 {
-    mObjects[id] = so;
+    //mObjects[id] = so;
 }
 
 void GLWidget::clear()
 {
-    mObjects.clear();
+    //mObjects.clear();
 }
 
 void GLWidget::zoomIn()
@@ -198,9 +199,8 @@ void GLWidget::paintGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-
-
-    if (mObjects.size()>0) {
+    std::map<int, SceneObject>& objects = mFrame->getSceneObjects();
+    if (objects.size()>0) {
 
         m_uiTexture = bindTexture(mScreenShot);
         program.bind();
@@ -215,7 +215,7 @@ void GLWidget::paintGL()
         }
 
         std::map<int, SceneObject>::iterator iter;
-        for (iter = mObjects.begin();iter != mObjects.end();iter++) {
+        for (iter = objects.begin() ; iter != objects.end() ; iter++) {
             SceneObject so = (*iter).second;
             QMatrix4x4 objectMatrix = so.mWorldMatrix;
 
@@ -284,12 +284,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event) {
         update();
     } else {
         // assume that the first node has the screen size
-
-       if (mObjects.size()>0) {
-           float x = (float)event->pos().x()/(float)width()*2.0f -1.0f;
+        std::map<int, SceneObject>& objects = mFrame->getSceneObjects();
+        if (objects.size()>0) {
+            float x = (float)event->pos().x()/(float)width()*2.0f -1.0f;
            float y = (float)event->pos().y()/(float)height()*-2.0f + 1.0f;
 
-           SceneObject so = mObjects.begin()->second;
+           SceneObject so = objects.begin()->second;
 
            QMatrix4x4 objectMatrix = so.mWorldMatrix;
 
@@ -342,7 +342,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *releaseEvent){
 void GLWidget::select(float x, float y) {
     std::vector<int> ids;
     std::map<int, SceneObject>::iterator iter;
-    for (iter = mObjects.begin();iter != mObjects.end();iter++) {
+    std::map<int, SceneObject>& objects = mFrame->getSceneObjects();
+    for (iter = objects.begin() ; iter != objects.end() ; iter++) {
         SceneObject so = (*iter).second;
         QMatrix4x4 objectMatrix = so.mWorldMatrix;
 

@@ -17,15 +17,29 @@
 
 #include "socketclient.h"
 
-SocketClient::SocketClient(QObject* parent): QObject(parent)
+SocketClient::SocketClient(QObject* parent)
+    : QObject(parent),
+    mNotif(NULL),
+    mCallback(NULL)
 {
+  client.setReadBufferSize(65536);
   connect(&client, SIGNAL(connected()),
     this, SLOT(startTransfer()));
+
 }
 
 SocketClient::~SocketClient()
 {
+  delete mNotif;
   client.close();
+}
+
+void SocketClient::waitForMessages(IMessageReceived* callback)
+{
+    mCallback = callback;
+    mNotif = new QSocketNotifier(client.socketDescriptor(), QSocketNotifier::Read, this);
+    QObject::connect(mNotif, SIGNAL(activated(int)), this, SLOT(received()));
+    mNotif->setEnabled(true);
 }
 
 QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QString command)
@@ -59,6 +73,31 @@ QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QSt
 
 }
 
+std::string SocketClient::readSizedString()
+{
+    client.waitForReadyRead();
+    QString r1 = client.readLine(32);
+    int len = r1.toInt();
+    if (len>0)
+    {
+        char* buf = new char[len];
+        char* ptr = buf;
+
+        int read = -1;
+        while (len > 0 && read !=0) {
+            client.waitForReadyRead();
+            read = client.read(ptr, len);
+
+            len -= read;
+            ptr += read;
+        }
+        std::string resp = std::string(buf);
+        delete [] buf;
+        return resp;
+    }
+    return "";
+}
+
 void SocketClient::sendCommand(QString& address, quint16 port, QString command)
 {
     QString resp;
@@ -74,5 +113,34 @@ void SocketClient::sendCommand(QString& address, quint16 port, QString command)
 
 void SocketClient::startTransfer()
 {
+}
+
+void SocketClient::received()
+{
+    client.waitForReadyRead(1);
+    while (client.bytesAvailable()>0)
+    {
+        QString r1 = client.readLine();
+        int len = r1.toInt();
+        char* buf = new char[len];
+        char* ptr = buf;
+
+        int read = -1;
+        while (len > 0 && read !=0) {
+            client.waitForReadyRead(1);
+            read = client.read(ptr, len);
+
+            len -= read;
+            ptr += read;
+        }
+        std::string resp = std::string(buf);
+        delete [] buf;
+        if (mCallback != NULL)
+        {
+//            qDebug() << QString(resp.c_str());//"received";
+            mCallback->MessageReceived(resp);
+        }
+        client.waitForReadyRead(1);
+    }
 }
 

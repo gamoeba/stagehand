@@ -75,7 +75,7 @@ private:
     QVector<QVector3D> normals;
 
     Frame* mFrame;
-    std::map<int, SceneObject> mObjects;
+    //std::map<int, SceneObject> mObjects;
     std::vector<int> mSelectedIds;
     unsigned int mSelectionIndex;
     int frames;
