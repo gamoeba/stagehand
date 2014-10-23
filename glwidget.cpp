@@ -22,6 +22,8 @@
 #include <math.h>
 #include <map>
 #include "frame.h"
+#include <fstream>
+#include <sstream>
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
@@ -193,7 +195,7 @@ void GLWidget::paintGL()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     glFrontFace(GL_CW);
-    glCullFace(GL_FRONT);
+    //glCullFace(GL_FRONT);
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -220,6 +222,40 @@ void GLWidget::paintGL()
             QMatrix4x4 objectMatrix = so.mWorldMatrix;
 
             QVector3D size = so.mSize;
+            int resourceID = so.mResourceID;
+            bool validTexture = false;
+            if (resourceID != -1) {
+                std::map<int, QImage>::iterator i = mImages.find(resourceID);
+                QImage* img;
+                if (i != mImages.end()) {
+                    img = &(i->second);
+                } else {
+                    char name[256];
+                    char buf[256];
+                    sprintf(name,"/tmp/dali_resources/image_%d.raw",resourceID);
+                    std::ifstream ifs;
+                    ifs.open(name, std::ifstream::in | std::ifstream::binary);
+                    int width,height, pixelformat, size;
+                    ifs.getline(buf,256);
+
+                    std::istringstream iss(buf);
+                    iss >> width;
+                    iss >> height;
+                    iss >> pixelformat;
+                    iss >> size;
+                    char* buffer = new char[size];
+                    ifs.read(buffer, size);
+                    int bytesperline = size / height;
+
+                    img = new QImage((unsigned char*)buffer, width, height, bytesperline, pixelformat == 13? QImage::Format_RGBA8888 : QImage::Format_RGB888);
+                    //delete [] buffer;
+                    mImages[resourceID] = *img;
+                }
+                if (!img->isNull()) {
+                  m_uiTexture = bindTexture(*img);
+                  validTexture = true;
+                }
+            }
             objectMatrix.scale(size);
             objectMatrix = mModelView * objectMatrix;
             objectMatrix.scale(1.0f, 1.0f, 0.05f);
@@ -233,7 +269,7 @@ void GLWidget::paintGL()
             float ypixels = (float)height() * (br.y()-tl.y())/2.0;
             float ythreshold = 1.0/ypixels;
 
-            program.setUniformValue(drawTextureUniform, mShowScreenShot && (*iter).first == 1);
+            program.setUniformValue(drawTextureUniform, validTexture); //mShowScreenShot && (*iter).first == 1);
             program.setUniformValue(matrixUniform, objectMatrix);
             program.setUniformValue(selectedUniform, (*iter).first == selectionId);
             program.setUniformValue(screenShotUniform, mShowScreenShot);

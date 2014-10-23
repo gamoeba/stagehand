@@ -23,11 +23,12 @@
 class SceneObject
 {
 public:
-    SceneObject(){;}
+    SceneObject(){mResourceID=-1;}
     SceneObject(QMatrix4x4 worldMatrix, QVector3D size);
 
     QMatrix4x4 mWorldMatrix;
     QVector3D mSize;
+    int mResourceID;
 };
 
 #endif // SCENEOBJECT_H

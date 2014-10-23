@@ -22,14 +22,14 @@ Frame::Frame(QJsonDocument doc)
 }
 
 Frame::Frame(const Frame &f)
-   : mDoc(f.mDoc),
+   : //mDoc(f.mDoc),
      mObjects(f.mObjects),
      mProjectionMatrix(f.mProjectionMatrix),
      mViewMatrix(f.mViewMatrix),
      mAspectRatio(f.mAspectRatio)
 {
-    mTreeModel = new TreeModel;
-    mTreeModel->setTreeData(mDoc);
+   // mTreeModel = new TreeModel;
+    //mTreeModel->setTreeData(mDoc);
 //    addObjects();
 /*    std::map<int, SceneObject>::const_iterator iter;
     for (iter=f.mObjects.begin();iter!=f.mObjects.end();iter++)
@@ -49,21 +49,33 @@ void Frame::updateProperties(std::string proplist)
         QString line = iss.readLine();
         std::string propName, propValue;
         QStringList strList = line.split("|");
-        if (strList.length()==4)
+        if (strList[0].compare("p")==0 && strList.length()==5)
         {
-            int actorId = strList[0].toInt();
+            int actorId = strList[1].toInt();
+            int propId = strList[2].toInt();
             SceneObject& so = mObjects[actorId];
-            if (strList[2].trimmed().compare("world-matrix") ==0)
+            if (strList[3].trimmed().compare("world-matrix") ==0)
             {
-                DataObject wm( strList[3] );
+                DataObject wm( strList[4] );
                 so.mWorldMatrix = wm.get4x4Matrix();
             }
-            else if (strList[2].trimmed().compare("size")==0)
+            else if (strList[3].trimmed().compare("size")==0)
             {
-                DataObject sz( strList[3] );
+                DataObject sz( strList[4] );
                 std::vector<double> size = sz.getVector();
                 QVector3D qsize(size[0], size[1], size[2]);
                 so.mSize = qsize;
+            }
+            else if (strList[3].trimmed().compare("resourceID") == 0)
+            {
+                int resourceID = strList[4].toInt();
+                so.mResourceID = resourceID;
+            }
+        } else if (strList[0].compare("d")==0 && strList.length()==2){
+            int deleteActor = strList[1].toInt();
+            std::map<int, SceneObject>::iterator finditer = mObjects.find(deleteActor);
+            if (finditer != mObjects.end()) {
+                mObjects.erase(finditer);
             }
         }
     }

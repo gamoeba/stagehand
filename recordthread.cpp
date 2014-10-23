@@ -36,14 +36,18 @@ void RecordThread::run()
     mClient = new SocketClient;
     mClient->sendCommand(MainWindow::settings.mHostName, MainWindow::settings.mPortNumber.toUInt(), "start_record\n");
 
+    int frameCount = 0;
     while (mRunning)
     {
         std::string resp = mClient->readSizedString();
+        if (resp.length()>0)
         {
             QMutexLocker lock(&mFrameLock);
             mRecordedFrames.push_back(resp);
+            emit frameAvailable();
+        } else {
+            qDebug() << "zero sized frame";
         }
-        emit frameAvailable();
     }
 
     mClient->sendCommand(MainWindow::settings.mHostName, MainWindow::settings.mPortNumber.toUInt(), "stop_record\n");

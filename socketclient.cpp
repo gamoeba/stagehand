@@ -22,7 +22,7 @@ SocketClient::SocketClient(QObject* parent)
     mNotif(NULL),
     mCallback(NULL)
 {
-  client.setReadBufferSize(65536);
+  client.setReadBufferSize(512*1024);
   connect(&client, SIGNAL(connected()),
     this, SLOT(startTransfer()));
 
@@ -75,9 +75,13 @@ QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QSt
 
 std::string SocketClient::readSizedString()
 {
-    client.waitForReadyRead();
-    QString r1 = client.readLine(32);
-    int len = r1.toInt();
+    while (!client.canReadLine()) {
+        client.waitForReadyRead(-1);
+    }
+    QString r1 = client.readLine();
+    QStringList strs = r1.split(" ");
+    int frameNum = strs[1].toInt();
+    int len = strs[2].toInt();
     if (len>0)
     {
         char* buf = new char[len];
@@ -85,7 +89,7 @@ std::string SocketClient::readSizedString()
 
         int read = -1;
         while (len > 0 && read !=0) {
-            client.waitForReadyRead();
+            client.waitForReadyRead(-1);
             read = client.read(ptr, len);
 
             len -= read;

@@ -76,6 +76,7 @@ private:
 
     Frame* mFrame;
     //std::map<int, SceneObject> mObjects;
+    std::map<int, QImage> mImages;
     std::vector<int> mSelectedIds;
     unsigned int mSelectionIndex;
     int frames;

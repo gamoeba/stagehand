@@ -28,6 +28,6 @@ OF SUCH DAMAGE.
 #include "sceneobject.h"
 
 SceneObject::SceneObject(QMatrix4x4 matrix, QVector3D size)
-    : mWorldMatrix(matrix), mSize(size)
+    : mWorldMatrix(matrix), mSize(size), mResourceID(-1)
 {
 }
