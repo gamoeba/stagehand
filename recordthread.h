@@ -18,6 +18,7 @@ public:
     std::string getFrame();
 signals:
     void frameAvailable();
+    void recordingFinished();
 
 public slots:
 

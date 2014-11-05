@@ -276,7 +276,7 @@
    <addaction name="actionPrevFrame"/>
    <addaction name="actionNextFrame"/>
    <addaction name="actionRecord"/>
-   <addaction name="actionStop"/>
+   <addaction name="actionHold"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoad">
@@ -347,23 +347,49 @@
    </property>
   </action>
   <action name="actionPrevFrame">
+   <property name="icon">
+    <iconset>
+     <normalon>:/stagehand/backward.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>PrevFrame</string>
    </property>
   </action>
   <action name="actionNextFrame">
+   <property name="icon">
+    <iconset>
+     <normalon>:/stagehand/forward.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>NextFrame</string>
    </property>
   </action>
   <action name="actionRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/stagehand/record.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Record</string>
    </property>
   </action>
-  <action name="actionStop">
+  <action name="actionHold">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/stagehand/hold.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
-    <string>Stop</string>
+    <string>Hold</string>
    </property>
   </action>
  </widget>
@@ -502,9 +528,9 @@
   </connection>
   <connection>
    <sender>actionRecord</sender>
-   <signal>triggered()</signal>
+   <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>recordFrame()</slot>
+   <slot>record(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -517,10 +543,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionStop</sender>
-   <signal>triggered()</signal>
+   <sender>actionHold</sender>
+   <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>stopRecord()</slot>
+   <slot>holdFrame(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -542,7 +568,7 @@
   <slot>showScreenShot(bool)</slot>
   <slot>nextFrame()</slot>
   <slot>prevFrame()</slot>
-  <slot>recordFrame()</slot>
-  <slot>stopRecord()</slot>
+  <slot>record(bool)</slot>
+  <slot>holdFrame(bool)</slot>
  </slots>
 </ui>

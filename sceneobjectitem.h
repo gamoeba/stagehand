@@ -15,22 +15,28 @@
  *
  */
 
-#ifndef SCENEOBJECT_H
-#define SCENEOBJECT_H
+#ifndef SCENEOBJECTITEM_H
+#define SCENEOBJECTITEM_H
 
-#include <QMatrix4x4>
+#include <QStandardItem>
 
-class SceneObject
+class SceneObjectItem : public QStandardItem
 {
 public:
-    SceneObject(){mResourceID=-1;}
-    SceneObject(QMatrix4x4 worldMatrix, QVector3D size);
+    static const int SceneObjectRole = Qt::UserRole +2;
 
-    QMatrix4x4 mWorldMatrix;
-    QVector3D mSize;
-    QVector<int> mChildren;
-    int mResourceID;
-    QString mName;
+    explicit SceneObjectItem(SceneObject& object, bool overallVisible);
+    QVariant data(int role) const;
+
+signals:
+
+public slots:
+
+
+private:
+    QJsonObject mObject;
+    QString mDisplayName;
+    bool mOverallVisible;
 };
 
-#endif // SCENEOBJECT_H
+#endif // JSONITEM_H

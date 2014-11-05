@@ -67,10 +67,10 @@ public slots:
     void selectedId(int id);
     void mousePositionChanged(int x, int y);
     void showScreenShot(bool show);
+    void holdFrame(bool hold);
     void tableItemChanged(QStandardItem*);
 
-    void recordFrame();
-    void stopRecord();
+    void record(bool recordOn);
 protected:
     void inputFiles(QString jsonFile, QString screenShotFile);
     void updateTableView(const QModelIndex &index);
@@ -90,6 +90,8 @@ private slots:
     void on_treeSearch_returnPressed();
 
     void newRecordedFrame();
+    void recordingFinished();
+    void frameSliderChanged(int value);
 
 private:
     Ui::MainWindow *ui;
@@ -101,12 +103,17 @@ private:
     int mCurrentTreeSearchIndex;
 
     QLabel* mSBLabel;
+    QSlider* mFrameSelector;
+    QLabel* mFrameNumberLabel;
 
     void resetSearch();
 
     std::vector<Frame*> mFrames;
     int mCurrentFrameIndex;
     void updateFrame();
+
+    bool mRecording;
+    bool mHoldFrame;
 
     // IMessageReceived interface
 public:

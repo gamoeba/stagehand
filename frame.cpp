@@ -11,6 +11,9 @@
 Frame::Frame()
 {
     mTreeModel = new TreeModel;
+    mProjectionMatrixSet = false;
+    mViewMatrixSet = false;
+    mAspectRatioSet = false;
 }
 
 Frame::Frame(QJsonDocument doc)
@@ -26,7 +29,10 @@ Frame::Frame(const Frame &f)
      mObjects(f.mObjects),
      mProjectionMatrix(f.mProjectionMatrix),
      mViewMatrix(f.mViewMatrix),
-     mAspectRatio(f.mAspectRatio)
+     mAspectRatio(f.mAspectRatio),
+     mProjectionMatrixSet(f.mProjectionMatrixSet),
+     mViewMatrixSet(f.mViewMatrixSet),
+     mAspectRatioSet(f.mAspectRatioSet)
 {
    // mTreeModel = new TreeModel;
     //mTreeModel->setTreeData(mDoc);
@@ -53,23 +59,65 @@ void Frame::updateProperties(std::string proplist)
         {
             int actorId = strList[1].toInt();
             int propId = strList[2].toInt();
+            QString propName = strList[3].trimmed();
             SceneObject& so = mObjects[actorId];
-            if (strList[3].trimmed().compare("world-matrix") ==0)
+
+            if (!mProjectionMatrixSet && actorId == 2) {
+                if (propName.compare("projection-matrix") ==0)
+                {
+                    DataObject wm( strList[4] );
+                    mProjectionMatrix = wm.get4x4Matrix();
+                    mProjectionMatrixSet = true;
+                }
+            }
+            if (!mViewMatrixSet && actorId == 2) {
+
+                if (propName.compare("view-matrix") ==0)
+                {
+                    DataObject wm( strList[4] );
+                    mViewMatrix = wm.get4x4Matrix();
+                    mViewMatrixSet = true;
+                }
+
+            }
+            if (!mAspectRatioSet && actorId == 2) {
+
+                if (propName.compare("aspect-ratio") ==0)
+                {
+                    mAspectRatio = strList[4].toDouble();
+                    mAspectRatioSet = true;
+                }
+
+            }
+            if (propName.compare("world-matrix") ==0)
             {
                 DataObject wm( strList[4] );
                 so.mWorldMatrix = wm.get4x4Matrix();
             }
-            else if (strList[3].trimmed().compare("size")==0)
+            else if (propName.compare("size")==0)
             {
                 DataObject sz( strList[4] );
                 std::vector<double> size = sz.getVector();
                 QVector3D qsize(size[0], size[1], size[2]);
                 so.mSize = qsize;
             }
-            else if (strList[3].trimmed().compare("resourceID") == 0)
+            else if (propName.compare("resourceID") == 0)
             {
                 int resourceID = strList[4].toInt();
                 so.mResourceID = resourceID;
+            }
+            else if (propId.compare("name") == 0)
+            {
+                so.mName = strList[4];
+            }
+            else if (propName.compare("children")) {
+                DataObject children( strList[4] );
+                std::vector<double> childlist = children.getVector();
+                std::vector<double>::iterator it;
+                for (it=childlist.begin();it!=childlist.end();++it)
+                {
+                    so.mChildren.push_back((int)*it);
+                }
             }
         } else if (strList[0].compare("d")==0 && strList.length()==2){
             int deleteActor = strList[1].toInt();

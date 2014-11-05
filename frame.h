@@ -40,6 +40,9 @@ private:
     QMatrix4x4 mProjectionMatrix;
     QMatrix4x4 mViewMatrix;
     double mAspectRatio;
+    bool mProjectionMatrixSet;
+    bool mViewMatrixSet;
+    bool mAspectRatioSet;
 };
 
 #endif // FRAME_H

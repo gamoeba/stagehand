@@ -21,5 +21,10 @@
         <file>stagehand.icns</file>
         <file>shader.fsh</file>
         <file>shader.vsh</file>
+        <file>backward.png</file>
+        <file>forward.png</file>
+        <file>stop.png</file>
+        <file>record.png</file>
+        <file>hold.png</file>
     </qresource>
 </RCC>

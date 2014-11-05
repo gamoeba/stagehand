@@ -45,13 +45,11 @@ void RecordThread::run()
             QMutexLocker lock(&mFrameLock);
             mRecordedFrames.push_back(resp);
             emit frameAvailable();
-        } else {
-            qDebug() << "zero sized frame";
         }
     }
 
     mClient->sendCommand(MainWindow::settings.mHostName, MainWindow::settings.mPortNumber.toUInt(), "stop_record\n");
-
+    emit recordingFinished();
     delete mClient;
     mClient = NULL;
 }

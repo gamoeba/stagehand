@@ -81,11 +81,31 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
     QObject::connect(mGLWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
     QObject::connect(&mRecordThread, SIGNAL(frameAvailable()), this, SLOT(newRecordedFrame()));
+    QObject::connect(&mRecordThread, SIGNAL(recordingFinished()), this, SLOT(recordingFinished()));
 
     mCurrentFrameIndex = 0;
+    mHoldFrame = false;
+    mRecording = false;
 
     mSBLabel = new QLabel();
-    ui->statusBar->addWidget(mSBLabel);
+    mSBLabel->setText("Cursor Pos: Offscreen");
+    mSBLabel->setMinimumSize(mSBLabel->sizeHint());
+    mFrameSelector = new QSlider();
+    mFrameSelector->setMinimumWidth(150);
+    mFrameSelector->setTickInterval(60);
+    mFrameSelector->setOrientation(Qt::Horizontal);
+    mFrameSelector->setTracking(true);
+    QObject::connect(mFrameSelector, SIGNAL(sliderMoved(int)), this, SLOT(frameSliderChanged(int)));
+    //mFrameSelector->setq(Qt::AlignRight);
+    mFrameNumberLabel = new QLabel;
+    mFrameNumberLabel->setMinimumWidth(25);
+    mFrameNumberLabel->setText("0");
+    mFrameNumberLabel->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+
+    ui->statusBar->addPermanentWidget(mSBLabel,0);
+    ui->statusBar->addPermanentWidget(mFrameSelector,1);
+    ui->statusBar->addPermanentWidget(new QLabel("Frame:"));
+    ui->statusBar->addPermanentWidget(mFrameNumberLabel,0);
     resize(sz);
 }
 
@@ -189,15 +209,15 @@ void MainWindow::updateScene()
     }
 }
 
-void MainWindow::recordFrame()
+void MainWindow::record(bool recordOn)
 {
     adbForward();
-    mRecordThread.startRecord();
-}
-
-void MainWindow::stopRecord()
-{
-    mRecordThread.stopRecord();
+    if (recordOn) {
+        mRecordThread.startRecord();
+        mRecording = true;
+    } else {
+        mRecordThread.stopRecord();
+    }
 }
 
 void MainWindow::updateFrame()
@@ -217,11 +237,19 @@ void MainWindow::MessageReceived(std::string recv)
     {
         Frame* currentFrame = mFrames[mFrames.size()-1];
         newFrame = new Frame(*currentFrame);
+    } else {
+        newFrame = new Frame();
+    }
 
-        newFrame->updateProperties(recv);
-        mGLWidget->setFrame(newFrame);
-        mFrames.push_back(newFrame);
+    newFrame->updateProperties(recv);
+    mGLWidget->setFrame(newFrame);
+    mFrames.push_back(newFrame);
+    mFrameSelector->setRange(0, mFrames.size()-1);
+
+    if (!mHoldFrame) {
         mCurrentFrameIndex = mFrames.size()-1;
+        mFrameSelector->setValue(mCurrentFrameIndex);
+        mFrameNumberLabel->setText(QString::number(mCurrentFrameIndex));
     }
 }
 
@@ -294,6 +322,11 @@ void MainWindow::mousePositionChanged(int x, int y)
 void MainWindow::showScreenShot(bool show)
 {
     mGLWidget->showScreenShot(show);
+}
+
+void MainWindow::holdFrame(bool hold)
+{
+    mHoldFrame = hold;
 }
 
 
@@ -476,4 +509,17 @@ void MainWindow::newRecordedFrame()
     mGLWidget->repaint();
 
 
+}
+
+void MainWindow::recordingFinished()
+{
+    mRecording = false;
+}
+
+void MainWindow::frameSliderChanged(int value)
+{
+    mHoldFrame = true;
+    ui->actionHold->setChecked(true);
+    mCurrentFrameIndex = value;
+    mFrameNumberLabel->setText(QString::number(mCurrentFrameIndex));
 }
