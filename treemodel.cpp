@@ -52,6 +52,25 @@ void TreeModel::setTreeData(QJsonDocument doc)
     }
 }
 
+/*
+void TreeModel::setTreeData(Frame* frame)
+{
+    map<int, SceneObject>& objects = frame->getSceneObjects();
+    map<int, SceneObject>::iterator iter;
+    SceneObject* root = NULL;
+    for (iter = objects.begin();iter !=objects.end();++iter) {
+        SceneObject& obj = *iter;
+        if (obj.mName.compare("RootLayer")==0)
+        {
+            root = &obj;
+        }
+    }
+    if (root) {
+
+    }
+}
+*/
+
 void TreeModel::addChildren(QStandardItem* parent, QJsonArray array, bool visible) {
     QJsonArray::iterator iter;
 

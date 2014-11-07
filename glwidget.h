@@ -52,6 +52,7 @@ public:
     void showScreenShot(bool show){mShowScreenShot=show;update();}
 
     void setSelection(int id);
+    QImage getScreenShot();
 public slots:
     void animate();
 

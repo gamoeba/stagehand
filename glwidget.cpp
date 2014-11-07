@@ -105,6 +105,11 @@ void GLWidget::setScreenShot(QImage img)
     mScreenShot = img;
 }
 
+QImage GLWidget::getScreenShot()
+{
+    return mScreenShot;
+}
+
 void GLWidget::setSelection(int id)
 {
     mSelectedIds.clear();

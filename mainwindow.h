@@ -52,6 +52,7 @@ public:
 
     void adbForward();
     void nextSelection();
+    void saveJson(QString &fileName, const QString &str);
 public slots:
     void loadFile();
     void saveFile();
@@ -88,6 +89,7 @@ private:
     GLWidget* mGLWidget;
 
     QString mCurrentTreeSearch;
+    QString mJsonTxt;
     QModelIndexList mCurrentTreeSearchResults;
     int mCurrentTreeSearchIndex;
 

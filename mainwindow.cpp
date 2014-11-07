@@ -143,7 +143,25 @@ void MainWindow::loadFile() {
 
 void MainWindow::saveFile()
 {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                                                   "",
+                                                   tr("Files (*.zip)"),NULL,
+                                                   QFileDialog::DontUseNativeDialog);
 
+    QProcess process;
+    if (!fileName.isEmpty()) {
+
+        QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
+        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
+        QImage ss = mGLWidget->getScreenShot();
+        if (!ss.isNull()) {
+            ss.save(screenShotFile);
+        }
+        saveJson(jsonFile,mJsonTxt);
+        process.execute("zip", QStringList() << "-j" << fileName << jsonFile << screenShotFile);
+        process.waitForFinished();
+
+    }
 }
 
 void MainWindow::zoomIn()
@@ -288,17 +306,25 @@ void MainWindow::addObjects2(QJsonArray array) {
 
 QJsonDocument MainWindow::readJson(QString& fileName)
    {
-      QString val;
       QFile file;
       file.setFileName(fileName);
       file.open(QIODevice::ReadOnly | QIODevice::Text);
-      val = file.readAll();
+      mJsonTxt = file.readAll();
       file.close();
 
-      QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
+      QJsonDocument d = QJsonDocument::fromJson(mJsonTxt.toUtf8());
       return d;
-
    }
+
+void MainWindow::saveJson(QString& fileName, const QString& str)
+{
+    QFile file;
+    file.setFileName(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    file.write(str.toUtf8());
+    file.close();
+}
 
 void MainWindow::on_treeView_clicked(const QModelIndex &index)
 {
