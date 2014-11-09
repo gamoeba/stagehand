@@ -178,10 +178,10 @@ void MainWindow::updateScene()
 {
     adbForward();
     SocketClient client;
-    QString json = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
+    mJsonTxt = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
 
-    if (json.length() > 0 ) {
-        mDoc = QJsonDocument::fromJson(json.toUtf8());
+    if (mJsonTxt.length() > 0 ) {
+        mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
 
         QProcess process;
         QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
