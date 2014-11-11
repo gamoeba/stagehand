@@ -39,7 +39,7 @@ QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QSt
         client.write(command.toUtf8().data(), command.length());
         client.flush();
         client.waitForReadyRead();
-        QString r1 = client.readLine(32);
+        QString r1 = client.readLine();
         int len = r1.toInt();
         char* buf = new char[len];
         char* ptr = buf;

@@ -35,6 +35,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QDesktopWidget>
+#include <QtConcurrent/QtConcurrent>
 
 Settings MainWindow::settings;
 
@@ -80,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
     QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
     QObject::connect(mGLWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
+    QObject::connect(this, SIGNAL(newImage(QImage)), this, SLOT(newImageReceived(QImage)));
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
@@ -138,6 +140,7 @@ void MainWindow::loadFile() {
         QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
         QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
         inputFiles(jsonFile, screenShotFile);
+        refreshScene();
     }
 }
 
@@ -174,6 +177,17 @@ void MainWindow::zoomOut()
     mGLWidget->zoomOut();
 }
 
+void MainWindow::takeScreenShot()
+{
+    QProcess process;
+    QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
+
+    process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
+    QImage img(screenShotFile);
+    QFile::remove(screenShotFile);
+    // notify main thread since we can only update GL widget on main thread
+    emit newImage(img);
+}
 void MainWindow::updateScene()
 {
     adbForward();
@@ -183,12 +197,10 @@ void MainWindow::updateScene()
     if (mJsonTxt.length() > 0 ) {
         mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
 
-        QProcess process;
-        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
-
-        process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
-
-        inputFiles(QString(""), screenShotFile);
+        QImage img;
+        mGLWidget->setScreenShot(img); // set an empty image through to clear any previous images while we wait for the screenshot
+        refreshScene();
+        QtConcurrent::run(this, &MainWindow::takeScreenShot);
     } else {
         QMessageBox msgBox;
         msgBox.setText("Error");
@@ -211,6 +223,10 @@ void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
         mGLWidget->setScreenShot(img);
     }
 
+}
+
+void MainWindow::refreshScene()
+{
     if (! (mDoc.isNull() || mDoc.isEmpty()) )
     {
         mTreeModel->setTreeData(mDoc);
@@ -391,6 +407,12 @@ void MainWindow::tableItemChanged(QStandardItem * item)
     ui->updatePanel->setHidden(false);
     ui->tableViewUpdate->resizeColumnsToContents();
     ui->tableViewUpdate->resizeRowsToContents();
+}
+
+void MainWindow::newImageReceived(QImage img)
+{
+    mGLWidget->setScreenShot(img);
+    mGLWidget->repaint();
 }
 
 void MainWindow::on_clearButton_clicked()

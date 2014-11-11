@@ -53,6 +53,10 @@ public:
     void adbForward();
     void nextSelection();
     void saveJson(QString &fileName, const QString &str);
+    void takeScreenShot();
+
+signals:
+    void newImage(QImage img);
 public slots:
     void loadFile();
     void saveFile();
@@ -63,11 +67,13 @@ public slots:
     void mousePositionChanged(int x, int y);
     void showScreenShot(bool show);
     void tableItemChanged(QStandardItem*);
+    void newImageReceived(QImage img);
 
 protected:
     void inputFiles(QString jsonFile, QString screenShotFile);
     void updateTableView(const QModelIndex &index);
     void updateGLView(const QModelIndex &index);
+    void refreshScene();
 private slots:
     void on_treeView_clicked(const QModelIndex &index);
 
