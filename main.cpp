@@ -38,5 +38,6 @@ int main(int argc, char *argv[])
         w.setPortNumber(port);
     }
     w.show();
+    w.checkForUpdates();
     return a.exec();
 }

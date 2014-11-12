@@ -27,6 +27,7 @@ public:
     void loadSettings(QString fileName);
     QString updateSetting(QSettings &settings, QString settingName, QString defaultValue);
 
+    QString mBaseUpdateUrl;
     QString mNodeName;
     QString mNodeID;
     QString mNodeVisible;

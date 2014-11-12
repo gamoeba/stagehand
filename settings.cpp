@@ -17,6 +17,7 @@
 
 #include "settings.h"
 
+const QString KBaseUpdateUrl("UpdateUrl");
 const QString KNodeName("NodeName");
 const QString KNodeId("NodeId");
 const QString KNodeVisible("NodeVisible");
@@ -59,6 +60,7 @@ void Settings::loadSettings(QString fileName)
     mCmdGetScene = updateSetting(settings, KCmdGetScene, "get_scene");
     mCmdSetProperties = updateSetting(settings, KCmdSetProperties, "set_properties");
     mFontPointSize = updateSetting(settings, KFontPointSize, "10");
+    mBaseUpdateUrl = updateSetting(settings, KBaseUpdateUrl, "http://www.gamoeba.com/stagehand_updates");
     settings.sync();
 }
 

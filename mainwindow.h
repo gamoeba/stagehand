@@ -27,6 +27,7 @@
 #include "tablemodel.h"
 #include "settings.h"
 #include "delegate.h"
+#include "filedownloader.h"
 
 class GLWidget;
 
@@ -54,6 +55,7 @@ public:
     void nextSelection();
     void saveJson(QString &fileName, const QString &str);
     void takeScreenShot();
+    void checkForUpdates();
 
 signals:
     void newImage(QImage img);
@@ -74,6 +76,9 @@ protected:
     void updateTableView(const QModelIndex &index);
     void updateGLView(const QModelIndex &index);
     void refreshScene();
+protected slots:
+    void versionAvailable();
+    void updateDownloaded();
 private slots:
     void on_treeView_clicked(const QModelIndex &index);
 
@@ -101,6 +106,7 @@ private:
 
     QJsonDocument mDoc;
     QLabel* mSBLabel;
+    FileDownloader* m_pDownloader;
 
     void addObjects();
     void addObjects2(QJsonArray array);

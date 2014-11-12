@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     sceneobject.cpp \
     settings.cpp \
     socketclient.cpp \
-    delegate.cpp
+    delegate.cpp \
+    filedownloader.cpp
 
 HEADERS  += mainwindow.h \
     treemodel.h \
@@ -36,7 +37,9 @@ HEADERS  += mainwindow.h \
     sceneobject.h \
     settings.h \
     socketclient.h \
-    delegate.h
+    delegate.h \
+    filedownloader.h \
+    version.h
 
 FORMS    += mainwindow.ui
 
