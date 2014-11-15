@@ -70,6 +70,7 @@ public slots:
     void showScreenShot(bool show);
     void tableItemChanged(QStandardItem*);
     void newImageReceived(QImage img);
+    void aboutStagehand();
 
 protected:
     void inputFiles(QString jsonFile, QString screenShotFile);

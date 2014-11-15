@@ -273,6 +273,7 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionScreenshot"/>
+   <addaction name="actionAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoad">
@@ -340,6 +341,11 @@
    </property>
    <property name="toolTip">
     <string>Show/Hide Screenshot</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
@@ -444,6 +450,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAbout</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>aboutStagehand()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadFile()</slot>
@@ -452,5 +474,6 @@
   <slot>zoomIn()</slot>
   <slot>zoomOut()</slot>
   <slot>showScreenShot(bool)</slot>
+  <slot>aboutStagehand()</slot>
  </slots>
 </ui>

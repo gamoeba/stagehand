@@ -21,15 +21,34 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QSplashScreen>
+#include <version.h>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
     QFileInfo fileInfo(argv[0]);
+    MainWindow w;
     w.setAppNameAndDirectory(fileInfo.baseName(), fileInfo.absoluteDir());
 
+
+    if (argc==2 && strcmp(argv[1],"--version")==0)
+    {
+        printf("%g\n", STAGEHAND_VERSION);
+        exit(0);
+    }
+
+    if (argc==2 && strcmp(argv[1],"--versioninfo")==0)
+    {
+        QFile versioninfo(":/stagehand/versioninfo.txt");
+        versioninfo.open(QIODevice::ReadOnly);
+        QByteArray ver = versioninfo.readAll();
+        QString str(ver);
+        printf("%g\n\n%s\n", STAGEHAND_VERSION, str.toStdString().c_str());
+        exit(0);
+    }
+
     if (argc>1) {
+
         QString hostName(argv[1]);
         w.setHostName(hostName);
     }

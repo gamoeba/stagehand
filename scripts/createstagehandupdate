@@ -1,0 +1,14 @@
+#!/bin/bash
+if [ -z "$STAGEHAND_BIN_COMPILE_LOCATION" ] 
+then
+  echo "Must set STAGEHAND_BIN_COMPILE_LOCATION"
+  exit 1
+fi
+mkdir -p updates/bin
+cd updates
+cp $STAGEHAND_BIN_COMPILE_LOCATION/stagehand bin/
+PLATFORM=`uname`
+VERSION=`bin/stagehand --version`
+zip -r $PLATFORM"_update"$VERSION.zip * -x \*.zip -x bin/stagehand.ini -x createstagehandupdate -x *.txt
+bin/stagehand --versioninfo > versioninfo_$PLATFORM.txt
+cd -

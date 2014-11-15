@@ -232,7 +232,7 @@ void MainWindow::refreshScene()
     {
         mTreeModel->setTreeData(mDoc);
         ui->treeView->setModel(mTreeModel->model());
-        ui->treeView->expandAll();
+        //ui->treeView->expandAll();
         addObjects();
         mGLWidget->repaint();
         resetSearch();
@@ -414,6 +414,18 @@ void MainWindow::newImageReceived(QImage img)
 {
     mGLWidget->setScreenShot(img);
     mGLWidget->repaint();
+}
+
+void MainWindow::aboutStagehand()
+{
+    QMessageBox msgBox;
+    QString path = QApplication::applicationDirPath();
+
+    msgBox.setText("Stage hand");
+    msgBox.setInformativeText("Version: " + QString::number(STAGEHAND_VERSION));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
 }
 
 void MainWindow::on_clearButton_clicked()
