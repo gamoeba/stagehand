@@ -2,5 +2,4 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export LD_LIBRARY_PATH=$DIR/lib
 export QT_PLUGIN_PATH=$DIR/plugins
-$DIR/checkupdates.sh
 $DIR/bin/stagehand > /dev/null 2>&1
