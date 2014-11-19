@@ -47,7 +47,7 @@ public:
     void setHostName(QString hostName);
     void setPortNumber(QString portNumber);
 
-    QJsonDocument readJson(QString &fileName);
+    QJsonDocument readJson(const QString &fileName);
 
     static Settings settings;
 
@@ -73,7 +73,6 @@ public slots:
     void aboutStagehand();
 
 protected:
-    void inputFiles(QString jsonFile, QString screenShotFile);
     void updateTableView(const QModelIndex &index);
     void updateGLView(const QModelIndex &index);
     void refreshScene();
