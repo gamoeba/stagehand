@@ -43,7 +43,8 @@ Settings MainWindow::settings;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    mForceUpdate(false)
 {
     QDesktopWidget desktop;
     QRect screenSize = desktop.availableGeometry(this);
@@ -518,8 +519,22 @@ void MainWindow::on_treeSearch_returnPressed()
 
 // Automatic update Functions
 
-void MainWindow::checkForUpdates()
+void MainWindow::checkForUpdates(bool forceUpdate)
 {
+    QString extractDir = appendPath(QApplication::applicationDirPath(),"../");
+    //these are obsolete, so delete in version 0.42/0.43
+    QString deleteFileName = appendPath(extractDir, "checkupdates.sh");
+    QString versionFileName = appendPath(extractDir, "CURRENT_VERSION");
+    QFile deleteFile(deleteFileName);
+    if (deleteFile.exists()) {
+        deleteFile.remove();
+    }
+    QFile vf(versionFileName);
+    if (vf.exists()) {
+        vf.remove();
+    }
+
+    mForceUpdate = forceUpdate;
     QString versionFile;
     versionFile.sprintf("/versioninfo_%s.txt",versionSuffix);
 
@@ -538,7 +553,7 @@ void MainWindow::versionAvailable()
     QString path = QApplication::applicationDirPath();
     QTextStream stream(data);
     double versionNumber = stream.readLine().toDouble();
-    if (versionNumber > STAGEHAND_VERSION)
+    if (mForceUpdate || versionNumber > STAGEHAND_VERSION)
     {
 
         msgBox.setText("Update Available");
@@ -583,12 +598,6 @@ void MainWindow::updateDownloaded()
     QFile::remove(updateFile);
     if (exitCode == 0)
     {
-        //these are obsolete, so delete in version 0.42/0.43
-        QString deleteFile1 = appendPath(extractDir, "checkupdates.sh");
-        QString deleteFile2 = appendPath(extractDir, "CURRENT_VERSION");
-        QFile::remove(deleteFile1);
-        QFile::remove(deleteFile2);
-
         QMessageBox msgBox;
         msgBox.setText("Restart required");
         msgBox.setInformativeText("Restart Application to complete update?");

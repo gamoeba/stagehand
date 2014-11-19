@@ -25,11 +25,12 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    QFileInfo fileInfo(argv[0]);
-    MainWindow w;
-    w.setAppNameAndDirectory(fileInfo.baseName(), fileInfo.absoluteDir());
+    bool forceUpdate = false;
 
+    if (argc==2 && strcmp(argv[1],"--force-update")==0)
+    {
+        forceUpdate = true;
+    }
 
     if (argc==2 && strcmp(argv[1],"--version")==0)
     {
@@ -47,6 +48,11 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
+    QApplication a(argc, argv);
+    QFileInfo fileInfo(argv[0]);
+    MainWindow w;
+
+
     if (argc>1) {
 
         QString hostName(argv[1]);
@@ -56,7 +62,10 @@ int main(int argc, char *argv[])
         QString port(argv[2]);
         w.setPortNumber(port);
     }
+
+    w.setAppNameAndDirectory(fileInfo.baseName(), fileInfo.absoluteDir());
+
     w.show();
-    w.checkForUpdates();
+    w.checkForUpdates(forceUpdate);
     return a.exec();
 }

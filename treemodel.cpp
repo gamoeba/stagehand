@@ -35,9 +35,32 @@ TreeModel::TreeModel(QObject *parent) :
     mModel = new QStandardItemModel;
 }
 
+static QList<QStandardItem*> childList( QStandardItem *qi )
+{
+    QStandardItemModel *pm = qi->model();
+    QList<QStandardItem*> rList;
+    QModelIndex in = qi->index();
+    if (!in.isValid()) {
+        return rList;
+    }
+    if (qi->rowCount() == 0) {
+        return rList;
+    }
+    for (int e = 0; e < qi->rowCount(); ++e) {
+        QModelIndex si = pm->index(e,qi->column(),in);
+        QStandardItem *iz = pm->itemFromIndex(si);
+        if (iz) {
+            rList << iz;
+        }
+    }
+    return rList;
+}
+
+
 void TreeModel::setTreeData(QJsonDocument doc)
 {
     jsonDoc = doc;
+    QList<QStandardItem*> cl = childList(mModel->index(0, 0));
     mModel->clear();
     QJsonObject obj = jsonDoc.object();
     QJsonValue value = obj.value(settings.mNodeName);

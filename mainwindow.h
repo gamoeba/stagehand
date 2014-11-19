@@ -55,7 +55,7 @@ public:
     void nextSelection();
     void saveJson(QString &fileName, const QString &str);
     void takeScreenShot();
-    void checkForUpdates();
+    void checkForUpdates(bool forceUpdate);
 
 signals:
     void newImage(QImage img);
@@ -113,6 +113,7 @@ private:
     void addObjects2(QJsonArray array);
     bool addNodeObject(QJsonObject obj);
     void resetSearch();
+    bool mForceUpdate;
 };
 
 #endif // MAINWINDOW_H
