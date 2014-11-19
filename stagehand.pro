@@ -25,7 +25,10 @@ SOURCES += main.cpp\
     settings.cpp \
     socketclient.cpp \
     delegate.cpp \
-    filedownloader.cpp
+    filedownloader.cpp \
+    stagehandarchive.cpp
+
+INCLUDEPATH += /usr/local/include/quazip/
 
 HEADERS  += mainwindow.h \
     treemodel.h \
@@ -39,7 +42,8 @@ HEADERS  += mainwindow.h \
     socketclient.h \
     delegate.h \
     filedownloader.h \
-    version.h
+    version.h \
+    stagehandarchive.h
 
 FORMS    += mainwindow.ui
 
@@ -56,5 +60,7 @@ OTHER_FILES += \
 
 RESOURCES += \
     stagehand.qrc
+
+LIBS+= -L/usr/local/lib/ -lquazip
 
 

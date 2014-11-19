@@ -36,6 +36,7 @@
 #include <QMessageBox>
 #include <QDesktopWidget>
 #include <QtConcurrent/QtConcurrent>
+#include "stagehandarchive.h"
 #include "version.h"
 
 Settings MainWindow::settings;
@@ -133,16 +134,12 @@ void MainWindow::loadFile() {
                                                      tr("Files (*.zip)"),NULL,
                                                      QFileDialog::DontUseNativeDialog);
 
-    QProcess process;
-    if (!fileName.isEmpty()) {
-        process.execute("unzip", QStringList() << "-o" << "-d" << QDir::tempPath() << fileName);
-        process.waitForFinished();
-
-        QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
-        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
-        inputFiles(jsonFile, screenShotFile);
-        refreshScene();
-    }
+    StagehandArchive sa;
+    sa.unzip(fileName);
+    mJsonTxt = sa.getSceneData();
+    mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
+    mGLWidget->setScreenShot(sa.getScreenShot());
+    refreshScene();
 }
 
 void MainWindow::saveFile()
@@ -152,20 +149,10 @@ void MainWindow::saveFile()
                                                    tr("Files (*.zip)"),NULL,
                                                    QFileDialog::DontUseNativeDialog);
 
-    QProcess process;
-    if (!fileName.isEmpty()) {
-
-        QString jsonFile = appendPath(QDir::tempPath(), QString("actors.txt"));
-        QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
-        QImage ss = mGLWidget->getScreenShot();
-        if (!ss.isNull()) {
-            ss.save(screenShotFile);
-        }
-        saveJson(jsonFile,mJsonTxt);
-        process.execute("zip", QStringList() << "-j" << fileName << jsonFile << screenShotFile);
-        process.waitForFinished();
-
-    }
+    StagehandArchive sa;
+    sa.setSceneData(mJsonTxt);
+    sa.setScreenShot(mGLWidget->getScreenShot());
+    sa.zip(fileName);
 }
 
 void MainWindow::zoomIn()
@@ -210,20 +197,6 @@ void MainWindow::updateScene()
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
     }
-}
-
-void MainWindow::inputFiles(QString jsonFile, QString screenShotFile) {
-    if (jsonFile.length()>0 && QFile::exists(jsonFile)) {
-        mDoc = readJson(jsonFile);
-        QFile::remove(jsonFile);       
-    }
-    if (QFile::exists(screenShotFile))
-    {
-        QImage img(screenShotFile);
-        QFile::remove(screenShotFile);
-        mGLWidget->setScreenShot(img);
-    }
-
 }
 
 void MainWindow::refreshScene()
@@ -321,7 +294,7 @@ void MainWindow::addObjects2(QJsonArray array) {
 }
 
 
-QJsonDocument MainWindow::readJson(QString& fileName)
+QJsonDocument MainWindow::readJson(const QString& fileName)
    {
       QFile file;
       file.setFileName(fileName);
