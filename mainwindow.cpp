@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mGLWidget = new GLWidget();
 
     mGLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->glWidget->addWidget(mGLWidget);
+
 
     mTreeModel = new TreeModel;
     mTableModel = new TableModel(ui->tableView);
@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
     resize(sz);
+    ui->glParent->addWidget(mGLWidget);
 }
 
 MainWindow::~MainWindow()

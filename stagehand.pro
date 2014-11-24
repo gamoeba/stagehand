@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     socketclient.cpp \
     delegate.cpp \
     filedownloader.cpp \
-    stagehandarchive.cpp
+    stagehandarchive.cpp \
+    version.cpp
 
 INCLUDEPATH += /usr/local/include/quazip/
 
@@ -56,11 +57,27 @@ OTHER_FILES += \
     leaf_visible.png \
     visible.png \
     shader.fsh \
-    shader.vsh
+    shader.vsh \
+    android/AndroidManifest.xml
 
 RESOURCES += \
     stagehand.qrc
 
-LIBS+= -L/usr/local/lib/ -lquazip
+LIBS+=  -lquazip
+
+macx {
+LIBS+= -L$$PWD/extlibs/osx
+}
+
+android {
+LIBS+= -L$$PWD/extlibs/Android
+}
+
+ios {
+LIBS+= -L$$PWD/extlibs/ios
+}
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
 
 

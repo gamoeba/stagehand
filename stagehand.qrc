@@ -22,5 +22,7 @@
         <file>shader.fsh</file>
         <file>shader.vsh</file>
         <file>versioninfo.txt</file>
+        <file>gles_shader.fsh</file>
+        <file>gles_shader.vsh</file>
     </qresource>
 </RCC>

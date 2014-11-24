@@ -173,10 +173,14 @@ void GLWidget::initializeGL ()
     glGenTextures(1, &m_uiTexture);
 
     QGLShader *vshader = new QGLShader(QGLShader::Vertex);
-    vshader->compileSourceFile(":/stagehand/shader.vsh");
-
     QGLShader *fshader = new QGLShader(QGLShader::Fragment);
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+    vshader->compileSourceFile(":/stagehand/gles_shader.vsh");
+    fshader->compileSourceFile(":/stagehand/gles_shader.fsh");
+#else
+    vshader->compileSourceFile(":/stagehand/shader.vsh");
     fshader->compileSourceFile(":/stagehand/shader.fsh");
+ #endif
 
     program.addShader(vshader);
     program.addShader(fshader);
