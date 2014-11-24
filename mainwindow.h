@@ -108,8 +108,8 @@ private:
     void addObjects2(QJsonArray array);
     bool addNodeObject(QJsonObject obj);
     void resetSearch();
-    void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState);
-    void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState);
+    void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState, int& selectedIndex, int &treePosition);
+    void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState, int selectedIndex, int treePosition);
 };
 
 #endif // MAINWINDOW_H

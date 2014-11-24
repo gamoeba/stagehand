@@ -201,10 +201,12 @@ void MainWindow::refreshScene()
     if (! (mDoc.isNull() || mDoc.isEmpty()) )
     {
         std::map<int,bool> expandedState;
-        GetExpandedState(ui->treeView, mTreeModel->model(),expandedState);
+        int selectedIndex;
+        int treePosition;
+        GetExpandedState(ui->treeView, mTreeModel->model(), expandedState, selectedIndex, treePosition);
         mTreeModel->setTreeData(mDoc);
         ui->treeView->setModel(mTreeModel->model());
-        RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState);
+        RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState, selectedIndex, treePosition);
         //ui->treeView->expandAll();
         addObjects();
         mGLWidget->repaint();
@@ -345,7 +347,11 @@ void MainWindow::updateTableView(const QModelIndex &index)
 
 }
 
-void MainWindow::GetExpandedState(QTreeView* view, QStandardItemModel* model,  std::map<int, bool>& expandedState)
+void MainWindow::GetExpandedState(QTreeView* view,
+                                  QStandardItemModel* model,
+                                  std::map<int, bool>& expandedState,
+                                  int& selectedIndex,
+                                  int& treePosition)
 {
 
     QModelIndexList children;
@@ -368,9 +374,23 @@ void MainWindow::GetExpandedState(QTreeView* view, QStandardItemModel* model,  s
         int index = var.toInt();
         expandedState[index] = view->isExpanded(child);
     }
+
+    selectedIndex = 0;
+    QItemSelectionModel *sel = view->selectionModel();
+    if (sel) {
+        QModelIndexList modelindexlist = sel->selection().indexes();
+
+        if (!modelindexlist.empty()) {
+            QModelIndex ind = modelindexlist.at(0);
+            selectedIndex = model->itemFromIndex(ind)->data(JsonItem::IdRole).toInt();
+        }
+    }
+    treePosition = view->treePosition();
+    qDebug() << treePosition;
+
 }
 
-void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool> &expandedState)
+void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool> &expandedState, int selectedIndex, int treePosition)
 {
     QModelIndexList children;
 
@@ -393,7 +413,12 @@ void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model
         if (expandedState[index]) {
             view->expand(child);
         }
+        if (index == selectedIndex)
+        {
+            view->selectionModel()->select(child, QItemSelectionModel::ClearAndSelect);
+        }
     }
+    view->setTreePosition(treePosition);
 }
 
 void MainWindow::tableItemChanged(QStandardItem * item)
