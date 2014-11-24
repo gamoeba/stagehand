@@ -26,7 +26,7 @@ GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
     m_fScale = 1.0;
-    setAutoBufferSwap(false);
+    //setAutoBufferSwap(false);
 
     mTranslateX = 0;
     mTranslateY = 0;

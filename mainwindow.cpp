@@ -200,8 +200,11 @@ void MainWindow::refreshScene()
 {
     if (! (mDoc.isNull() || mDoc.isEmpty()) )
     {
+        std::map<int,bool> expandedState;
+        GetExpandedState(ui->treeView, mTreeModel->model(),expandedState);
         mTreeModel->setTreeData(mDoc);
         ui->treeView->setModel(mTreeModel->model());
+        RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState);
         //ui->treeView->expandAll();
         addObjects();
         mGLWidget->repaint();
@@ -340,6 +343,57 @@ void MainWindow::updateTableView(const QModelIndex &index)
     ui->tableView->resizeColumnsToContents();
     ui->tableView->resizeRowsToContents();
 
+}
+
+void MainWindow::GetExpandedState(QTreeView* view, QStandardItemModel* model,  std::map<int, bool>& expandedState)
+{
+
+    QModelIndexList children;
+
+    //  Get top-level first.
+    for ( int i = 0; i < model->rowCount(); ++i ) {
+        children << model->index( i, 0 );  //  Use whatever column you are interested in.
+    }
+
+    // Now descend through the generations.
+    for ( int i = 0; i < children.size(); ++i ) {
+        for ( int j = 0; j < model->rowCount( children[i] ); ++j ) {
+            children << children[i].child( j, 0 );
+        }
+    }
+
+    foreach (QModelIndex child, children)
+    {
+        QVariant var = model->itemFromIndex(child)->data(JsonItem::IdRole);
+        int index = var.toInt();
+        expandedState[index] = view->isExpanded(child);
+    }
+}
+
+void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool> &expandedState)
+{
+    QModelIndexList children;
+
+    //  Get top-level first.
+    for ( int i = 0; i < model->rowCount(); ++i ) {
+        children << model->index( i, 0 );  //  Use whatever column you are interested in.
+    }
+
+    // Now descend through the generations.
+    for ( int i = 0; i < children.size(); ++i ) {
+        for ( int j = 0; j < model->rowCount( children[i] ); ++j ) {
+            children << children[i].child( j, 0 );
+        }
+    }
+
+    foreach (QModelIndex child, children)
+    {
+        QVariant var = model->itemFromIndex(child)->data(JsonItem::IdRole);
+        int index = var.toInt();
+        if (expandedState[index]) {
+            view->expand(child);
+        }
+    }
 }
 
 void MainWindow::tableItemChanged(QStandardItem * item)

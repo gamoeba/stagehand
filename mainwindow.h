@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QLabel>
 #include <QSplashScreen>
+#include <QTreeView>
 #include "treemodel.h"
 #include "tablemodel.h"
 #include "settings.h"
@@ -103,11 +104,12 @@ private:
     QJsonDocument mDoc;
     QLabel* mSBLabel;
     FileDownloader* m_pDownloader;
-
     void addObjects();
     void addObjects2(QJsonArray array);
     bool addNodeObject(QJsonObject obj);
     void resetSearch();
+    void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState);
+    void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState);
 };
 
 #endif // MAINWINDOW_H

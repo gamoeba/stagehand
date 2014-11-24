@@ -27,7 +27,8 @@ JsonItem::JsonItem(QJsonObject object, bool overallVisible)
     QJsonValue value = mObject.value(MainWindow::settings.mNodeName);
     QJsonValue id = mObject.value(MainWindow::settings.mNodeID);
     QJsonValue isVisible = mObject.value(MainWindow::settings.mNodeVisible);
-    mDisplayName = "("+ QString::number(id.toInt()) + ") " + value.toString() ;
+    mId = id.toInt();
+    mDisplayName = "("+ QString::number(mId) + ") " + value.toString() ;
 }
 
 QVariant JsonItem::data(int role) const
@@ -55,6 +56,8 @@ QVariant JsonItem::data(int role) const
         }
         case JsonRole:
             return QVariant(mObject);
+        case IdRole:
+            return QVariant(mId);
         default:
             return QVariant();
 

@@ -25,7 +25,7 @@ class JsonItem : public QStandardItem
 {
 public:
     static const int JsonRole = Qt::UserRole +1;
-
+    static const int IdRole = Qt::UserRole +2;
     explicit JsonItem(QJsonObject object, bool overallVisible);
     QVariant data(int role) const;
 
@@ -38,6 +38,7 @@ private:
     QJsonObject mObject;
     QString mDisplayName;
     bool mOverallVisible;
+    int mId;
 };
 
 #endif // JSONITEM_H
