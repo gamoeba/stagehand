@@ -1,5 +1,5 @@
 #include <QString>
-#include <quazipfile.h>
+#include <quazip/quazipfile.h>
 #include <QDebug>
 #include <QBuffer>
 #include "stagehandarchive.h"

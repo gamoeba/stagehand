@@ -1,4 +1,2 @@
-Enabled Save Functionality
-Automatic update improvement
-Asynchronous loading of screen shot to
-improve responsiveness
+Allow automatic update to use proxy
+Internal Zip/Unzip functionality

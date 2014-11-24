@@ -38,14 +38,14 @@
 #include <QtConcurrent/QtConcurrent>
 #include "stagehandarchive.h"
 #include "version.h"
+#include "utils.h"
 
 Settings MainWindow::settings;
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    mForceUpdate(false)
+    ui(new Ui::MainWindow)
 {
     QDesktopWidget desktop;
     QRect screenSize = desktop.availableGeometry(this);
@@ -122,11 +122,6 @@ void MainWindow::setHostName(QString hostName)
 void MainWindow::setPortNumber(QString portNumber)
 {
     settings.mPortNumber = portNumber;
-}
-
-QString appendPath(const QString& path1, const QString& path2)
-{
-    return QDir::cleanPath(path1 + QDir::separator() + path2);
 }
 
 void MainWindow::loadFile() {
@@ -487,102 +482,4 @@ void MainWindow::on_treeSearch_returnPressed()
 {
     qDebug() << "return Pressed";
     nextSelection();
-}
-
-
-// Automatic update Functions
-
-void MainWindow::checkForUpdates(bool forceUpdate)
-{
-    QString extractDir = appendPath(QApplication::applicationDirPath(),"../");
-    //these are obsolete, so delete in version 0.42/0.43
-    QString deleteFileName = appendPath(extractDir, "checkupdates.sh");
-    QString versionFileName = appendPath(extractDir, "CURRENT_VERSION");
-    QFile deleteFile(deleteFileName);
-    if (deleteFile.exists()) {
-        deleteFile.remove();
-    }
-    QFile vf(versionFileName);
-    if (vf.exists()) {
-        vf.remove();
-    }
-
-    mForceUpdate = forceUpdate;
-    QString versionFile;
-    versionFile.sprintf("/versioninfo_%s.txt",versionSuffix);
-
-    QUrl versionUrl(settings.mBaseUpdateUrl + versionFile);
-    m_pDownloader = new FileDownloader(versionUrl, this);
-
-    QObject::connect(m_pDownloader, SIGNAL(downloaded()), SLOT(versionAvailable()));
-}
-
-void MainWindow::versionAvailable()
-{
-    QMessageBox msgBox;
-    QByteArray data = m_pDownloader->downloadedData();
-    QString versionInfo(data);
-
-    QString path = QApplication::applicationDirPath();
-    QTextStream stream(data);
-    double versionNumber = stream.readLine().toDouble();
-    if (mForceUpdate || versionNumber > STAGEHAND_VERSION)
-    {
-
-        msgBox.setText("Update Available");
-        msgBox.setInformativeText(versionInfo);
-        msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        msgBox.exec();
-        int res = msgBox.result();
-
-        if (res == QMessageBox::Yes)
-        {
-            QString updateFile;
-            updateFile.sprintf("/%s_update%g.zip",versionSuffix, versionNumber);
-
-            QUrl versionUrl(settings.mBaseUpdateUrl + updateFile);
-            m_pDownloader = new FileDownloader(versionUrl, this);
-
-            QObject::connect(m_pDownloader, SIGNAL(downloaded()), SLOT(updateDownloaded()));
-
-        }
-    }
-}
-
-void MainWindow::updateDownloaded()
-{
-    const QString updateFileName = "stagehand_update.zip";
-    QByteArray data = m_pDownloader->downloadedData();
-
-    QString updateFile = appendPath(QDir::tempPath(), QString(updateFileName));
-    QFile file;
-    file.setFileName(updateFile);
-    file.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    file.write(data);
-    file.close();
-
-    QString extractDir = appendPath(QApplication::applicationDirPath(),"../");
-
-    QProcess process;
-    process.execute("unzip", QStringList() << "-o" << "-d" << extractDir << updateFile);
-    process.waitForFinished();
-    int exitCode = process.exitCode();
-    QFile::remove(updateFile);
-    if (exitCode == 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Restart required");
-        msgBox.setInformativeText("Restart Application to complete update?");
-        msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        msgBox.exec();
-        int res = msgBox.result();
-
-        if (res == QMessageBox::Yes)
-        {
-            QProcess::startDetached(QApplication::applicationFilePath());
-            QApplication::quit();
-        }
-    }
 }

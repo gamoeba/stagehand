@@ -60,7 +60,6 @@ static QList<QStandardItem*> childList( QStandardItem *qi )
 void TreeModel::setTreeData(QJsonDocument doc)
 {
     jsonDoc = doc;
-    QList<QStandardItem*> cl = childList(mModel->index(0, 0));
     mModel->clear();
     QJsonObject obj = jsonDoc.object();
     QJsonValue value = obj.value(settings.mNodeName);

@@ -1,7 +1,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 #include <QtGlobal>
-static const double STAGEHAND_VERSION=0.44;
+static const double STAGEHAND_VERSION=0.45;
 
 #if defined Q_OS_LINUX
 static const char* versionSuffix = "Linux";

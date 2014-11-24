@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QSplashScreen>
 #include <version.h>
+#include "stagehandupdate.h"
 
 int main(int argc, char *argv[])
 {
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
     w.setAppNameAndDirectory(fileInfo.baseName(), fileInfo.absoluteDir());
 
     w.show();
-    w.checkForUpdates(forceUpdate);
+    StagehandUpdate updater;
+    updater.checkForUpdates(forceUpdate);
     return a.exec();
 }
