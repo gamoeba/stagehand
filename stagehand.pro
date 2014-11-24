@@ -27,9 +27,11 @@ SOURCES += main.cpp\
     delegate.cpp \
     filedownloader.cpp \
     stagehandarchive.cpp \
-    version.cpp
+    version.cpp \
+    stagehandupdate.cpp \
+    utils.cpp
 
-INCLUDEPATH += /usr/local/include/quazip/
+INCLUDEPATH += extlibs/include/quazip/
 
 HEADERS  += mainwindow.h \
     treemodel.h \
@@ -44,7 +46,9 @@ HEADERS  += mainwindow.h \
     delegate.h \
     filedownloader.h \
     version.h \
-    stagehandarchive.h
+    stagehandarchive.h \
+    stagehandupdate.h \
+    utils.h
 
 FORMS    += mainwindow.ui
 
@@ -63,11 +67,14 @@ OTHER_FILES += \
 RESOURCES += \
     stagehand.qrc
 
-LIBS+=  -lquazip
-
-macx {
-LIBS+= -L$$PWD/extlibs/osx
+unix:!macx {
+LIBS+= -Lextlibs/Linux
 }
+macx {
+LIBS+= -Lextlibs/Darwin
+}
+
+LIBS+= -lquazip
 
 android {
 LIBS+= -L$$PWD/extlibs/Android
