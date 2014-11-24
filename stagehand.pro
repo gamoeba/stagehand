@@ -31,7 +31,7 @@ SOURCES += main.cpp\
     stagehandupdate.cpp \
     utils.cpp
 
-INCLUDEPATH += extlibs/include/quazip/
+INCLUDEPATH += $$PWD/extlibs/include/
 
 HEADERS  += mainwindow.h \
     treemodel.h \
@@ -68,10 +68,10 @@ RESOURCES += \
     stagehand.qrc
 
 unix:!macx {
-LIBS+= -Lextlibs/Linux
+LIBS+= -L$$PWD/extlibs/Linux
 }
 macx {
-LIBS+= -Lextlibs/Darwin
+LIBS+= -L$$PWD/extlibs/osx
 }
 
 LIBS+= -lquazip
