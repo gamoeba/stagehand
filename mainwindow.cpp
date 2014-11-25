@@ -389,7 +389,6 @@ void MainWindow::GetExpandedState(QTreeView* view,
     QStandardItem* item = model->itemFromIndex(ind);
     if (item != NULL) {
         treePosition = item->data(JsonItem::IdRole).toInt();
-        qDebug() << treePosition;
     }
 
 }
@@ -562,13 +561,9 @@ void MainWindow::resetSearch()
 
 void MainWindow::on_treeSearch_editingFinished()
 {
-    //qDebug() << "edit finished";
-    //ui->treeView->selectionModel()->select(;
-
 }
 
 void MainWindow::on_treeSearch_returnPressed()
 {
-    qDebug() << "return Pressed";
     nextSelection();
 }

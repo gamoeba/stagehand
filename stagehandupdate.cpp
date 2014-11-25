@@ -157,7 +157,6 @@ void StagehandUpdate::extractAll(QuaZip& archive, const QString &extractDir )
         QString filePath = archive.getCurrentFileName();
         QString newPath = appendPath(extractDir, filePath);
 
-        qDebug() << filePath;
         if (!filePath.endsWith("/"))
         {
             QuaZipFileInfo64 info;

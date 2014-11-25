@@ -6,7 +6,7 @@ export QT_PLUGIN_PATH=$DIR/plugins
 # apply any updates
 if [ -d update ]
 then
-  cp -dfvR update/* .
-  rm -rf update
+  cp -dfvR $DIR/update/* .
+  rm -rf $DIR/update
 fi
 $DIR/bin/stagehand $*
