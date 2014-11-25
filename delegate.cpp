@@ -97,7 +97,7 @@ QSize TableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIn
     QString str = index.data(Qt::DisplayRole).toString();
     QTableWidget* tw = getTableWidget(str);
     if (tw) {
-        int cc = tw->colorCount();
+        int cc = tw->columnCount();
         int w = 0;
         for (int i=0;i<cc;i++)
             w += tw->columnWidth(i);
