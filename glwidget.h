@@ -53,6 +53,7 @@ public:
 
     void setSelection(int id);
     QImage getScreenShot();
+
 public slots:
     void animate();
 
@@ -63,6 +64,7 @@ signals:
 protected:
     void paintGL ();
     void initializeGL ();
+    void resizeGL(int width, int height);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *eventPress);
     void mouseReleaseEvent(QMouseEvent *releaseEvent);
@@ -80,6 +82,7 @@ private:
     QMatrix4x4 mViewMatrix;
     QMatrix4x4 mModelView;
     double mAspectRatio;
+    double mViewportRatio;
     std::map<int, SceneObject> mObjects;
     std::vector<int> mSelectedIds;
     unsigned int mSelectionIndex;

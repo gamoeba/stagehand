@@ -26,8 +26,7 @@ GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
     m_fScale = 1.0;
-    //setAutoBufferSwap(false);
-
+    mViewportRatio = 1.0;
     mTranslateX = 0;
     mTranslateY = 0;
     mDragX = 0;
@@ -205,6 +204,12 @@ void GLWidget::initializeGL ()
     m_fAngle = 0;
 }
 
+void GLWidget::resizeGL(int width, int height)
+ {
+     mViewportRatio = (double)height/(double)width;
+     glViewport(0,0,width,height);
+}
+
 void GLWidget::paintGL()
 {
     glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
@@ -229,7 +234,7 @@ void GLWidget::paintGL()
         program.bind();
         mModelView = mProjectionMatrix * mViewMatrix;
         mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
-        mModelView.scale(mAspectRatio, 1.0, 1.0);
+        mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
         mModelView.scale(m_fScale,m_fScale,1.0);
 
         int selectionId = 0;
