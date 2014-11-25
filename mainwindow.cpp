@@ -385,8 +385,12 @@ void MainWindow::GetExpandedState(QTreeView* view,
             selectedIndex = model->itemFromIndex(ind)->data(JsonItem::IdRole).toInt();
         }
     }
-    treePosition = view->treePosition();
-    qDebug() << treePosition;
+    QModelIndex ind = view->indexAt(view->rect().topLeft());
+    QStandardItem* item = model->itemFromIndex(ind);
+    if (item != NULL) {
+        treePosition = item->data(JsonItem::IdRole).toInt();
+        qDebug() << treePosition;
+    }
 
 }
 
@@ -405,7 +409,6 @@ void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model
             children << children[i].child( j, 0 );
         }
     }
-
     foreach (QModelIndex child, children)
     {
         QVariant var = model->itemFromIndex(child)->data(JsonItem::IdRole);
@@ -416,9 +419,15 @@ void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model
         if (index == selectedIndex)
         {
             view->selectionModel()->select(child, QItemSelectionModel::ClearAndSelect);
+            updateTableView(child);
+            updateGLView(child);
+        }
+
+        if (index == treePosition) {
+            view->scrollTo(child, QAbstractItemView::PositionAtTop);
         }
     }
-    view->setTreePosition(treePosition);
+
 }
 
 void MainWindow::tableItemChanged(QStandardItem * item)
