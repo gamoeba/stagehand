@@ -4,9 +4,9 @@ export LD_LIBRARY_PATH=$DIR/lib
 export QT_PLUGIN_PATH=$DIR/plugins
 
 # apply any updates
-if [ -d update ]
+if [ -d "$DIR/update" ]
 then
-  cp -dfvR $DIR/update/* .
+  cp -avf $DIR/update/* $DIR/ 
   rm -rf $DIR/update
 fi
 $DIR/bin/stagehand $*

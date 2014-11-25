@@ -108,8 +108,10 @@ void StagehandUpdate::updateDownloaded()
         if (res == QMessageBox::Yes)
         {
             // solve the chicken and egg problem
+            QString fromPath = appendPath(extractDir, appName);
             QFile::remove(startPath);
-            QFile::copy(appendPath(extractDir, appName), startPath );
+            QFile::copy(fromPath, startPath );
+            QFile::remove(fromPath); // to prevent it being copied while it is running
             QProcess::startDetached(startPath);
             QApplication::quit();
         }

@@ -1,3 +1,7 @@
+version 0.47
+------------
+Correct glviewport for some displays
+
 version 0.46
 ------------
 Keep position and selection in tree on update
