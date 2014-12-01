@@ -31,7 +31,7 @@ const QString KNodeWorldMatrixName("NodeWorldMatrixName");
 const QString KNodeSizeName("NodeSizeName");
 const QString KHostName("HostName");
 const QString KPortNumber("PortNumber");
-const QString KAdbDestPortNumber("AdbDestPortNumber");
+const QString KForwardPortDest("ForwardPortDest");
 const QString KCmdGetScene("GetScene");
 const QString KCmdSetProperties("SetProperties");
 const QString KFontPointSize("FontPointSize");
@@ -56,7 +56,7 @@ void Settings::loadSettings(QString fileName)
     mPropNodeSizeName = updateSetting(settings, KNodeSizeName, "size");
     mHostName = updateSetting(settings, KHostName, "127.0.0.1");
     mPortNumber = updateSetting(settings, KPortNumber, "5001");
-    mAdbForwardPort = updateSetting(settings, KAdbDestPortNumber, "");
+    mForwardPortDest = updateSetting(settings, KForwardPortDest, "");
     mCmdGetScene = updateSetting(settings, KCmdGetScene, "get_scene");
     mCmdSetProperties = updateSetting(settings, KCmdSetProperties, "set_properties");
     mFontPointSize = updateSetting(settings, KFontPointSize, "10");

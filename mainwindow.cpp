@@ -176,7 +176,7 @@ void MainWindow::takeScreenShot()
 }
 void MainWindow::updateScene()
 {
-    adbForward();
+    portForward();
     SocketClient client;
     mJsonTxt = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
 
@@ -509,7 +509,7 @@ void MainWindow::on_sendButton_clicked()
             command += "|";
         }
     }
-    adbForward();
+    portForward();
     SocketClient client;
     client.sendCommand(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdSetProperties + command);
 
@@ -517,10 +517,10 @@ void MainWindow::on_sendButton_clicked()
     on_clearButton_clicked();
 }
 
-void MainWindow::adbForward() {
-    if (settings.mAdbForwardPort.length()>0) {
+void MainWindow::portForward() {
+    if (settings.mForwardPortDest.length()>0) {
         QProcess process;
-        process.execute("adb", QStringList() << "forward" << "tcp:"+settings.mPortNumber << "tcp:"+settings.mAdbForwardPort);
+        process.execute("portforward", QStringList() << settings.mPortNumber << settings.mForwardPortDest);
         process.waitForFinished();
     }
 }

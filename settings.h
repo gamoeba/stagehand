@@ -45,7 +45,7 @@ public:
     QString mPortNumber;
     QString mCmdGetScene;
     QString mCmdSetProperties;
-    QString mAdbForwardPort;
+    QString mForwardPortDest;
     QString mFontPointSize;
 };
 
