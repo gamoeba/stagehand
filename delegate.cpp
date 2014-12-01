@@ -125,16 +125,16 @@ QTableWidget* TableDelegate::CreateMatrix() const
     tw->horizontalHeader()->setHidden(true);
     tw->verticalHeader()->setHidden(true);
 
-    QFont font;
     tw->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     tw->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
     tw->setFrameShape(QFrame::StyledPanel);
     tw->setFrameShadow(QFrame::Sunken);
-    //tw->setLineWidth(10);
-    tw->setGridStyle(Qt::DotLine);
+    tw->setGridStyle(Qt::SolidLine);
     tw->resizeRowsToContents();
     tw->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    tw->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    tw->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     return tw;
 }
 
@@ -184,7 +184,7 @@ void TableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     QTableWidget* tw = getTableWidget(str, false);
     if (tw) {
 
-        tw->setStyleSheet("QTableWidget {background-color: transparent;}"
+        tw->setStyleSheet("QTableWidget {background-color: transparent;gridline-color: rgb(200,200,200);border:0px;}"
                                         "QHeaderView::section {background-color: transparent;}"
                                         "QHeaderView {background-color: transparent;}"
                                         "QTableCornerButton::section {background-color: transparent;}");

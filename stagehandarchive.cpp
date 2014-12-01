@@ -20,7 +20,6 @@ void StagehandArchive::unzip(QString filename)
         QString fn = file.getActualFileName();
         QuaZipFileInfo64 info;
         file.getFileInfo(&info);
-        quint64 size = info.uncompressedSize;
         file.open(QIODevice::ReadOnly);
         QByteArray byteArray = file.readAll();
         if (fn.compare("actors.txt")==0) {

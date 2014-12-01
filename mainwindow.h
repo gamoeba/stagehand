@@ -52,7 +52,7 @@ public:
 
     static Settings settings;
 
-    void adbForward();
+    void portForward();
     void nextSelection();
     void saveJson(QString &fileName, const QString &str);
     void takeScreenShot();
