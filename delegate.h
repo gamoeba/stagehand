@@ -27,6 +27,7 @@ class TableDelegate : public QStyledItemDelegate
 
 public:
     TableDelegate(int editable, QObject *parent = 0);
+    ~TableDelegate();
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
@@ -41,9 +42,12 @@ public:
     QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const ;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    QTableWidget* getTableWidget(QString str) const;
+    QTableWidget* getTableWidget(QString str, bool isEditor) const;
 private:
-    int mEditableCol;
+    QTableWidget *CreateMatrix() const;
+
+    QTableWidget* mNormalTable;
+    int mEditableCol;  
 };
 
 

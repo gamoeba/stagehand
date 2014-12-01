@@ -104,6 +104,7 @@ private:
     QJsonDocument mDoc;
     QLabel* mSBLabel;
     FileDownloader* m_pDownloader;
+    bool mChangingProperties;
     void addObjects();
     void addObjects2(QJsonArray array);
     bool addNodeObject(QJsonObject obj);

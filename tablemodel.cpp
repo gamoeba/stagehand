@@ -40,7 +40,6 @@ void TableModel::setTableData(QJsonObject obj)
 {
     mJsonObject = obj;
 
-    mModel->clear();
 
     QJsonValue value = obj.value(QString("Name"));
     QJsonValue id = obj.value(QString("id"));
@@ -49,53 +48,61 @@ void TableModel::setTableData(QJsonObject obj)
 
     QJsonValue children =  obj.value(QString("properties"));
     if (children.isArray()) {
-        addChildren(children.toArray());
+        QJsonArray childrenArray = children.toArray();
+        replaceChildren(children.toArray());
     }
 
- /*   QModelIndex mi = mModel->index(1,1);
-    mModel->setData(mi, QVariant("test"));
-
-    QStandardItem* item = mModel->itemFromIndex(mi);
-
-    QTableWidget* tw = new QTableWidget(mTable);
-    tw->setRowCount(4);
-    tw->setColumnCount(4);
-    tw->horizontalHeader()->setVisible(false);
-    tw->verticalHeader()->setVisible(false);
-    tw->setVisible(true);
-//            mTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-//            //mTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-//            mTable->verticalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-//            //mTable->verticalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-
-    mTable->setIndexWidget(mi, tw);
-*/
 }
 
-void TableModel::addChildren( QJsonArray array) {
+void TableModel::replaceChildren( QJsonArray array) {
     QJsonArray::iterator iter;
+
+    // first remove rows not in new data
+    int rows = mModel->rowCount();
+    QString command = " |";
+    QList<int> rowsToDelete;
+    //reverse order to make it easier to delete by row
+    for (int i=rows-1;i>=0;--i) {
+        QString currname = mModel->data(mModel->index(i,0), Qt::DisplayRole).toString();
+        bool found = false;
+        for (iter = array.begin(); iter !=array.end();iter++) {
+            QJsonValue val = *iter;
+            if (val.isArray()) {
+                QJsonArray arr = val.toArray();
+                QString nameStr = arr.at(0).toString();
+                if (nameStr.compare(currname)==0)
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) rowsToDelete << i;
+
+    }
+    foreach(int row, rowsToDelete)
+        mModel->removeRow(row);
 
     for (iter = array.begin(); iter !=array.end();iter++) {
         QJsonValue val = *iter;
         if (val.isArray()) {
             QJsonArray arr = val.toArray();
+            QString nameStr = arr.at(0).toString();
             QString valStr = arr.at(1).toString();
-            //valStr.replace(QRegExp("\\] *, *\\["),"],\n[");
-            QStandardItem* name = new QStandardItem(arr.at(0).toString());
+            QStandardItem* name = new QStandardItem(nameStr);
             name->setFlags(name->flags() ^ Qt::ItemIsEditable);
             QStandardItem* value = new QStandardItem(valStr);
             QList<QStandardItem*> items;
-            items.append(name);
-            items.append(value);
-            mModel->appendRow(items);
-
+            QList<QStandardItem*> old = mModel->findItems(nameStr);
+            if (old.empty()) {
+                items.append(name);
+                items.append(value);
+                mModel->appendRow(items);
+            } else {
+                QModelIndex ind = old.at(0)->index();
+                mModel->item(ind.row(),1)->setText(valStr);
+            }
             DataObject obj(arr.at(1).toString());
-            obj.isMatrix();
-
-
-//            QModelIndex mi = mModel->indexFromItem(value);
-
-
         }
     }
 }

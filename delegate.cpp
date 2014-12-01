@@ -24,8 +24,15 @@
 #include <QPainter>
 
 TableDelegate::TableDelegate(int editableCol, QObject *parent)
-    : QStyledItemDelegate(parent), mEditableCol(editableCol)
+    : QStyledItemDelegate(parent),
+      mEditableCol(editableCol)
 {
+    mNormalTable = CreateMatrix();
+}
+
+TableDelegate::~TableDelegate()
+{
+    delete mNormalTable;
 }
 
 QWidget *TableDelegate::createEditor(QWidget *parent,
@@ -36,9 +43,10 @@ QWidget *TableDelegate::createEditor(QWidget *parent,
     if (index.column()!=mEditableCol) {
         return NULL;
     }
-    QTableWidget* tw = getTableWidget(str);
+    QTableWidget* tw = getTableWidget(str, true);
     if (tw != NULL) {
         tw->setParent(parent);
+        tw->setFont(option.font);
         tw->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         tw->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         return tw;
@@ -95,7 +103,7 @@ void TableDelegate::updateEditorGeometry(QWidget *editor,
 QSize TableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QString str = index.data(Qt::DisplayRole).toString();
-    QTableWidget* tw = getTableWidget(str);
+    QTableWidget* tw = getTableWidget(str, false);
     if (tw) {
         int cc = tw->columnCount();
         int w = 0;
@@ -111,63 +119,69 @@ QSize TableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIn
     }
 }
 
-QTableWidget* TableDelegate::getTableWidget(QString str) const{
+QTableWidget* TableDelegate::CreateMatrix() const
+{
+    QTableWidget* tw = new QTableWidget();
+    tw->horizontalHeader()->setHidden(true);
+    tw->verticalHeader()->setHidden(true);
+
+    QFont font;
+    tw->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    tw->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    tw->setFrameShape(QFrame::StyledPanel);
+    tw->setFrameShadow(QFrame::Sunken);
+    //tw->setLineWidth(10);
+    tw->setGridStyle(Qt::DotLine);
+    tw->resizeRowsToContents();
+    tw->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    return tw;
+}
+
+QTableWidget* TableDelegate::getTableWidget(QString str, bool isEditor) const {
     DataObject dobj(str);
-    if (dobj.isVector() || dobj.isMatrix() || dobj.is4x4Matrix()) {
-        QTableWidget* tw = new QTableWidget();
-        tw->horizontalHeader()->setHidden(true);
-        tw->verticalHeader()->setHidden(true);
-        if (dobj.isVector()) {
-            std::vector<double> arr = dobj.getVector();
-            int cols = arr.size();
-            tw->setColumnCount(cols);
-            tw->setRowCount(1);
+
+
+    QTableWidget* tw = isEditor? CreateMatrix() : mNormalTable;
+    if (dobj.isVector()) {
+        std::vector<double> arr = dobj.getVector();
+        int cols = arr.size();
+        tw->setRowCount(1);
+        tw->setColumnCount(cols);
+        if (tw != NULL) {
             for (int i=0;i<cols;i++) {
-                QTableWidgetItem* item = new QTableWidgetItem();
+                QTableWidgetItem* item  = new QTableWidgetItem();
                 item->setText(QString::number(arr[i]));
-                item->setTextAlignment(Qt::AlignRight);
+                item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
                 tw->setItem(0,i,item);
             }
-        } else if (dobj.is4x4Matrix()) {
-            QMatrix4x4 matrix = dobj.get4x4Matrix();
-            int cols = 4;
-            int rows = 4;
-            tw->setColumnCount(cols);
-            tw->setRowCount(rows);
-            for (int i=0;i<rows;i++) {
-                for (int j=0;j<cols;j++) {
-                    QTableWidgetItem* item = new QTableWidgetItem();
-                    item->setText(QString::number(matrix(i,j)));
-                    item->setTextAlignment(Qt::AlignRight);
-                    tw->setItem(j,i,item);
-                }
+        }
+    } else if (dobj.is4x4Matrix()) {
+        tw->setRowCount(4);
+        tw->setColumnCount(4);
+        QMatrix4x4 matrix = dobj.get4x4Matrix();
+        for (int i=0;i<4;i++) {
+            for (int j=0;j<4;j++) {
+                QTableWidgetItem* item = new QTableWidgetItem();
+                item->setText(QString::number(matrix(i,j)));
+                item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+                tw->setItem(j,i,item);
             }
         }
-        QFont font;
-        int pointSize = MainWindow::settings.mFontPointSize.toInt();
-        font.setPointSize(pointSize);
-        tw->setFont(font);
-        tw->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-        tw->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
-        tw->setFrameShape(QFrame::StyledPanel);
-        tw->setFrameShadow(QFrame::Sunken);
-        //tw->setLineWidth(10);
-        tw->setGridStyle(Qt::DotLine);
-        tw->resizeRowsToContents();
-        tw->setEditTriggers(QAbstractItemView::AllEditTriggers);
-
-
-        return tw;
+    } else {
+        tw = NULL;
     }
-    return NULL;
+
+
+    return tw;
+
 }
 
 void TableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const
 {
     QString str = index.data(Qt::DisplayRole).toString();
-    QTableWidget* tw = getTableWidget(str);
+    QTableWidget* tw = getTableWidget(str, false);
     if (tw) {
 
         tw->setStyleSheet("QTableWidget {background-color: transparent;}"
@@ -180,9 +194,9 @@ void TableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 
         painter->save();
         painter->translate(option.rect.topLeft());
+        tw->setFont(option.font);
         tw->render(painter);
         painter->restore();
-        delete tw;
     } else {
         QStyledItemDelegate::paint(painter, option, index);
     }

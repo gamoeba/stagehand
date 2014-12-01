@@ -45,7 +45,8 @@ Settings MainWindow::settings;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    mChangingProperties(false)
 {
     QDesktopWidget desktop;
     QRect screenSize = desktop.availableGeometry(this);
@@ -337,10 +338,9 @@ void MainWindow::updateTableView(const QModelIndex &index)
 {
     QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
     QJsonObject obj = var.toJsonObject();
-
-    //delete mTableModel;
-    //mTableModel = new TableModel(ui->tableView);
+    mChangingProperties = true;
     mTableModel->setTableData(obj);
+    mChangingProperties = false;
     ui->tableView->setModel(mTableModel->model());
     ui->tableView->resizeColumnsToContents();
     ui->tableView->resizeRowsToContents();
@@ -431,40 +431,43 @@ void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model
 
 void MainWindow::tableItemChanged(QStandardItem * item)
 {
-    QString valueStr = item->data(Qt::DisplayRole).toString();
-    QModelIndex ind = item->index();
-    QString nameStr =  mTableModel->model()->itemFromIndex(ind.sibling(ind.row(),0))->data(Qt::DisplayRole).toString();
-    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
-    int idval = mTableModel->getObjectId();
-    int rows = model->rowCount();
-    bool found = false;
-    for (int i=0;i<rows &&!found;i++) {
+    if (!mChangingProperties)
+    {
+        QString valueStr = item->data(Qt::DisplayRole).toString();
+        QModelIndex ind = item->index();
+        QString nameStr =  mTableModel->model()->itemFromIndex(ind.sibling(ind.row(),0))->data(Qt::DisplayRole).toString();
+        QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
+        int idval = mTableModel->getObjectId();
+        int rows = model->rowCount();
+        bool found = false;
+        for (int i=0;i<rows &&!found;i++) {
 
-        int currid = model->data(model->index(i,0), Qt::DisplayRole).toInt();
-        QString currname = model->data(model->index(i,1), Qt::DisplayRole).toString();
-        if (currid==idval && currname == nameStr) {
-            found = true;
-            //model->setData(model->index(i,2), QVariant(valueStr),Qt::DisplayRole);
-            // SetItem force repaint but for some reason setData doesn't?
-            QStandardItem* value = new QStandardItem(valueStr);
-            model->setItem(i,2, value);
+            int currid = model->data(model->index(i,0), Qt::DisplayRole).toInt();
+            QString currname = model->data(model->index(i,1), Qt::DisplayRole).toString();
+            if (currid==idval && currname == nameStr) {
+                found = true;
+                //model->setData(model->index(i,2), QVariant(valueStr),Qt::DisplayRole);
+                // SetItem force repaint but for some reason setData doesn't?
+                QStandardItem* value = new QStandardItem(valueStr);
+                model->setItem(i,2, value);
+            }
         }
+        if (!found) {
+            QStandardItem* id = new QStandardItem(QString::number(idval));
+            id->setFlags(id->flags() ^ Qt::ItemIsEditable);
+            QStandardItem* name = new QStandardItem(nameStr);
+            name->setFlags(name->flags() ^ Qt::ItemIsEditable);
+            QStandardItem* value = new QStandardItem(valueStr);
+            QList<QStandardItem*> items;
+            items.append(id);
+            items.append(name);
+            items.append(value);
+            model->appendRow(items);
+        }
+        ui->updatePanel->setHidden(false);
+        ui->tableViewUpdate->resizeColumnsToContents();
+        ui->tableViewUpdate->resizeRowsToContents();
     }
-    if (!found) {
-        QStandardItem* id = new QStandardItem(QString::number(idval));
-        id->setFlags(id->flags() ^ Qt::ItemIsEditable);
-        QStandardItem* name = new QStandardItem(nameStr);
-        name->setFlags(name->flags() ^ Qt::ItemIsEditable);
-        QStandardItem* value = new QStandardItem(valueStr);
-        QList<QStandardItem*> items;
-        items.append(id);
-        items.append(name);
-        items.append(value);
-        model->appendRow(items);
-    }
-    ui->updatePanel->setHidden(false);
-    ui->tableViewUpdate->resizeColumnsToContents();
-    ui->tableViewUpdate->resizeRowsToContents();
 }
 
 void MainWindow::newImageReceived(QImage img)

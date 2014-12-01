@@ -33,7 +33,7 @@ public:
     void setTableData(QJsonObject obj);
 
     QStandardItemModel* model() {return mModel;}
-    void addChildren(QJsonArray array);
+    void replaceChildren(QJsonArray array);
 
     int getObjectId() {return mObjectId;}
     void setObjectId(int id) {mObjectId = id;}
