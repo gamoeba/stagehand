@@ -202,12 +202,18 @@ void MainWindow::refreshScene()
     if (! (mDoc.isNull() || mDoc.isEmpty()) )
     {
         std::map<int,bool> expandedState;
-        int selectedIndex;
+        int selectedIndex, currentIndex;
         int treePosition;
-        GetExpandedState(ui->treeView, mTreeModel->model(), expandedState, selectedIndex, treePosition);
+        GetExpandedState(ui->treeView, mTreeModel->model(), expandedState, selectedIndex, currentIndex, treePosition);
         mTreeModel->setTreeData(mDoc);
         ui->treeView->setModel(mTreeModel->model());
-        RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState, selectedIndex, treePosition);
+
+        QObject::connect(ui->treeView->selectionModel(),
+                         SIGNAL(currentChanged(const QModelIndex&,const QModelIndex&)),
+                         this,
+                         SLOT(treeCurrentItemChanged(const QModelIndex&, const QModelIndex&)));
+
+        RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState, selectedIndex, currentIndex, treePosition);
         //ui->treeView->expandAll();
         addObjects();
         mGLWidget->repaint();
@@ -319,13 +325,6 @@ void MainWindow::saveJson(QString& fileName, const QString& str)
     file.close();
 }
 
-void MainWindow::on_treeView_clicked(const QModelIndex &index)
-{
-    updateTableView(index);
-    updateGLView(index);
-
-}
-
 void MainWindow::updateGLView(const QModelIndex &index)
 {
     QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
@@ -351,6 +350,7 @@ void MainWindow::GetExpandedState(QTreeView* view,
                                   QStandardItemModel* model,
                                   std::map<int, bool>& expandedState,
                                   int& selectedIndex,
+                                  int& currentIndex,
                                   int& treePosition)
 {
 
@@ -376,6 +376,7 @@ void MainWindow::GetExpandedState(QTreeView* view,
     }
 
     selectedIndex = 0;
+    currentIndex = 0;
     QItemSelectionModel *sel = view->selectionModel();
     if (sel) {
         QModelIndexList modelindexlist = sel->selection().indexes();
@@ -384,6 +385,10 @@ void MainWindow::GetExpandedState(QTreeView* view,
             QModelIndex ind = modelindexlist.at(0);
             selectedIndex = model->itemFromIndex(ind)->data(JsonItem::IdRole).toInt();
         }
+        QModelIndex curr = sel->currentIndex();
+        QStandardItem* currItem = model->itemFromIndex(curr);
+        if (currItem)
+            currentIndex = currItem->data(JsonItem::IdRole).toInt();
     }
     QModelIndex ind = view->indexAt(view->rect().topLeft());
     QStandardItem* item = model->itemFromIndex(ind);
@@ -393,7 +398,7 @@ void MainWindow::GetExpandedState(QTreeView* view,
 
 }
 
-void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool> &expandedState, int selectedIndex, int treePosition)
+void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool> &expandedState, int selectedIndex, int currentIndex, int treePosition)
 {
     QModelIndexList children;
 
@@ -418,6 +423,11 @@ void MainWindow::RestoreExpandedState(QTreeView *view, QStandardItemModel *model
         if (index == selectedIndex)
         {
             view->selectionModel()->select(child, QItemSelectionModel::ClearAndSelect);
+        }
+
+        if (index == currentIndex)
+        {
+            view->selectionModel()->setCurrentIndex(child, QItemSelectionModel::Current);
             updateTableView(child);
             updateGLView(child);
         }
@@ -569,4 +579,10 @@ void MainWindow::on_treeSearch_editingFinished()
 void MainWindow::on_treeSearch_returnPressed()
 {
     nextSelection();
+}
+
+void MainWindow::treeCurrentItemChanged(const QModelIndex& current, const QModelIndex& previous)
+{
+    updateTableView(current);
+    updateGLView(current);
 }

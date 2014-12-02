@@ -77,8 +77,6 @@ protected:
     void updateGLView(const QModelIndex &index);
     void refreshScene();
 private slots:
-    void on_treeView_clicked(const QModelIndex &index);
-
 
     void on_clearButton_clicked();
 
@@ -90,6 +88,7 @@ private slots:
 
     void on_treeSearch_returnPressed();
 
+    void treeCurrentItemChanged(const QModelIndex &current, const QModelIndex &previous);
 private:
     Ui::MainWindow *ui;
     TreeModel* mTreeModel;
@@ -109,8 +108,8 @@ private:
     void addObjects2(QJsonArray array);
     bool addNodeObject(QJsonObject obj);
     void resetSearch();
-    void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState, int& selectedIndex, int &treePosition);
-    void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState, int selectedIndex, int treePosition);
+    void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState, int& selectedIndex, int &currentIndex, int &treePosition);
+    void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState, int selectedIndex, int currentIndex, int treePosition);
 };
 
 #endif // MAINWINDOW_H
