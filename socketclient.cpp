@@ -33,12 +33,12 @@ QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QSt
     QString resp;
     QHostAddress addr(address);
     client.connectToHost(addr, port);
-    bool conn = client.waitForConnected();
+    bool conn = client.waitForConnected(2000);
     mCommand = command;
     if (conn) {
         client.write(command.toUtf8().data(), command.length());
         client.flush();
-        client.waitForReadyRead();
+        client.waitForReadyRead(2000);
         QString r1 = client.readLine();
         int len = r1.toInt();
         char* buf = new char[len];
