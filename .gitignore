@@ -1,4 +1,11 @@
 stagehand.pro.user
 stagehand.pro.user*
+moc_*
+qrc_*
+ui_*
+*.o
 .DS_Store
 scripts/updates
+Makefile
+stagehand
+stagehand.ini
