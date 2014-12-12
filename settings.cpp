@@ -31,6 +31,7 @@ const QString KNodeWorldMatrixName("NodeWorldMatrixName");
 const QString KNodeSizeName("NodeSizeName");
 const QString KHostName("HostName");
 const QString KPortNumber("PortNumber");
+const QString KAdbDestPortNumber("AdbDestPortNumber");
 const QString KForwardPortDest("ForwardPortDest");
 const QString KCmdGetScene("GetScene");
 const QString KCmdSetProperties("SetProperties");
@@ -61,7 +62,19 @@ void Settings::loadSettings(QString fileName)
     mCmdSetProperties = updateSetting(settings, KCmdSetProperties, "set_properties");
     mFontPointSize = updateSetting(settings, KFontPointSize, "10");
     mBaseUpdateUrl = updateSetting(settings, KBaseUpdateUrl, "http://www.gamoeba.com/stagehand_updates");
+    upgradeOldSettings(settings);
     settings.sync();
+}
+
+void Settings::upgradeOldSettings(QSettings& settings) {
+    QString value = settings.value(KAdbDestPortNumber, "").toString();
+    QString replacementSetting = settings.value(KForwardPortDest, "").toString();
+
+    if (value.length()>0 && replacementSetting.length()==0) {
+        // only replace the new port forwarding setting if not being used yet
+        settings.setValue(KForwardPortDest, "tcp:"+value);
+    }
+    settings.remove(KAdbDestPortNumber);
 }
 
 QString Settings::updateSetting(QSettings& settings, QString settingName, QString defaultValue ) {

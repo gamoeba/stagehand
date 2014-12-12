@@ -88,7 +88,7 @@ private slots:
 
     void on_treeSearch_returnPressed();
 
-    void treeCurrentItemChanged(const QModelIndex &current, const QModelIndex &previous);
+    void treeCurrentItemChanged(const QModelIndex &current, const QModelIndex &);
 private:
     Ui::MainWindow *ui;
     TreeModel* mTreeModel;

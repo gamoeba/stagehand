@@ -47,6 +47,8 @@ public:
     QString mCmdSetProperties;
     QString mForwardPortDest;
     QString mFontPointSize;
+private:
+    void upgradeOldSettings(QSettings &settings);
 };
 
 #endif // SETTINGS_H

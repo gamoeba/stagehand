@@ -581,7 +581,7 @@ void MainWindow::on_treeSearch_returnPressed()
     nextSelection();
 }
 
-void MainWindow::treeCurrentItemChanged(const QModelIndex& current, const QModelIndex& previous)
+void MainWindow::treeCurrentItemChanged(const QModelIndex& current, const QModelIndex& /*previous*/)
 {
     updateTableView(current);
     updateGLView(current);
