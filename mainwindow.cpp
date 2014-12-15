@@ -169,6 +169,7 @@ void MainWindow::takeScreenShot()
     QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
 
     process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
+    process.waitForFinished();
     QImage img(screenShotFile);
     QFile::remove(screenShotFile);
     // notify main thread since we can only update GL widget on main thread
@@ -185,8 +186,8 @@ void MainWindow::updateScene()
 
         QImage img;
         mGLWidget->setScreenShot(img); // set an empty image through to clear any previous images while we wait for the screenshot
-        refreshScene();
         QtConcurrent::run(this, &MainWindow::takeScreenShot);
+        refreshScene();
     } else {
         QMessageBox msgBox;
         msgBox.setText("Error");
