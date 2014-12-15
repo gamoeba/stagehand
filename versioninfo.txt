@@ -1,3 +1,7 @@
+version 0.51
+------------
+Fix for screenshot loading 
+
 version 0.50
 ------------
 More flexible port forwarding
@@ -12,7 +16,3 @@ version 0.46
 Keep position and selection in tree on update
 Fixes for GL rendering and QPaintDevice warning
 
-version 0.45
-------------
-Allow automatic update to use proxy
-Internal Zip/Unzip functionality
