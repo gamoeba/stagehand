@@ -64,10 +64,8 @@ int main(int argc, char *argv[])
         w.setPortNumber(port);
     }
 
-    w.setAppNameAndDirectory(fileInfo.baseName(), fileInfo.absoluteDir());
-
     w.show();
-    StagehandUpdate updater;
+    StagehandUpdate updater(w.settings[KBaseUpdateUrl]);
     updater.checkForUpdates(forceUpdate);
     return a.exec();
 }

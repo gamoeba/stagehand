@@ -44,13 +44,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void setAppNameAndDirectory(QString appName, QDir directory);
     void setHostName(QString hostName);
     void setPortNumber(QString portNumber);
 
     QJsonDocument readJson(const QString &fileName);
 
-    static Settings settings;
+    Settings settings;
 
     void portForward();
     void nextSelection();
@@ -72,6 +71,7 @@ public slots:
     void newImageReceived(QImage img);
     void aboutStagehand();
 
+    void editSettings();
 protected:
     void updateTableView(const QModelIndex &index);
     void updateGLView(const QModelIndex &index);
@@ -110,6 +110,7 @@ private:
     void resetSearch();
     void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState, int& selectedIndex, int &currentIndex, int &treePosition);
     void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState, int selectedIndex, int currentIndex, int treePosition);
+    void runPlatformScript(QString scriptName, QStringList parameters);
 };
 
 #endif // MAINWINDOW_H

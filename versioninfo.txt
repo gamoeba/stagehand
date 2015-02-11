@@ -1,18 +1,14 @@
-version 0.51
+version 0.54
 ------------
-Fix for screenshot loading 
+Add setting for Path to adb/sdb tools
 
-version 0.50
+version 0.53
 ------------
-More flexible port forwarding
-Properties table maintains state during update
+Improvements to support new settings and installation
 
-version 0.47
+version 0.52
 ------------
-Correct glviewport for some displays
+New settings dialog
 
-version 0.46
-------------
-Keep position and selection in tree on update
-Fixes for GL rendering and QPaintDevice warning
+
 

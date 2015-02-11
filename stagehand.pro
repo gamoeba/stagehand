@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     stagehandarchive.cpp \
     version.cpp \
     stagehandupdate.cpp \
-    utils.cpp
+    utils.cpp \
+    settingsdialog.cpp
 
 INCLUDEPATH += $$PWD/extlibs/include/
 
@@ -48,9 +49,12 @@ HEADERS  += mainwindow.h \
     version.h \
     stagehandarchive.h \
     stagehandupdate.h \
-    utils.h
+    utils.h \
+    settingsdialog.h \
+    consts.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    settingsdialog.ui
 
 OTHER_FILES += \
     folder_invisible.png \

@@ -45,7 +45,6 @@ public slots:
 private:
     QStandardItemModel* mModel;
     QJsonDocument jsonDoc;
-    Settings& settings;
     std::map<int, QStandardItem*> mIndices;
 };
 

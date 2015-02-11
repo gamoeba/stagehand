@@ -267,6 +267,7 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionScreenshot"/>
+   <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -338,8 +339,22 @@
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="stagehand.qrc">
+     <normaloff>:/stagehand/information.png</normaloff>:/stagehand/information.png</iconset>
+   </property>
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="stagehand.qrc">
+     <normaloff>:/stagehand/settings.png</normaloff>
+     <normalon>:/stagehand/settings.png</normalon>:/stagehand/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>
@@ -460,6 +475,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSettings</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>editSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadFile()</slot>
@@ -469,5 +500,6 @@
   <slot>zoomOut()</slot>
   <slot>showScreenShot(bool)</slot>
   <slot>aboutStagehand()</slot>
+  <slot>editSettings()</slot>
  </slots>
 </ui>

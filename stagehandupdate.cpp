@@ -14,8 +14,8 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
-StagehandUpdate::StagehandUpdate(QObject* parent)
-    :QObject(parent)
+StagehandUpdate::StagehandUpdate(QString baseUpdates, QObject* parent)
+    :QObject(parent), mBaseUpdates(baseUpdates)
 {
 }
 
@@ -24,24 +24,12 @@ StagehandUpdate::StagehandUpdate(QObject* parent)
 void StagehandUpdate::checkForUpdates(bool forceUpdate)
 {
     QNetworkProxyFactory::setUseSystemConfiguration(true);
-    QString extractDir = appendPath(QApplication::applicationDirPath(),"../");
-    //these are obsolete, so delete in version 0.42/0.43
-    QString deleteFileName = appendPath(extractDir, "checkupdates.sh");
-    QString versionFileName = appendPath(extractDir, "CURRENT_VERSION");
-    QFile deleteFile(deleteFileName);
-    if (deleteFile.exists()) {
-        deleteFile.remove();
-    }
-    QFile vf(versionFileName);
-    if (vf.exists()) {
-        vf.remove();
-    }
 
     mForceUpdate = forceUpdate;
     QString versionFile;
-    versionFile.sprintf("/versioninfo_%s.txt",versionSuffix);
+    versionFile.sprintf("/version_info_%s.txt",versionSuffix);
 
-    QUrl versionUrl(MainWindow::settings.mBaseUpdateUrl + versionFile);
+    QUrl versionUrl(mBaseUpdates + versionFile);
     m_pDownloader = new FileDownloader(versionUrl, this);
 
     QObject::connect(m_pDownloader, SIGNAL(downloaded()), SLOT(versionAvailable()));
@@ -53,7 +41,6 @@ void StagehandUpdate::versionAvailable()
     QByteArray data = m_pDownloader->downloadedData();
     QString versionInfo(data);
 
-    QString path = QApplication::applicationDirPath();
     QTextStream stream(data);
     double versionNumber = stream.readLine().toDouble();
     if (mForceUpdate || versionNumber > STAGEHAND_VERSION)
@@ -71,7 +58,7 @@ void StagehandUpdate::versionAvailable()
             QString updateFile;
             updateFile.sprintf("/%s_update%g.zip",versionSuffix, versionNumber);
 
-            QUrl versionUrl(MainWindow::settings.mBaseUpdateUrl + updateFile);
+            QUrl versionUrl(mBaseUpdates + updateFile);
             m_pDownloader = new FileDownloader(versionUrl, this);
 
             QObject::connect(m_pDownloader, SIGNAL(downloaded()), SLOT(updateDownloaded()));
@@ -85,9 +72,9 @@ void StagehandUpdate::updateDownloaded()
     const QString appName = "stagehand";
     QByteArray data = m_pDownloader->downloadedData();
 
-    QString mainPath = appendPath(QApplication::applicationDirPath(),"../");
+    QString mainPath = appendPath(QDir::homePath(),".stagehand");
     QString extractDir = appendPath(mainPath, "update");
-    QString startPath = appendPath(mainPath, appName);
+    QString startPath = appendPath(QApplication::applicationDirPath(), "../" +appName);
 
     QBuffer buffer( &data );
     buffer.open( QBuffer::ReadOnly );
@@ -108,17 +95,13 @@ void StagehandUpdate::updateDownloaded()
         if (res == QMessageBox::Yes)
         {
             // solve the chicken and egg problem
-            QString fromPath = appendPath(extractDir, appName);
-            QFile::remove(startPath);
-            QFile::copy(fromPath, startPath );
-            QFile::remove(fromPath); // to prevent it being copied while it is running
-            QProcess::startDetached(startPath);
+			QProcess::startDetached(startPath);
             QApplication::quit();
         }
     }
 }
 
-QString StagehandUpdate::createApplyUpdateScript(const QString& extractDir, const QString& mainDir)
+/*QString StagehandUpdate::createApplyUpdateScript(const QString& extractDir, const QString& mainDir)
 {
     QString applyUpdatesScript = appendPath(mainDir, "applyUpdates");
     QFile applyUpdates(applyUpdatesScript);
@@ -136,7 +119,7 @@ QString StagehandUpdate::createApplyUpdateScript(const QString& extractDir, cons
     applyUpdates.close();
     return applyUpdatesScript;
 }
-
+*/
 
 void StagehandUpdate::extractAll(QuaZip& archive, const QString &extractDir )
 {

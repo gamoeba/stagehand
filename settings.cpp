@@ -14,76 +14,50 @@
  * limitations under the License.
  *
  */
-
+#include <QDir>
 #include "settings.h"
+#include <QDebug>
 
-const QString KBaseUpdateUrl("UpdateUrl");
-const QString KNodeName("NodeName");
-const QString KNodeId("NodeId");
-const QString KNodeVisible("NodeVisible");
-const QString KNodeChildrenName("NodeChildrenName");
-const QString KNodePropertiesName("NodePropertiesName");
-const QString KCameraNodeName("CameraNode");
-const QString KCameraNodeProjectionMatrixName("CameraNodeProjectionMatrixName");
-const QString KCameraNodeViewMatrixName("CameraNodeViewMatrixName");
-const QString KCameraNodeAspectRatioName("CameraNodeAspectRatioName");
-const QString KNodeWorldMatrixName("NodeWorldMatrixName");
-const QString KNodeSizeName("NodeSizeName");
-const QString KHostName("HostName");
-const QString KPortNumber("PortNumber");
-const QString KAdbDestPortNumber("AdbDestPortNumber");
-const QString KForwardPortDest("ForwardPortDest");
-const QString KCmdGetScene("GetScene");
-const QString KCmdSetProperties("SetProperties");
-const QString KFontPointSize("FontPointSize");
+
 
 Settings::Settings()
+    :mSettingsFile(QDir::homePath()+QDir::separator()+".stagehand"+QDir::separator()+"stagehand.ini",
+                   QSettings::IniFormat)
 {
-}
+    mSettings[KHostName] ="127.0.3.1";
+    mSettings[KPortNumber] = "3031";
+    mSettings[KForwardPortDest] = "";
+    mSettings[KFontPointSize] = "10";
+    mSettings[KBaseUpdateUrl] = "http://www.gamoeba.com/stagehand_updates";
+    mSettings[KTargetType] = "android";
+    mSettings[KTargetToolsPath] = "~/bin";
 
-void Settings::loadSettings(QString fileName)
-{
-    QSettings settings(fileName, QSettings::IniFormat);
-    mNodeName = updateSetting(settings, KNodeName, "Name");
-    mNodeID = updateSetting(settings, KNodeId, "id");
-    mNodeVisible = updateSetting(settings, KNodeVisible, "visible");
-    mNodePropertiesName = updateSetting(settings, KNodePropertiesName, "properties");
-    mNodeChildrenName = updateSetting(settings, KNodeChildrenName, "children");
-    mCameraNodeName = updateSetting(settings, KCameraNodeName, "camera");
-    mPropProjectionMatrixName = updateSetting(settings, KCameraNodeProjectionMatrixName, "projMatrix");
-    mPropViewMatrixName = updateSetting(settings, KCameraNodeViewMatrixName, "viewMatrix");
-    mPropAspectRatioName = updateSetting(settings, KCameraNodeAspectRatioName, "aspectRatio");
-    mPropNodeWorldMatrixName = updateSetting(settings, KNodeWorldMatrixName, "worldMatrix");
-    mPropNodeSizeName = updateSetting(settings, KNodeSizeName, "size");
-    mHostName = updateSetting(settings, KHostName, "127.0.0.1");
-    mPortNumber = updateSetting(settings, KPortNumber, "5001");
-    mForwardPortDest = updateSetting(settings, KForwardPortDest, "");
-    mCmdGetScene = updateSetting(settings, KCmdGetScene, "get_scene");
-    mCmdSetProperties = updateSetting(settings, KCmdSetProperties, "set_properties");
-    mFontPointSize = updateSetting(settings, KFontPointSize, "10");
-    mBaseUpdateUrl = updateSetting(settings, KBaseUpdateUrl, "http://www.gamoeba.com/stagehand_updates");
-    upgradeOldSettings(settings);
-    settings.sync();
-}
-
-void Settings::upgradeOldSettings(QSettings& settings) {
-    QString value = settings.value(KAdbDestPortNumber, "").toString();
-    QString replacementSetting = settings.value(KForwardPortDest, "").toString();
-
-    if (value.length()>0 && replacementSetting.length()==0) {
-        // only replace the new port forwarding setting if not being used yet
-        settings.setValue(KForwardPortDest, "tcp:"+value);
+    QMap<QString, QString>::iterator iter;
+    for (iter = mSettings.begin();iter != mSettings.end();iter++) {
+        updateSetting(iter.key(), iter.value());
     }
-    settings.remove(KAdbDestPortNumber);
+
 }
 
-QString Settings::updateSetting(QSettings& settings, QString settingName, QString defaultValue ) {
-    QString value = settings.value(settingName,"").toString();
+void Settings::updateSetting(QString settingName, QString defaultValue ) {
+    QString value = mSettingsFile.value(settingName,"").toString();
     if (value.length()==0) {
+        qDebug() << "reset default"<< settingName;
         value = defaultValue;
-        settings.setValue(settingName, value);
+        mSettingsFile.setValue(settingName, value);
+    } else {
+        mSettings[settingName] = value;
     }
-    return value;
+}
+
+void Settings::saveSettings()
+{
+    QMap<QString, QString>::iterator iter;
+    for (iter = mSettings.begin();iter !=mSettings.end();++iter)
+    {
+        mSettingsFile.setValue(iter.key(),iter.value());
+    }
+    mSettingsFile.sync();
 }
 
 

@@ -24,5 +24,7 @@
         <file>versioninfo.txt</file>
         <file>gles_shader.fsh</file>
         <file>gles_shader.vsh</file>
+        <file>settings.png</file>
+        <file>information.png</file>
     </qresource>
 </RCC>

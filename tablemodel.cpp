@@ -29,6 +29,7 @@
 #include <QHeaderView>
 
 #include "nodeobject.h"
+#include "consts.h"
 
 TableModel::TableModel(QTableView* table) :
     QObject(NULL), mTable(table)
@@ -41,12 +42,12 @@ void TableModel::setTableData(QJsonObject obj)
     mJsonObject = obj;
 
 
-    QJsonValue value = obj.value(QString("Name"));
-    QJsonValue id = obj.value(QString("id"));
+    QJsonValue value = obj.value(KDaliNodeName);
+    QJsonValue id = obj.value(KDaliNodeId);
 
     setObjectId((int)id.toDouble());
 
-    QJsonValue children =  obj.value(QString("properties"));
+    QJsonValue children =  obj.value(KDaliNodePropertiesName);
     if (children.isArray()) {
         QJsonArray childrenArray = children.toArray();
         replaceChildren(children.toArray());

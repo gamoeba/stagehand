@@ -4,16 +4,8 @@ then
   echo "Must set STAGEHAND_BIN_COMPILE_LOCATION"
   exit 1
 fi
-mkdir -p updates/bin
-mkdir -p updates/lib
 PLATFORM=`uname`
-cp -d ../extlibs/$PLATFORM/* updates/lib/
-cd updates
-cp $STAGEHAND_BIN_COMPILE_LOCATION/stagehand bin/
-cp ../takescreenshot bin/
-cp ../portforward bin/
-cp ../stagehand .
-VERSION=`bin/stagehand --version`
-zip -r --symlinks $PLATFORM"_update"$VERSION.zip * -x \*.zip -x bin/stagehand.ini -x createstagehandupdate -x *.txt
-bin/stagehand --versioninfo > versioninfo_$PLATFORM.txt
-cd -
+
+VERSION=`$STAGEHAND_BIN_COMPILE_LOCATION/stagehand --version`
+zip -r --symlinks $PLATFORM"_update"$VERSION.zip stagehand*.deb doUpdate
+$STAGEHAND_BIN_COMPILE_LOCATION/stagehand --versioninfo > version_info_$PLATFORM.txt

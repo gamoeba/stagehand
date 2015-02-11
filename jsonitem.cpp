@@ -17,16 +17,21 @@
 
 #include "jsonitem.h"
 #include "mainwindow.h"
+#include "consts.h"
+#include "nodeobject.h"
 
 #include <QIcon>
 
-JsonItem::JsonItem(QJsonObject object, bool overallVisible)
+JsonItem::JsonItem(QJsonObject& object, bool overallVisible)
+    :mObject(object)
 {
     mObject = object;
     mOverallVisible = overallVisible;
-    QJsonValue value = mObject.value(MainWindow::settings.mNodeName);
-    QJsonValue id = mObject.value(MainWindow::settings.mNodeID);
-    QJsonValue isVisible = mObject.value(MainWindow::settings.mNodeVisible);
+    QJsonValue value = mObject.value(KDaliNodeName);
+    QJsonValue id = mObject.value(KDaliNodeId);
+    NodeObject node(mObject, KDaliNodePropertiesName);
+    mVisible = node.getProperty(KDaliNodeVisible).toBoolean();
+
     mId = id.toInt();
     mDisplayName = "("+ QString::number(mId) + ") " + value.toString() ;
 }
@@ -39,8 +44,7 @@ QVariant JsonItem::data(int role) const
 
         case Qt::DecorationRole:
         {
-            int isVisible = mObject.value(MainWindow::settings.mNodeVisible).toInt();
-            if (isVisible==1) {
+            if (mVisible) {
                 return QVariant(QIcon(":/stagehand/leaf_visible.png"));
             } else {
                 return QVariant(QIcon(":/stagehand/leaf_invisible.png"));
@@ -48,7 +52,7 @@ QVariant JsonItem::data(int role) const
         }
         case Qt::ForegroundRole:
         {
-            if (mOverallVisible) {
+            if (mOverallVisible && mVisible) {
                 return QVariant(QColor(Qt::black));
             } else {
                 return QVariant(QColor(Qt::lightGray));

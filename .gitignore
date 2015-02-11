@@ -9,3 +9,5 @@ scripts/updates
 Makefile
 stagehand
 stagehand.ini
+*.backup
+*.autosave

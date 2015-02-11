@@ -1,13 +1,23 @@
 #!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# first resolve actual path of script ...
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+# now add library paths 
 export LD_LIBRARY_PATH=$DIR/lib
 export QT_PLUGIN_PATH=$DIR/plugins
 export PATH=$DIR/bin:$PATH
 
+UPDATEDIR=$HOME/.stagehand/update
 # apply any updates
-if [ -d "$DIR/update" ]
+if [ -d "$UPDATEDIR" ]
 then
-  cp -avf $DIR/update/* $DIR/ 
-  rm -rf $DIR/update
+  gksudo $UPDATEDIR/doUpdate && rm -rf $UPDATEDIR
 fi
+# now run app
 $DIR/bin/stagehand $*

@@ -10,7 +10,7 @@ class StagehandUpdate : public QObject
     Q_OBJECT
 
 public:
-    explicit StagehandUpdate(QObject *parent = 0);
+    explicit StagehandUpdate(QString baseUpdates, QObject *parent = 0);
     void checkForUpdates(bool forceUpdate);
 protected slots:
     void versionAvailable();
@@ -18,10 +18,11 @@ protected slots:
 
 private:
     void extractAll(QuaZip &archive, const QString& extractDir);
-    QString createApplyUpdateScript(const QString &extractDir, const QString &mainDir);
+//    QString createApplyUpdateScript(const QString &extractDir, const QString &mainDir);
 
     FileDownloader* m_pDownloader;
     bool mForceUpdate;
+    QString mBaseUpdates;
 };
 
 #endif // STAGEHANDUPDATE_H

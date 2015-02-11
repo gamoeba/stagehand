@@ -38,6 +38,7 @@ public:
 
     QString toString() {return mValue;}
     double toDouble() {return mValue.toDouble();}
+    bool toBoolean() {return mValue.toInt()==1;}
 
 private:
     std::vector<double> parseVector(QString str);

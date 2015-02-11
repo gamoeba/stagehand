@@ -39,8 +39,9 @@
 #include "stagehandarchive.h"
 #include "version.h"
 #include "utils.h"
+#include "settingsdialog.h"
+#include "consts.h"
 
-Settings MainWindow::settings;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -89,8 +90,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
-    resize(sz);
     ui->glParent->addWidget(mGLWidget);
+
+    QFont font;
+    int pointSize = settings[KFontPointSize].toInt();
+    font.setPointSize(pointSize);
+    ui->tableView->setFont(font);
+    ui->tableViewUpdate->setFont(font);
+    ui->treeView->setFont(font);
+
+    resize(sz);
+    this->repaint();
 }
 
 MainWindow::~MainWindow()
@@ -101,29 +111,14 @@ MainWindow::~MainWindow()
     delete mTableModel;
 }
 
-void MainWindow::setAppNameAndDirectory(QString appName, QDir directory)
-{
-    setWindowTitle(appName);
-    QString settingsFile = directory.filePath(appName+".ini");
-    settings.loadSettings(settingsFile);
-
-    QFont font;
-    int pointSize = settings.mFontPointSize.toInt();
-    font.setPointSize(pointSize);
-    ui->tableView->setFont(font);
-    ui->tableViewUpdate->setFont(font);
-    ui->treeView->setFont(font);
-
-}
-
 void MainWindow::setHostName(QString hostName)
 {
-    settings.mHostName = hostName;
+    settings[KHostName] = hostName;
 }
 
 void MainWindow::setPortNumber(QString portNumber)
 {
-    settings.mPortNumber = portNumber;
+    settings[KPortNumber] = portNumber;
 }
 
 void MainWindow::loadFile() {
@@ -163,23 +158,11 @@ void MainWindow::zoomOut()
     mGLWidget->zoomOut();
 }
 
-void MainWindow::takeScreenShot()
-{
-    QProcess process;
-    QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
-
-    process.execute("bash", QStringList() << "takescreenshot" << screenShotFile);
-    process.waitForFinished();
-    QImage img(screenShotFile);
-    QFile::remove(screenShotFile);
-    // notify main thread since we can only update GL widget on main thread
-    emit newImage(img);
-}
 void MainWindow::updateScene()
 {
     portForward();
     SocketClient client;
-    mJsonTxt = client.sendCommandSizedReturn(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdGetScene + "\n");
+    mJsonTxt = client.sendCommandSizedReturn(settings[KHostName], settings[KPortNumber].toUInt(), KDaliCmdDumpScene);
 
     if (mJsonTxt.length() > 0 ) {
         mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
@@ -250,7 +233,7 @@ void MainWindow::addObjects() {
     mGLWidget->clear();
     QJsonObject obj = mDoc.object();
     addNodeObject(obj);
-    QJsonValue children = obj.value(settings.mNodeChildrenName);
+    QJsonValue children = obj.value(KDaliNodeChildrenName);
     if (children.isArray()) {
         QJsonArray array = children.toArray();
         addObjects2(array);
@@ -258,25 +241,23 @@ void MainWindow::addObjects() {
 }
 
 bool MainWindow::addNodeObject(QJsonObject obj) {
-    QJsonValue value = obj.value(settings.mNodeName);
-    QJsonValue id = obj.value(settings.mNodeID);
-    QJsonValue isVis = obj.value(settings.mNodeVisible);
-    bool vis = isVis.toInt() == 1;
+    QJsonValue value = obj.value(KDaliNodeName);
+    QJsonValue id = obj.value(KDaliNodeId);
     int idVal = (int)id.toInt();
 
-    NodeObject node(obj, settings.mNodePropertiesName);
-    if (value == settings.mCameraNodeName) {
-        DataObject pm = node.getProperty(settings.mPropProjectionMatrixName);
+    NodeObject node(obj, KDaliNodePropertiesName);
+    bool vis = node.getProperty(KDaliNodeVisible).toBoolean();
+    if (value.toString() == KDaliCameraNodeName) {
+        DataObject pm = node.getProperty(KDaliCameraNodeProjectionMatrixName);
         mGLWidget->setProjectionMatrix(pm.get4x4Matrix());
-        DataObject vm = node.getProperty(settings.mPropViewMatrixName);
+        DataObject vm = node.getProperty(KDaliCameraNodeViewMatrixName);
         mGLWidget->setViewMatrix(vm.get4x4Matrix());
 
-        double aspectRatio = node.getProperty(settings.mPropAspectRatioName).toDouble();
+        double aspectRatio = node.getProperty(KDaliCameraNodeAspectRatioName).toDouble();
         mGLWidget->setAspectRatio(aspectRatio);
     } else {
-
-        QMatrix4x4 wm = node.getProperty(settings.mPropNodeWorldMatrixName).get4x4Matrix();
-        std::vector<double> size = node.getProperty(settings.mPropNodeSizeName).getVector();
+        QMatrix4x4 wm = node.getProperty(KDaliNodeWorldMatrixName).get4x4Matrix();
+        std::vector<double> size = node.getProperty(KDaliNodeSizeName).getVector();
         QVector3D qsize(size[0], size[1], size[2]);
         if (vis) {
             mGLWidget->addObject(idVal, SceneObject(wm, qsize));
@@ -295,7 +276,7 @@ void MainWindow::addObjects2(QJsonArray array) {
         if (val.isObject()) {
             QJsonObject obj = val.toObject();
             bool vis = addNodeObject(obj);
-            QJsonValue children = obj.value(settings.mNodeChildrenName);
+            QJsonValue children = obj.value(KDaliNodeChildrenName);
             if (vis && children.isArray()) {
                 addObjects2(children.toArray());
             }
@@ -330,7 +311,7 @@ void MainWindow::updateGLView(const QModelIndex &index)
 {
     QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
     QJsonObject obj = var.toJsonObject();
-    int id = obj.value(settings.mNodeID).toInt();
+    int id = obj.value(KDaliNodeId).toInt();
     mGLWidget->setSelection(id);
 }
 
@@ -522,19 +503,12 @@ void MainWindow::on_sendButton_clicked()
     }
     portForward();
     SocketClient client;
-    client.sendCommand(settings.mHostName, settings.mPortNumber.toUInt(), settings.mCmdSetProperties + command);
+    client.sendCommand(settings[KHostName], settings[KPortNumber].toUInt(), KDaliCmdSetProperties + command);
 
     // after sending, clear the data
     on_clearButton_clicked();
 }
 
-void MainWindow::portForward() {
-    if (settings.mForwardPortDest.length()>0) {
-        QProcess process;
-        process.execute("portforward", QStringList() << settings.mPortNumber << settings.mForwardPortDest);
-        process.waitForFinished();
-    }
-}
 
 void MainWindow::nextSelection() {
     if (mCurrentTreeSearchResults.size()>0) {
@@ -586,4 +560,50 @@ void MainWindow::treeCurrentItemChanged(const QModelIndex& current, const QModel
 {
     updateTableView(current);
     updateGLView(current);
+}
+
+
+void MainWindow::takeScreenShot()
+{
+    QProcess process;
+    QString screenShotFile = appendPath(QDir::tempPath(), QString("screenshot.png"));
+
+    runPlatformScript("takescreenshot", QStringList() << screenShotFile);
+
+    QImage img(screenShotFile);
+    QFile::remove(screenShotFile);
+    // notify main thread since we can only update GL widget on main thread
+    emit newImage(img);
+}
+
+void MainWindow::portForward() {
+    if (settings[KForwardPortDest].length()>0) {
+        runPlatformScript("portforward", QStringList() << settings[KPortNumber] << settings[KForwardPortDest]);
+    }
+}
+
+void MainWindow::editSettings()
+{
+    SettingsDialog d;
+    d.updateFromSettings(settings);
+    int res = d.exec();
+    if (res == QDialog::Accepted) {
+        d.updateSettings(settings);
+    }
+}
+
+void MainWindow::runPlatformScript(QString scriptName, QStringList parameters)
+{
+
+    QString scriptlocation = appendPath(qApp->applicationDirPath(), settings[KTargetType]);
+    QString scriptfullpath = appendPath(scriptlocation, scriptName);
+    qDebug() << "running " << scriptfullpath;
+
+    QProcess process;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("PATH", env.value("Path") + ":" + settings[KTargetToolsPath]);
+    process.setProcessEnvironment(env);
+
+    process.execute(scriptfullpath, parameters);
+    process.waitForFinished();
 }

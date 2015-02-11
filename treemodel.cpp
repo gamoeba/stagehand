@@ -27,10 +27,10 @@
 #include <jsonitem.h>
 #include "nodeobject.h"
 #include "mainwindow.h"
+#include "consts.h"
 
 TreeModel::TreeModel(QObject *parent) :
-    QObject(parent),
-    settings(MainWindow::settings)
+    QObject(parent)
 {
     mModel = new QStandardItemModel;
 }
@@ -40,13 +40,13 @@ void TreeModel::setTreeData(QJsonDocument doc)
     jsonDoc = doc;
     mModel->clear();
     QJsonObject obj = jsonDoc.object();
-    QJsonValue value = obj.value(settings.mNodeName);
-    QJsonValue id = obj.value(settings.mNodeID);
-    bool visible = obj.value(settings.mNodeVisible).toInt()==1;
+    QJsonValue value = obj.value(KDaliNodeName);
+    QJsonValue id = obj.value(KDaliNodeId);
+    bool visible = true;//obj.value(KDaliNodeVisible).toInt()==1;
     QStandardItem* itemx = new JsonItem(obj, visible);
     mModel->appendRow(itemx);
     mIndices[id.toInt()] = itemx;
-    QJsonValue children = obj.value(settings.mNodeChildrenName);
+    QJsonValue children = obj.value(KDaliNodeChildrenName);
     if (children.isArray()) {
         addChildren(itemx, children.toArray(), visible);
     }
@@ -78,17 +78,18 @@ void TreeModel::addChildren(QStandardItem* parent, QJsonArray array, bool visibl
         QJsonValue val = *iter;
         if (val.isObject()) {
             QJsonObject obj = val.toObject();
-            QJsonValue value = obj.value(settings.mNodeName);
-            QJsonValue id = obj.value(settings.mNodeID);
-            bool nodeVisible = obj.value(settings.mNodeVisible).toInt()==1;
+            QJsonValue value = obj.value(KDaliNodeName);
+            QJsonValue id = obj.value(KDaliNodeId);
+            int idval = id.toInt();
+            bool nodeVisible = true;//obj.value(KDaliNodeVisible).toInt()==1;
 
             QStandardItem* itemx = new JsonItem(obj, nodeVisible);
             if (nodeVisible) {
                 nodeVisible = visible;
             }
-            mIndices[id.toInt()] = itemx;
+            mIndices[idval] = itemx;
             parent->appendRow(itemx);
-            QJsonValue children = obj.value(settings.mNodeChildrenName);
+            QJsonValue children = obj.value(KDaliNodeChildrenName);
             if (children.isArray()) {
                 addChildren(itemx, children.toArray(), nodeVisible);
             }
