@@ -269,6 +269,7 @@
    <addaction name="actionScreenshot"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
+   <addaction name="actionPerformance"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoad">
@@ -355,6 +356,14 @@
    </property>
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionPerformance">
+   <property name="text">
+    <string>Performance</string>
+   </property>
+   <property name="toolTip">
+    <string>performance viewer</string>
    </property>
   </action>
  </widget>
@@ -491,6 +500,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPerformance</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>performanceViewer()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadFile()</slot>
@@ -501,5 +526,6 @@
   <slot>showScreenShot(bool)</slot>
   <slot>aboutStagehand()</slot>
   <slot>editSettings()</slot>
+  <slot>performanceViewer()</slot>
  </slots>
 </ui>

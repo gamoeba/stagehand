@@ -72,6 +72,7 @@ public slots:
     void aboutStagehand();
 
     void editSettings();
+    void performanceViewer();
 protected:
     void updateTableView(const QModelIndex &index);
     void updateGLView(const QModelIndex &index);

@@ -22,6 +22,7 @@
 #include "nodeobject.h"
 #include "sceneobject.h"
 #include "socketclient.h"
+#include "performancedialog.h"
 
 #include <QStandardItemModel>
 #include <QFileDialog>
@@ -590,6 +591,14 @@ void MainWindow::editSettings()
     if (res == QDialog::Accepted) {
         d.updateSettings(settings);
     }
+}
+
+void MainWindow::performanceViewer()
+{
+    PerformanceDialog p;
+    p.setConnection(settings[KHostName], settings[KPortNumber].toUInt());
+    p.exec();
+
 }
 
 void MainWindow::runPlatformScript(QString scriptName, QStringList parameters)
