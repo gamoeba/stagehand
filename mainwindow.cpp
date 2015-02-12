@@ -163,7 +163,8 @@ void MainWindow::updateScene()
 {
     portForward();
     SocketClient client;
-    mJsonTxt = client.sendCommandSizedReturn(settings[KHostName], settings[KPortNumber].toUInt(), KDaliCmdDumpScene);
+    client.connectSocket(settings[KHostName], settings[KPortNumber].toUInt());
+    mJsonTxt = client.sendCommandSizedReturn( KDaliCmdDumpScene);
 
     if (mJsonTxt.length() > 0 ) {
         mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
@@ -504,7 +505,8 @@ void MainWindow::on_sendButton_clicked()
     }
     portForward();
     SocketClient client;
-    client.sendCommand(settings[KHostName], settings[KPortNumber].toUInt(), KDaliCmdSetProperties + command);
+    client.connectSocket(settings[KHostName], settings[KPortNumber].toUInt());
+    client.sendCommand( KDaliCmdSetProperties + command);
 
     // after sending, clear the data
     on_clearButton_clicked();

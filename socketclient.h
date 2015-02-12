@@ -25,19 +25,30 @@
 #include <QString>
 #include <QTcpSocket>
 
+#include "messagereceived.h"
+
 class SocketClient : public QObject
 {
 Q_OBJECT
 public:
     SocketClient(QObject* parent = 0);
-    QString sendCommandSizedReturn(QString &address, quint16 port, QString command);
+    bool connectSocket(QString&address, quint16 port);
+    bool disconnectSocket();
+    QString sendCommandSizedReturn(QString command);
     ~SocketClient();
-    void sendCommand(QString &address, quint16 port, QString command);
+    void sendCommand(QString command);
+    void waitForMessages(IMessageReceived *callback);
+    std::string readSizedString();
 public slots:
     void startTransfer();
+    void received();
 private:
     QString mCommand;
     QTcpSocket client;
+    QSocketNotifier* mNotif;
+    IMessageReceived* mCallback;
+    QString mHostAddress;
+    quint16 mPort;
 };
 
 #endif // SOCKETCLIENT_H

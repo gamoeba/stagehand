@@ -17,62 +17,120 @@
 
 #include "socketclient.h"
 
-SocketClient::SocketClient(QObject* parent): QObject(parent)
+SocketClient::SocketClient(QObject* parent)
+    : QObject(parent),
+    mNotif(NULL),
+    mCallback(NULL)
 {
+  client.setReadBufferSize(512*1024);
   connect(&client, SIGNAL(connected()),
     this, SLOT(startTransfer()));
 }
 
 SocketClient::~SocketClient()
 {
+  delete mNotif;
+  disconnectSocket();
   client.close();
 }
 
-QString SocketClient::sendCommandSizedReturn(QString& address, quint16 port, QString command)
+void SocketClient::waitForMessages(IMessageReceived* callback)
+{
+    mCallback = callback;
+    mNotif = new QSocketNotifier(client.socketDescriptor(), QSocketNotifier::Read, this);
+    QObject::connect(mNotif, SIGNAL(activated(int)), this, SLOT(received()));
+    mNotif->setEnabled(true);
+}
+
+bool SocketClient::connectSocket(QString &address, quint16 port)
+{
+    mHostAddress = address;
+    mPort = port;
+    client.connectToHost(mHostAddress, mPort);
+    return client.waitForConnected(2000);
+}
+
+bool SocketClient::disconnectSocket()
+{
+    return client.waitForDisconnected(2000);
+}
+
+QString SocketClient::sendCommandSizedReturn(QString command)
 {
     QString resp;
-    QHostAddress addr(address);
-    client.connectToHost(addr, port);
-    bool conn = client.waitForConnected(2000);
-    mCommand = command;
-    if (conn) {
-        client.write(command.toUtf8().data(), command.length());
-        client.flush();
-        client.waitForReadyRead(2000);
-        QString r1 = client.readLine();
-        int len = r1.toInt();
+    client.write(command.toUtf8().data(), command.length());
+    client.flush();
+    client.waitForReadyRead(2000);
+    QString r1 = client.readLine();
+    int len = r1.toInt();
+    char* buf = new char[len];
+    char* ptr = buf;
+
+    int read = -1;
+    while (len > 0 && read !=0) {
+        client.waitForReadyRead();
+        read = client.read(ptr, len);
+
+        len -= read;
+        ptr += read;
+    }
+    resp = QString(buf);
+    delete [] buf;
+    return resp;
+}
+
+std::string SocketClient::readSizedString()
+{
+    while (!client.canReadLine()) {
+        client.waitForReadyRead(-1);
+    }
+    QString r1 = client.readLine();
+    QStringList strs = r1.split(" ");
+    int frameNum = strs[1].toInt();
+    int len = strs[2].toInt();
+    if (len>0)
+    {
         char* buf = new char[len];
         char* ptr = buf;
 
         int read = -1;
         while (len > 0 && read !=0) {
-            client.waitForReadyRead();
+            client.waitForReadyRead(-1);
             read = client.read(ptr, len);
 
             len -= read;
             ptr += read;
         }
-        resp = QString(buf);
+        std::string resp = std::string(buf);
         delete [] buf;
+        return resp;
     }
-    return resp;
-
+    return "";
 }
 
-void SocketClient::sendCommand(QString& address, quint16 port, QString command)
+void SocketClient::sendCommand(QString command)
 {
-    QString resp;
-    QHostAddress addr(address);
-    client.connectToHost(addr, port);
-    bool conn = client.waitForConnected();
-    mCommand = command;
-    if (conn) {
-        client.write(command.toUtf8().data(), command.length());
-        client.flush();
-    }
+    client.write(command.toUtf8().data(), command.length());
+    client.flush();
 }
 
 void SocketClient::startTransfer()
 {
+}
+
+void SocketClient::received()
+{
+    client.waitForReadyRead(1);
+    while (client.bytesAvailable()>0)
+    {
+        QString resp = client.readLine();
+
+        if (mCallback != NULL)
+        {
+//            qDebug() << QString(resp.c_str());//"received";
+            mCallback->MessageReceived(resp);
+        }
+        client.waitForReadyRead(1);
+    }
 }
 
