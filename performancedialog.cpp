@@ -59,7 +59,7 @@ PerformanceDialog::PerformanceDialog(QWidget *parent) :
     mScene->setSceneRect(0,0,33.333,100);
     ui->graphicsView->setScene(mScene);
 
-//    ui->graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    ui->graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 //    ui->graphicsView->viewport()->installEventFilter(this);
     ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->pauseButton->setEnabled(false);
