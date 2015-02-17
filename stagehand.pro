@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     stagehandupdate.cpp \
     utils.cpp \
     settingsdialog.cpp \
-    performancedialog.cpp
+    performancedialog.cpp \
+    circularbuffer.cpp
 
 INCLUDEPATH += $$PWD/extlibs/include/
 
@@ -53,7 +54,8 @@ HEADERS  += mainwindow.h \
     utils.h \
     settingsdialog.h \
     consts.h \
-    performancedialog.h
+    performancedialog.h \
+    circularbuffer.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \

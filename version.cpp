@@ -1,6 +1,6 @@
 #include "version.h"
 
-const double STAGEHAND_VERSION=0.54;
+const double STAGEHAND_VERSION=0.55;
 
 #if defined Q_OS_LINUX
 const char* versionSuffix = "Linux";

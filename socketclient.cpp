@@ -124,10 +124,10 @@ void SocketClient::received()
     while (client.bytesAvailable()>0)
     {
         QString resp = client.readLine();
+        if (resp.endsWith("\n")) resp.truncate(resp.length()-1);
 
         if (mCallback != NULL)
         {
-//            qDebug() << QString(resp.c_str());//"received";
             mCallback->MessageReceived(resp);
         }
         client.waitForReadyRead(1);
