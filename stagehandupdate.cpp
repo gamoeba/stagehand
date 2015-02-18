@@ -101,26 +101,6 @@ void StagehandUpdate::updateDownloaded()
     }
 }
 
-/*QString StagehandUpdate::createApplyUpdateScript(const QString& extractDir, const QString& mainDir)
-{
-    QString applyUpdatesScript = appendPath(mainDir, "applyUpdates");
-    QFile applyUpdates(applyUpdatesScript);
-    applyUpdates.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    applyUpdates.setPermissions(QFile::ExeOwner | QFile::ReadOwner | QFile::ExeGroup | QFile::ReadGroup);
-    QString filesToCopy = extractDir + "/*";
-//    QProcess proc;
-    applyUpdates.write("#!/bin/bash\n");
-    QString cpCommand = "cp -dfrv " + filesToCopy + " " + mainDir + "\n";
-    applyUpdates.write(cpCommand.toStdString().c_str());
-    QString rmCommand = QString("rm -rf ") + extractDir +"\n";
-    applyUpdates.write(rmCommand.toStdString().c_str());
-    QString restartCommand = QApplication::applicationFilePath() + "\n";
-    applyUpdates.write(restartCommand.toStdString().c_str());
-    applyUpdates.close();
-    return applyUpdatesScript;
-}
-*/
-
 void StagehandUpdate::extractAll(QuaZip& archive, const QString &extractDir )
 {
     // extracts all files from the archive and saves

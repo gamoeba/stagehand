@@ -32,7 +32,7 @@ class SocketClient : public QObject
 Q_OBJECT
 public:
     SocketClient(QObject* parent = 0);
-    bool connectSocket(QString&address, quint16 port);
+    bool connectSocket(const QString &address, quint16 port);
     bool disconnectSocket();
     QString sendCommandSizedReturn(QString command);
     ~SocketClient();

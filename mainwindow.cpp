@@ -41,9 +41,10 @@
 #include "version.h"
 #include "utils.h"
 #include "settingsdialog.h"
+#include "initialsettingsdialog.h"
 #include "consts.h"
 
-
+const QString KLocalHostAddress = "127.0.0.1";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -112,16 +113,6 @@ MainWindow::~MainWindow()
     delete mTableModel;
 }
 
-void MainWindow::setHostName(QString hostName)
-{
-    settings[KHostName] = hostName;
-}
-
-void MainWindow::setPortNumber(QString portNumber)
-{
-    settings[KPortNumber] = portNumber;
-}
-
 void MainWindow::loadFile() {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                      "",
@@ -163,7 +154,7 @@ void MainWindow::updateScene()
 {
     portForward();
     SocketClient client;
-    client.connectSocket(settings[KHostName], settings[KPortNumber].toUInt());
+    client.connectSocket(getConnectionHost(), settings[KPortNumber].toUInt());
     mJsonTxt = client.sendCommandSizedReturn( KDaliCmdDumpScene);
 
     if (mJsonTxt.length() > 0 ) {
@@ -505,7 +496,7 @@ void MainWindow::on_sendButton_clicked()
     }
     portForward();
     SocketClient client;
-    client.connectSocket(settings[KHostName], settings[KPortNumber].toUInt());
+    client.connectSocket(getConnectionHost(), settings[KPortNumber].toUInt());
     client.sendCommand( KDaliCmdSetProperties + command);
 
     // after sending, clear the data
@@ -580,14 +571,14 @@ void MainWindow::takeScreenShot()
 }
 
 void MainWindow::portForward() {
-    if (settings[KForwardPortDest].length()>0) {
+    if (settings[KForwardMode]=="forward" && settings[KForwardPortDest].length()>0) {
         runPlatformScript("portforward", QStringList() << settings[KPortNumber] << settings[KForwardPortDest]);
     }
 }
 
 void MainWindow::editSettings()
 {
-    SettingsDialog d;
+    InitialSettingsDialog d;
     d.updateFromSettings(settings);
     int res = d.exec();
     if (res == QDialog::Accepted) {
@@ -597,8 +588,9 @@ void MainWindow::editSettings()
 
 void MainWindow::performanceViewer()
 {
+    portForward();
     PerformanceDialog p;
-    p.setConnection(settings[KHostName], settings[KPortNumber].toUInt());
+    p.setConnection(getConnectionHost(), settings[KPortNumber].toUInt());
     p.exec();
 
 }
@@ -617,4 +609,12 @@ void MainWindow::runPlatformScript(QString scriptName, QStringList parameters)
 
     process.execute(scriptfullpath, parameters);
     process.waitForFinished();
+}
+
+const QString& MainWindow::getConnectionHost() {
+    if (settings[KForwardMode]=="forward") {
+        return KLocalHostAddress;
+    } else {
+        return settings[KHostName];
+    }
 }

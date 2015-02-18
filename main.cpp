@@ -50,19 +50,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
-    QFileInfo fileInfo(argv[0]);
     MainWindow w;
-
-
-    if (argc>1) {
-
-        QString hostName(argv[1]);
-        w.setHostName(hostName);
-    }
-    if (argc ==3) {
-        QString port(argv[2]);
-        w.setPortNumber(port);
-    }
 
     w.show();
     StagehandUpdate updater(w.settings[KBaseUpdateUrl]);

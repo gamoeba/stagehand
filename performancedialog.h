@@ -24,7 +24,7 @@ public:
     void setConnection(QString hostAddress, quint16 portNumber);
 
 protected:
-    void resizeEvent(QResizeEvent* event);
+    void resizeEvent(QResizeEvent*);
 //    bool eventFilter(QObject * obj, QEvent * event);
 
 private:

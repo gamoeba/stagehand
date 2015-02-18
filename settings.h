@@ -30,6 +30,7 @@ const QString KForwardPortDest("ForwardPortDest");
 const QString KFontPointSize("FontPointSize");
 const QString KTargetType("TargetType");
 const QString KTargetToolsPath("TargetToolsPath");
+const QString KForwardMode("ForwardMode");
 
 class Settings
 {

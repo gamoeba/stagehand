@@ -24,13 +24,14 @@ Settings::Settings()
     :mSettingsFile(QDir::homePath()+QDir::separator()+".stagehand"+QDir::separator()+"stagehand.ini",
                    QSettings::IniFormat)
 {
-    mSettings[KHostName] ="127.0.3.1";
+    mSettings[KHostName] ="127.0.0.1";
     mSettings[KPortNumber] = "3031";
-    mSettings[KForwardPortDest] = "";
+    mSettings[KForwardPortDest] = "tcp:3031";
     mSettings[KFontPointSize] = "10";
     mSettings[KBaseUpdateUrl] = "http://www.gamoeba.com/stagehand_updates";
     mSettings[KTargetType] = "android";
     mSettings[KTargetToolsPath] = "~/bin";
+    mSettings[KForwardMode] = "forward";
 
     QMap<QString, QString>::iterator iter;
     for (iter = mSettings.begin();iter != mSettings.end();iter++) {

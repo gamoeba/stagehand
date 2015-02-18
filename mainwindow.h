@@ -44,9 +44,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void setHostName(QString hostName);
-    void setPortNumber(QString portNumber);
-
     QJsonDocument readJson(const QString &fileName);
 
     Settings settings;
@@ -112,6 +109,7 @@ private:
     void GetExpandedState(QTreeView *view, QStandardItemModel *model, std::map<int, bool>& expandedState, int& selectedIndex, int &currentIndex, int &treePosition);
     void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState, int selectedIndex, int currentIndex, int treePosition);
     void runPlatformScript(QString scriptName, QStringList parameters);
+    const QString &getConnectionHost();
 };
 
 #endif // MAINWINDOW_H

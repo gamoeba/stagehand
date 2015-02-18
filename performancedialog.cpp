@@ -86,7 +86,7 @@ void PerformanceDialog::setConnection(QString hostAddress, quint16 portNumber)
     mPortNumber = portNumber;
 }
 
-void PerformanceDialog::resizeEvent(QResizeEvent *event)
+void PerformanceDialog::resizeEvent(QResizeEvent * /* event */)
 {
     ui->graphicsView->fitInView(0,KLineSize*mCurrentRow-ui->graphicsView->height(),33.33,ui->graphicsView->height());
 }

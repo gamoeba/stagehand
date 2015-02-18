@@ -42,7 +42,7 @@ void SocketClient::waitForMessages(IMessageReceived* callback)
     mNotif->setEnabled(true);
 }
 
-bool SocketClient::connectSocket(QString &address, quint16 port)
+bool SocketClient::connectSocket(const QString &address, quint16 port)
 {
     mHostAddress = address;
     mPort = port;

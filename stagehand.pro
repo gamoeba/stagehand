@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     utils.cpp \
     settingsdialog.cpp \
     performancedialog.cpp \
-    circularbuffer.cpp
+    circularbuffer.cpp \
+    initialsettingsdialog.cpp
 
 INCLUDEPATH += $$PWD/extlibs/include/
 
@@ -55,11 +56,13 @@ HEADERS  += mainwindow.h \
     settingsdialog.h \
     consts.h \
     performancedialog.h \
-    circularbuffer.h
+    circularbuffer.h \
+    initialsettingsdialog.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
-    performancedialog.ui
+    performancedialog.ui \
+    initialsettingsdialog.ui
 
 OTHER_FILES += \
     folder_invisible.png \
