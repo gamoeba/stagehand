@@ -110,6 +110,7 @@ private:
     void RestoreExpandedState(QTreeView* view, QStandardItemModel * model, std::map<int, bool>& expandedState, int selectedIndex, int currentIndex, int treePosition);
     void runPlatformScript(QString scriptName, QStringList parameters);
     const QString &getConnectionHost();
+    bool mFoundCamera;
 };
 
 #endif // MAINWINDOW_H

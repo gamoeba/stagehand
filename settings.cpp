@@ -32,6 +32,7 @@ Settings::Settings()
     mSettings[KTargetType] = "android";
     mSettings[KTargetToolsPath] = "~/bin";
     mSettings[KForwardMode] = "forward";
+    mSettings["perfmode"] = "off";
 
     QMap<QString, QString>::iterator iter;
     for (iter = mSettings.begin();iter != mSettings.end();iter++) {
@@ -43,7 +44,6 @@ Settings::Settings()
 void Settings::updateSetting(QString settingName, QString defaultValue ) {
     QString value = mSettingsFile.value(settingName,"").toString();
     if (value.length()==0) {
-        qDebug() << "reset default"<< settingName;
         value = defaultValue;
         mSettingsFile.setValue(settingName, value);
     } else {

@@ -101,6 +101,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableViewUpdate->setFont(font);
     ui->treeView->setFont(font);
 
+    ui->actionPerformance->setVisible(settings["perfmode"]=="on");
+
     resize(sz);
     this->repaint();
 }
@@ -224,6 +226,7 @@ void MainWindow::showScreenShot(bool show)
 
 void MainWindow::addObjects() {
     mGLWidget->clear();
+    mFoundCamera = false;
     QJsonObject obj = mDoc.object();
     addNodeObject(obj);
     QJsonValue children = obj.value(KDaliNodeChildrenName);
@@ -240,7 +243,7 @@ bool MainWindow::addNodeObject(QJsonObject obj) {
 
     NodeObject node(obj, KDaliNodePropertiesName);
     bool vis = node.getProperty(KDaliNodeVisible).toBoolean();
-    if (value.toString() == KDaliCameraNodeName) {
+    if (!mFoundCamera && value.toString() == KDaliCameraNodeName) {
         DataObject pm = node.getProperty(KDaliCameraNodeProjectionMatrixName);
         mGLWidget->setProjectionMatrix(pm.get4x4Matrix());
         DataObject vm = node.getProperty(KDaliCameraNodeViewMatrixName);
@@ -248,6 +251,7 @@ bool MainWindow::addNodeObject(QJsonObject obj) {
 
         double aspectRatio = node.getProperty(KDaliCameraNodeAspectRatioName).toDouble();
         mGLWidget->setAspectRatio(aspectRatio);
+        mFoundCamera = true;
     } else {
         QMatrix4x4 wm = node.getProperty(KDaliNodeWorldMatrixName).get4x4Matrix();
         std::vector<double> size = node.getProperty(KDaliNodeSizeName).getVector();
@@ -600,14 +604,14 @@ void MainWindow::runPlatformScript(QString scriptName, QStringList parameters)
 
     QString scriptlocation = appendPath(qApp->applicationDirPath(), settings[KTargetType]);
     QString scriptfullpath = appendPath(scriptlocation, scriptName);
-    qDebug() << "running " << scriptfullpath;
 
     QProcess process;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("PATH", env.value("Path") + ":" + settings[KTargetToolsPath]);
+    QString newPath = env.value("PATH") + ":" + settings[KTargetToolsPath];
+    env.insert("PATH", newPath);
     process.setProcessEnvironment(env);
 
-    process.execute(scriptfullpath, parameters);
+    process.start(scriptfullpath, parameters);
     process.waitForFinished();
 }
 

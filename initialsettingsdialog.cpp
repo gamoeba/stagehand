@@ -1,3 +1,4 @@
+#include <QFileDialog>
 #include "initialsettingsdialog.h"
 #include "ui_initialsettingsdialog.h"
 #include "settings.h"
@@ -50,4 +51,12 @@ void InitialSettingsDialog::modeChanged(int index) {
     ui->forwardStringEdit->setEnabled(true);
     ui->hostNameEdit->setEnabled(false);
   }
+}
+
+void InitialSettingsDialog::pathBrowse()
+{
+    QString dir = ui->pathEdit->text();
+    QString newDir = QFileDialog::getExistingDirectory(this,"choose directory",dir);
+    if (newDir.length()>0)
+        ui->pathEdit->setText(newDir);
 }

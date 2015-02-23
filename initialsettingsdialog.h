@@ -20,6 +20,7 @@ public:
     void updateSettings(Settings &settings);
 public slots:
     void modeChanged(int index);
+    void pathBrowse();
 private:
     Ui::InitialSettingsDialog *ui;
 };

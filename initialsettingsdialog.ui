@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>393</height>
+    <width>433</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,10 +93,21 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="1">
-    <widget class="QLineEdit" name="pathEdit"/>
-   </item>
    <item row="12" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="pathEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pathBrowseButton">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="14" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -158,8 +169,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pathBrowseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>InitialSettingsDialog</receiver>
+   <slot>pathBrowse()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>380</x>
+     <y>332</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>216</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>modeChanged(int)</slot>
+  <slot>pathBrowse()</slot>
  </slots>
 </ui>

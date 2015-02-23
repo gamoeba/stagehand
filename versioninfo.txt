@@ -1,18 +1,12 @@
-version 0.55
+version 0.61
 ------------
-Performance Viewer added
 
-version 0.54
-------------
-Add setting for Path to adb/sdb tools
+Fixed problem preventing additional path for adb/sdb working
 
-version 0.53
+version 0.60
 ------------
-Improvements to support new settings and installation
-
-version 0.52
-------------
-New settings dialog
+New Settings Dialog
+Fix for situation where the incorrect camera is chosen
 
 
 
