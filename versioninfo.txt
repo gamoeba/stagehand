@@ -1,3 +1,17 @@
+version 0.64
+------------
+Improved installer
+Fix for display of inherited invisibility in node tree
+Fix for clicking through all actors covering point
+
+version 0.63
+------------
+Removed
+
+version 0.62
+------------
+Added ubuntu version
+
 version 0.61
 ------------
 

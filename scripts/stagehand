@@ -17,7 +17,7 @@ UPDATEDIR=$HOME/.stagehand/update
 # apply any updates
 if [ -d "$UPDATEDIR" ]
 then
-  gksudo $UPDATEDIR/doUpdate && rm -rf $UPDATEDIR
+  $UPDATEDIR/doUpdate && rm -rf $UPDATEDIR
 fi
 # now run app
 $DIR/bin/stagehand $*

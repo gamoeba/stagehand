@@ -111,10 +111,20 @@ QImage GLWidget::getScreenShot()
 
 void GLWidget::setSelection(int id)
 {
-    mSelectedIds.clear();
-    mSelectedIds.push_back(id);
-    mSelectionIndex=0;
-    update();
+    // only update if it isn't the same as is already set
+    // this avoids clearing the list when the change was actually
+    // caused by this class
+    bool updateNeeded = true;
+    if (mSelectionIndex < mSelectedIds.size() && mSelectedIds[mSelectionIndex] == id)
+    {
+        updateNeeded = false;
+    }
+    if (updateNeeded) {
+        mSelectedIds.clear();
+        mSelectedIds.push_back(id);
+        mSelectionIndex=0;
+        update();
+    }
 }
 
 void GLWidget::animate()
@@ -359,6 +369,23 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *releaseEvent){
     }
     mDragging = false;
     update();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *wheelEvent)
+{
+/*    const float scrollFactor = 1.1f;
+    float xpos = wheelEvent->posF().x();
+    float xposzoom = 0.0f;
+    if (wheelEvent->delta() > 0 ) {
+        m_fScale /= scrollFactor;
+        xposzoom = xpos / scrollFactor;
+    }  else if (wheelEvent->delta()<0){
+        m_fScale *= scrollFactor;
+        xposzoom = xpos * scrollFactor;
+    }
+    mTranslateX+= xpos - xposzoom;
+    repaint();
+*/
 }
 
 void GLWidget::select(float x, float y) {

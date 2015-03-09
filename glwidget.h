@@ -68,6 +68,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *eventPress);
     void mouseReleaseEvent(QMouseEvent *releaseEvent);
+    void wheelEvent(QWheelEvent * wheelEvent);
 private:
     GLuint  m_uiTexture;
     qreal   m_fAngle;

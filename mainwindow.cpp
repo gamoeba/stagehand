@@ -609,6 +609,8 @@ void MainWindow::runPlatformScript(QString scriptName, QStringList parameters)
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     QString newPath = env.value("PATH") + ":" + settings[KTargetToolsPath];
     env.insert("PATH", newPath);
+    env.insert("DALI_HOST", settings[KHostName]);
+    env.insert("DALI_PORT", settings[KPortNumber]);
     process.setProcessEnvironment(env);
 
     process.start(scriptfullpath, parameters);
