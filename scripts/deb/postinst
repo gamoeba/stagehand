@@ -1,0 +1,3 @@
+#! /bin/bash -e
+
+ln -fs "/usr/share/stagehand/stagehand" "/usr/bin/stagehand"

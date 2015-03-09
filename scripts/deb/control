@@ -1,0 +1,5 @@
+Package: stagehand
+Maintainer: Kevin Butchart <kevinbutchart@gmail.com>
+Priority: optional
+Depends: libc6, gdebi, imagemagick, wmctrl, zlib1g, stagehand-qtdeps (>=1.00)
+Description: Stagehand debugging tool for Dali

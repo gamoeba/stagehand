@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Stagehand
+Version=1.0
+Exec=/usr/share/stagehand/stagehand
+Comment=Stagehand debugging tool
+Icon=/usr/share/stagehand/stagehand.png
+Type=Application
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=

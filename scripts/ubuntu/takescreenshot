@@ -1,0 +1,10 @@
+#!/bin/bash
+pid_listen() {
+  netstat -lpt 2>/dev/null | grep $1 | awk 'BEGIN {FS=" +|/"} {print $7}'
+}
+
+find_wid() {
+  wmctrl -l -p | grep `pid_listen $1` | awk '{ print $1 }'
+}
+WID=`find_wid $DALI_PORT`
+import -window $WID $1
