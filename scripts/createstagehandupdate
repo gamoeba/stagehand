@@ -24,6 +24,7 @@ echo "Architecture: "$ARCH >> $BASEDIR/DEBIAN/control
 echo "Version: "$VERSION >> $BASEDIR/DEBIAN/control
 
 mkdir -p $BASEDIR/usr/share/applications
+mkdir -p $BASEDIR/usr/share/doc/stagehand
 mkdir -p $BASEDIR/usr/share/stagehand
 mkdir -p $BASEDIR/usr/share/stagehand/bin
 mkdir -p $BASEDIR/usr/share/stagehand/bin/android
@@ -31,6 +32,7 @@ mkdir -p $BASEDIR/usr/share/stagehand/bin/tizen
 mkdir -p $BASEDIR/usr/share/stagehand/bin/ubuntu
 
 cp deb/Stagehand.desktop $BASEDIR/usr/share/applications/
+cp deb/copyright $BASEDIR/usr/share/doc/stagehand/
 cp ../stagehand.png $BASEDIR/usr/share/stagehand/stagehand.png
 cp stagehand $BASEDIR/usr/share/stagehand/stagehand
 cp $STAGEHAND_BIN_COMPILE_LOCATION/stagehand $BASEDIR/usr/share/stagehand/bin/
@@ -41,6 +43,8 @@ cp -R ubuntu $BASEDIR/usr/share/stagehand/bin
 chmod -R 755 $BASEDIR
 chmod 644 $BASEDIR/usr/share/applications/Stagehand.desktop
 chmod 644 $BASEDIR/usr/share/stagehand/stagehand.png
+
+echo "Installed-Size: "`du -s -k $BASEDIR | awk '{ print $1 }'` >> $BASEDIR/DEBIAN/control
 
 fakeroot dpkg-deb --build $BASEDIR
 
