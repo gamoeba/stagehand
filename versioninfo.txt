@@ -1,3 +1,7 @@
+version 0.66
+------------
+Fix: Foward/Direct connection setting was not saved when editing it in settings
+
 version 0.65
 ------------
 Added support for 32-bit Ubuntu
