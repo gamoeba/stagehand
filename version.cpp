@@ -1,6 +1,12 @@
 #include "version.h"
 
-const double STAGEHAND_VERSION=0.64;
+const double STAGEHAND_VERSION=0.65;
+
+#if defined Q_PROCESSOR_X86_64
+const char* archType = "x86_64";
+#else
+const char* archType = "i386";
+#endif
 
 #if defined Q_OS_LINUX
 const char* versionSuffix = "Linux";

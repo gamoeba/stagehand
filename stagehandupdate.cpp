@@ -27,7 +27,7 @@ void StagehandUpdate::checkForUpdates(bool forceUpdate)
 
     mForceUpdate = forceUpdate;
     QString versionFile;
-    versionFile.sprintf("/version_info_%s.txt",versionSuffix);
+    versionFile.sprintf("/version_info_%s_%s.txt",versionSuffix, archType);
 
     QUrl versionUrl(mBaseUpdates + versionFile);
     m_pDownloader = new FileDownloader(versionUrl, this);

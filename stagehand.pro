@@ -80,7 +80,7 @@ RESOURCES += \
     stagehand.qrc
 
 unix:!macx {
-LIBS+= -L$$PWD/extlibs/Linux
+LIBS+= -L$$PWD/extlibs/Linux/$$QMAKE_HOST.arch
 }
 macx {
 LIBS+= -L$$PWD/extlibs/osx
