@@ -3,7 +3,7 @@
 const double STAGEHAND_VERSION=0.65;
 
 #if defined Q_PROCESSOR_X86_64
-const char* archType = "x86_64";
+const char* archType = "amd64";
 #else
 const char* archType = "i386";
 #endif

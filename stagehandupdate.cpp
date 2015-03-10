@@ -56,7 +56,7 @@ void StagehandUpdate::versionAvailable()
         if (res == QMessageBox::Yes)
         {
             QString updateFile;
-            updateFile.sprintf("/%s_update%g.zip",versionSuffix, versionNumber);
+            updateFile.sprintf("/%s_%s_update%g.zip",versionSuffix, archType, versionNumber);
 
             QUrl versionUrl(mBaseUpdates + updateFile);
             m_pDownloader = new FileDownloader(versionUrl, this);
