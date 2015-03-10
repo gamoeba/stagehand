@@ -86,7 +86,7 @@ macx {
 LIBS+= -L$$PWD/extlibs/osx
 }
 
-LIBS+= -lquazip
+LIBS+= -lquazip -lz
 
 android {
 LIBS+= -L$$PWD/extlibs/Android

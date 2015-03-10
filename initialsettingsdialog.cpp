@@ -40,6 +40,11 @@ void InitialSettingsDialog::updateSettings(Settings& settings) {
     settings[KForwardPortDest] = ui->forwardStringEdit->text();
     settings[KTargetToolsPath] = ui->pathEdit->text();
     settings[KTargetType] = ui->targetPlatformSelect->currentText();
+    if (ui->forwardMode->currentIndex()==0) {
+        settings[KForwardMode] = "direct";
+    } else {
+        settings[KForwardMode] = "forward";
+    }
     settings.saveSettings();
 }
 
