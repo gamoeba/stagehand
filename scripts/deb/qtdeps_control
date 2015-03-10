@@ -1,0 +1,7 @@
+Package: stagehand-qtdeps
+Maintainer: Kevin Butchart <kevinbutchart@gmail.com>
+Priority: optional
+Depends:
+Description: Qt dependencies for Stagehand
+  Since linux 12.04 doesn't distribute Qt5, it is necessary to distribute these 
+  libraries. 
