@@ -47,7 +47,6 @@ SettingsDialog::~SettingsDialog()
     delete ui;
 }
 
-void SettingsDialog::cellEntered(int row, int column)
+void SettingsDialog::cellEntered(int /*row*/, int /*column*/)
 {
-
 }

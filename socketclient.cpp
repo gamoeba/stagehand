@@ -63,7 +63,8 @@ QString SocketClient::sendCommandSizedReturn(QString command)
     client.waitForReadyRead(2000);
     QString r1 = client.readLine();
     int len = r1.toInt();
-    char* buf = new char[len];
+    char* buf = new char[len+1];
+    buf[len] = '\0';
     char* ptr = buf;
 
     int read = -1;
@@ -86,7 +87,7 @@ std::string SocketClient::readSizedString()
     }
     QString r1 = client.readLine();
     QStringList strs = r1.split(" ");
-    int frameNum = strs[1].toInt();
+    //int frameNum = strs[1].toInt();
     int len = strs[2].toInt();
     if (len>0)
     {

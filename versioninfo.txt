@@ -1,6 +1,14 @@
+version 0.67
+------------
+Fix:
+Update data from scene was unreliable - sometimes it failed for no reason
+Feature:
+Enable zoom with scroll wheel
+
 version 0.66
 ------------
-Fix: Foward/Direct connection setting was not saved when editing it in settings
+Fix:
+Foward/Direct connection setting was not saved when editing it in settings
 
 version 0.65
 ------------

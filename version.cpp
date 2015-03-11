@@ -1,6 +1,6 @@
 #include "version.h"
 
-const double STAGEHAND_VERSION=0.66;
+const double STAGEHAND_VERSION=0.67;
 
 #if defined Q_PROCESSOR_X86_64
 const char* archType = "amd64";
