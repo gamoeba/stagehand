@@ -373,8 +373,10 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *releaseEvent){
 
 void GLWidget::wheelEvent(QWheelEvent *wheelEvent)
 {
-/*    const float scrollFactor = 1.1f;
-    float xpos = wheelEvent->posF().x();
+    const float scrollFactor = 1.1f;
+    float xpos = wheelEvent->posF().x()-(size().width()/2.0f);
+    xpos *= m_fScale;
+
     float xposzoom = 0.0f;
     if (wheelEvent->delta() > 0 ) {
         m_fScale /= scrollFactor;
@@ -383,9 +385,9 @@ void GLWidget::wheelEvent(QWheelEvent *wheelEvent)
         m_fScale *= scrollFactor;
         xposzoom = xpos * scrollFactor;
     }
-    mTranslateX+= xpos - xposzoom;
+    mTranslateX -= xposzoom - xpos;
     repaint();
-*/
+
 }
 
 void GLWidget::select(float x, float y) {
