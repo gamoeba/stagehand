@@ -1,3 +1,9 @@
+version 0.68
+------------
+Improved rendering
+Support rotation for viewing landscape scenes
+Support sending animatable properties
+
 version 0.67
 ------------
 Fix:
