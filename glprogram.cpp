@@ -29,7 +29,7 @@ bool GlProgram::CreateProgram(const string& vertexShaderSrc, const string& fragm
 
 bool GlProgram::bind()
 {
-    mProgram.bind();
+    return mProgram.bind();
 }
 
 void GlProgram::release()

@@ -51,6 +51,11 @@ GLWidget::GLWidget(QWidget *parent)
 
     mLogo = QPixmap(":/stagehand/splash.png");
 
+    QGLFormat glf = QGLFormat::defaultFormat();
+    glf.setSampleBuffers(true);
+    glf.setSamples(4);
+    QGLFormat::setDefaultFormat(glf);
+
 }
 
 GLWidget::~GLWidget()
@@ -242,7 +247,7 @@ bool GLWidget::sceneLoaded()
 
 void GLWidget::drawRects(int startRect, int count, bool selected)
 {
-    if (!mShowScreenShot)
+    if (!mShowScreenShot || selected)
     {
         mProgram.bind();
         mProgram.setAttributeArray(VERTEX_ATTR, &mVertices[0], 3);
@@ -261,7 +266,7 @@ void GLWidget::drawRects(int startRect, int count, bool selected)
     mProgramLines.setAttributeArray(VERTEX_ATTR, &mLines[0], 3);
     mProgramLines.enableAttributeArray(VERTEX_ATTR, true);
     mProgramLines.setUniformValue(MATRIX_UNIFORM, mModelView );
-    glLineWidth(2.0f);
+    glLineWidth(1.0f);
     glDrawArrays(GL_LINES, startRect*8, count*8); // lines takes total vertex count
     mProgramLines.enableAttributeArray(VERTEX_ATTR, false);
     mProgramLines.release();
@@ -305,6 +310,7 @@ void GLWidget::addRect(const QMatrix4x4 matrix,  int objIndex) {
 
 void GLWidget::initializeGL ()
 {
+    glEnable(GL_MULTISAMPLE);
     glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 
     glGenTextures(1, &m_uiTexture);
@@ -334,7 +340,6 @@ void GLWidget::buildScene()
 
         std::map<int, SceneObject>::iterator iter;
         int numVerts = mObjects.size();
-        qDebug() << "num verts: " << numVerts;
         mVertices.resize(numVerts*3*6);
         mLines.resize(numVerts*3*8);
         mIds.clear();
@@ -359,8 +364,6 @@ void GLWidget::buildScene()
             }
         }
         mNumberRectangles = objIndex;
-
-        qDebug() << mNumberRectangles;
     }
     mSceneChanged = false;
 }
