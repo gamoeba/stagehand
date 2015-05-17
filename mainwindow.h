@@ -64,6 +64,8 @@ public slots:
     void selectedId(int id);
     void mousePositionChanged(int x, int y);
     void showScreenShot(bool show);
+    void rotateLeft();
+    void rotateRight();
     void tableItemChanged(QStandardItem*);
     void newImageReceived(QImage img);
     void aboutStagehand();
@@ -87,6 +89,9 @@ private slots:
     void on_treeSearch_returnPressed();
 
     void treeCurrentItemChanged(const QModelIndex &current, const QModelIndex &);
+
+    void on_animateButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     TreeModel* mTreeModel;

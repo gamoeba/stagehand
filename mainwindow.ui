@@ -145,7 +145,41 @@
              <item>
               <widget class="QPushButton" name="sendButton">
                <property name="text">
-                <string>Send</string>
+                <string>Set</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Duration: </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="durationEdit">
+               <property name="text">
+                <string>1.0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="animateButton">
+               <property name="text">
+                <string>Animate</string>
                </property>
               </widget>
              </item>
@@ -266,6 +300,8 @@
    <addaction name="actionUpdate"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_In"/>
+   <addaction name="actionRotate_Left"/>
+   <addaction name="actionRotate_Right"/>
    <addaction name="actionScreenshot"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -370,6 +406,24 @@
    </property>
    <property name="visible">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionRotate_Right">
+   <property name="icon">
+    <iconset resource="stagehand.qrc">
+     <normaloff>:/stagehand/sub_black_rotate_cw.png</normaloff>:/stagehand/sub_black_rotate_cw.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Clockwise</string>
+   </property>
+  </action>
+  <action name="actionRotate_Left">
+   <property name="icon">
+    <iconset resource="stagehand.qrc">
+     <normaloff>:/stagehand/sub_black_rotate_ccw.png</normaloff>:/stagehand/sub_black_rotate_ccw.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Counterclockwise</string>
    </property>
   </action>
  </widget>
@@ -522,6 +576,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionRotate_Left</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>rotateLeft()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRotate_Right</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>rotateRight()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>389</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadFile()</slot>
@@ -533,5 +619,7 @@
   <slot>aboutStagehand()</slot>
   <slot>editSettings()</slot>
   <slot>performanceViewer()</slot>
+  <slot>rotateRight()</slot>
+  <slot>rotateLeft()</slot>
  </slots>
 </ui>

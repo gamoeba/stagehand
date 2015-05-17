@@ -19,13 +19,22 @@
 #include <QPainter>
 #include <QPaintEngine>
 #include <QMouseEvent>
+#include <qquaternion.h>
 #include <math.h>
 #include <map>
+#include <algorithm>
+
+const std::string VERTEX_ATTR = "vertex";
+const std::string TEXCOORD_ATTR = "texCoord";
+const std::string MATRIX_UNIFORM = "viewMatrix";
+const std::string SELECTED_UNIFORM = "selected";
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
-    m_fScale = 1.0;
+    mSceneChanged = false;
+    mNumberRectangles = 0;
+    mScale = 1.0;
     mViewportRatio = 1.0;
     mTranslateX = 0;
     mTranslateY = 0;
@@ -34,8 +43,10 @@ GLWidget::GLWidget(QWidget *parent)
     mSelectionIndex=0;
     mShowScreenShot = false;
     mDragging = false;
+    mAnimating = false;
 
-    connect(&mAnimationTimer,SIGNAL(timeout()),SLOT(animate()));
+    mAnimatingRotation = false;
+
     setMouseTracking(true);
 
     mLogo = QPixmap(":/stagehand/splash.png");
@@ -63,40 +74,76 @@ void GLWidget::setAspectRatio(double aspectRatio) {
 void GLWidget::addObject(int id, SceneObject so, bool /*selected*/)
 {
     mObjects[id] = so;
+    mSceneChanged = true;
 }
 
 void GLWidget::clear()
 {
     mObjects.clear();
+    mSceneChanged = true;
 }
 
 void GLWidget::zoomIn()
 {
-    if (mAnimationTimer.isActive()) {
-        mAnimationTimer.stop();
-        m_fScale = mEndScale;
-        update();
+    if (!sceneLoaded()) return;
+
+    if (mAnimating) {
+        mScale = mEndScale;
     }
     mAnimationLengthms = 500;
-    mStartScale = m_fScale;
-    mEndScale = m_fScale * 2;
+    mStartScale = mScale;
+    mEndScale = mScale * 2;
     mElapsedTimer.start();
-    mAnimationTimer.start(10);
+    mAnimating = true;
+    update();
 }
 
 void GLWidget::zoomOut()
 {
-    if (mAnimationTimer.isActive()) {
-        mAnimationTimer.stop();
-        m_fScale = mEndScale;
-        update();
+    if (!sceneLoaded()) return;
+
+    if (mAnimating) {
+        mAnimating = false;
+        mScale = mEndScale;
     }
 
     mAnimationLengthms = 500;
-    mStartScale = m_fScale;
-    mEndScale = m_fScale / 2.0;
+    mStartScale = mScale;
+    mEndScale = mScale / 2.0;
     mElapsedTimer.start();
-    mAnimationTimer.start(10);
+    mAnimating = true;
+    update();
+}
+
+void GLWidget::rotateLeft()
+{
+    if (!sceneLoaded()) return;
+
+    endRotationAnimation();
+
+    mRotationAnimationLengthms = 500;
+    mStartRotation = mRotationAngleDegrees;
+    mEndRotation = mRotationAngleDegrees-90;
+    mRotationTimer.start();
+    mAnimatingRotation = true;
+
+    update();
+}
+
+void GLWidget::rotateRight()
+{
+    if (!sceneLoaded()) return;
+
+    endRotationAnimation();
+
+    mRotationAnimationLengthms = 500;
+    mStartRotation = mRotationAngleDegrees;
+    mEndRotation = mRotationAngleDegrees+90;
+    mRotationTimer.start();
+
+    mAnimatingRotation = true;
+
+    update();
 }
 
 void GLWidget::setScreenShot(QImage img)
@@ -129,50 +176,131 @@ void GLWidget::setSelection(int id)
 
 void GLWidget::animate()
 {
-    float step = mEndScale - mStartScale;
+    double step = mEndScale - mStartScale;
     qint64 elapsedTimems = mElapsedTimer.nsecsElapsed()/1000000;
-    float scalefac = ((float)(elapsedTimems)/(float)mAnimationLengthms);
-    m_fScale = mStartScale + scalefac*step;
+    double scalefac = ((float)(elapsedTimems)/(float)mAnimationLengthms);
+    mScale = mStartScale + scalefac*step;
     if (mElapsedTimer.hasExpired(mAnimationLengthms)) {
-        m_fScale = mEndScale;
-        mAnimationTimer.stop();
+        endScaleAnimation();
     }
     update();
 }
 
-void GLWidget::drawRect()
+void GLWidget::animateRotation()
 {
-    glBindTexture(GL_TEXTURE_2D, m_uiTexture);
-    GLfloat afVertices[] = {
-        -0.5, 0.5, 0.5, 0.5,-0.5,0.5,-0.5,-0.5,0.5,
-        0.5, -0.5, 0.5, -0.5,0.5,0.5,0.5,0.5,0.5
-    };
-    program.setAttributeArray(vertexAttr, afVertices, 3);
+    double step = mEndRotation - mStartRotation;
+    qint64 elapsedTimens = mRotationTimer.nsecsElapsed();
+    double scalefac = (double)elapsedTimens/(double)((double)mRotationAnimationLengthms*1000000.0);
 
-    GLfloat afTexCoord[] = {
-        0.0f,0.0f, 1.0f,1.0f, 0.0f,1.0f,
-        1.0f,1.0f, 0.0f,0.0f, 1.0f,0.0f
-    };
-    program.setAttributeArray(texCoordAttr, afTexCoord, 2);
+    mRotationAngleDegrees = mStartRotation + scalefac*step;
+    if (mRotationTimer.hasExpired(mRotationAnimationLengthms)) {
+        endRotationAnimation();
+    }
+    update();
+}
 
-    GLfloat afNormals[] = {
+void GLWidget::endScaleAnimation()
+{
+    if (mAnimating){
+        mAnimating = false;
+        mScale = mEndScale;
+    }
+}
 
-        0,0,-1, 0,0,-1, 0,0,-1,
-        0,0,-1, 0,0,-1, 0,0,-1
-    };
-    program.setAttributeArray(normalAttr, afNormals, 3);
+void GLWidget::endRotationAnimation()
+{
+    if (mAnimatingRotation){
+        mAnimatingRotation = false;
+        mRotationAngleDegrees = mEndRotation;
+        mRotationAngleDegrees += 360.0;
+        mRotationAngleDegrees = (double)((int)mRotationAngleDegrees % (int)360);
+    }
+}
 
-    program.setUniformValue(textureUniform, 0);    // use texture unit 0
 
-    program.enableAttributeArray(vertexAttr);
-    program.enableAttributeArray(normalAttr);
-    program.enableAttributeArray(texCoordAttr);
 
+
+void GLWidget::drawScreenshot()
+{
+    mProgramImage.bind();
+    bindTexture(mScreenShot);
+    mProgramImage.setAttributeArray(VERTEX_ATTR, &mVertices[0], 3);
+    mProgramImage.setAttributeArray(TEXCOORD_ATTR, &mTextureCoords[0], 2);
+    mProgramImage.setUniformValue(MATRIX_UNIFORM, mModelView );
+    mProgramImage.enableAttributeArray(VERTEX_ATTR, true);
+    mProgramImage.enableAttributeArray(TEXCOORD_ATTR, true);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    mProgramImage.enableAttributeArray(VERTEX_ATTR, false);
+    mProgramImage.enableAttributeArray(TEXCOORD_ATTR, false);
+    mProgramImage.release();
+}
 
-    program.disableAttributeArray(vertexAttr);
-    program.disableAttributeArray(normalAttr);
-    program.disableAttributeArray(texCoordAttr);
+bool GLWidget::sceneLoaded()
+{
+    return mObjects.size()>0;
+}
+
+void GLWidget::drawRects(int startRect, int count, bool selected)
+{
+    if (!mShowScreenShot)
+    {
+        mProgram.bind();
+        mProgram.setAttributeArray(VERTEX_ATTR, &mVertices[0], 3);
+        mProgram.setAttributeArray(TEXCOORD_ATTR, &mTextureCoords[0], 2);
+        mProgram.setUniformValue(MATRIX_UNIFORM, mModelView );
+        mProgram.setUniformValue(SELECTED_UNIFORM, selected);
+        mProgram.enableAttributeArray(VERTEX_ATTR, true);
+        mProgram.enableAttributeArray(TEXCOORD_ATTR, true);
+        glDrawArrays(GL_TRIANGLES, startRect*6, count*6);
+        mProgram.enableAttributeArray(VERTEX_ATTR, false);
+        mProgram.enableAttributeArray(TEXCOORD_ATTR, false);
+        mProgram.release();
+    }
+
+    mProgramLines.bind();
+    mProgramLines.setAttributeArray(VERTEX_ATTR, &mLines[0], 3);
+    mProgramLines.enableAttributeArray(VERTEX_ATTR, true);
+    mProgramLines.setUniformValue(MATRIX_UNIFORM, mModelView );
+    glLineWidth(2.0f);
+    glDrawArrays(GL_LINES, startRect*8, count*8); // lines takes total vertex count
+    mProgramLines.enableAttributeArray(VERTEX_ATTR, false);
+    mProgramLines.release();
+}
+
+void GLWidget::addRect(const QMatrix4x4 matrix,  int objIndex) {
+    GLfloat fVertices[] = {
+        -0.5, 0.5, 0.5, 0.5, 0.5,0.5,0.5,-0.5,0.5,
+        -0.5, -0.5, 0.5, -0.5,0.5,0.5, 0.5,-0.5,0.5
+    };
+    GLfloat fTexCoord[] = {
+        0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f,
+        0.0f,1.0f, 0.0f,0.0f, 1.0f,1.0f
+    };
+
+    for (int i=0;i<6;i++) {
+        int baseIndex = i*3;
+        QVector3D v(fVertices[baseIndex], fVertices[baseIndex+1], fVertices[baseIndex+2]);
+        QVector3D res = matrix * v;
+        int outputBaseIndex = objIndex *3 * 6 + i*3;
+        mVertices[outputBaseIndex] = res[0];
+        mVertices[outputBaseIndex+1] = res[1];
+        mVertices[outputBaseIndex+2] = res[2];
+    }
+
+    int outputBase = objIndex * 3 * 6;
+    int lineBase = objIndex * 3 * 8;
+    for (int i=0;i<4;i++){
+        int outputOffset = i*3;
+        mLines[lineBase++] = mVertices[outputBase+outputOffset];
+        mLines[lineBase++] = mVertices[outputBase+outputOffset+1];
+        mLines[lineBase++] = mVertices[outputBase+outputOffset+2];
+        outputOffset = ((i+1)*3) %12; // wrap to start for 8th vertex
+        mLines[lineBase++] = mVertices[outputBase+outputOffset];
+        mLines[lineBase++] = mVertices[outputBase+outputOffset+1];
+        mLines[lineBase++] = mVertices[outputBase+outputOffset+2];
+    }
+
+    memcpy(&mTextureCoords[objIndex*2*6], &fTexCoord[0], 12*sizeof(float));
 }
 
 void GLWidget::initializeGL ()
@@ -181,43 +309,60 @@ void GLWidget::initializeGL ()
 
     glGenTextures(1, &m_uiTexture);
 
-    QGLShader *vshader = new QGLShader(QGLShader::Vertex);
-    QGLShader *fshader = new QGLShader(QGLShader::Fragment);
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    vshader->compileSourceFile(":/stagehand/gles_shader.vsh");
-    fshader->compileSourceFile(":/stagehand/gles_shader.fsh");
-#else
-    vshader->compileSourceFile(":/stagehand/shader.vsh");
-    fshader->compileSourceFile(":/stagehand/shader.fsh");
- #endif
 
-    program.addShader(vshader);
-    program.addShader(fshader);
-    program.link();
 
-    vertexAttr = program.attributeLocation("vertex");
-    normalAttr = program.attributeLocation("normal");
-    texCoordAttr = program.attributeLocation("texCoord");
-    matrixUniform = program.uniformLocation("matrix");
-    textureUniform = program.uniformLocation("tex");
-    selectedUniform = program.uniformLocation("selected");
-    screenShotUniform = program.uniformLocation("screenshot");
-    drawTextureUniform = program.uniformLocation("drawTexture");
-    xthresholdUniform = program.uniformLocation("xthreshold");
-    ythresholdUniform = program.uniformLocation("ythreshold");
-
+    mProgram.CreateProgram(":/stagehand/shader.vsh",":/stagehand/shader.fsh");
+    mProgramLines.CreateProgram(":/stagehand/shaderLines.vsh",":/stagehand/shaderLines.fsh");
+    mProgramImage.CreateProgram(":/stagehand/shaderImage.vsh",":/stagehand/shaderImage.fsh");
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
+    mRotationAngleDegrees = 0.0;
 
-    m_fAngle = 0;
 }
 
 void GLWidget::resizeGL(int width, int height)
  {
      mViewportRatio = (double)height/(double)width;
      glViewport(0,0,width,height);
+}
+
+void GLWidget::buildScene()
+{
+    if (mObjects.size()>0) {
+
+        std::map<int, SceneObject>::iterator iter;
+        int numVerts = mObjects.size();
+        qDebug() << "num verts: " << numVerts;
+        mVertices.resize(numVerts*3*6);
+        mLines.resize(numVerts*3*8);
+        mIds.clear();
+        std::fill(mLines.begin(),mLines.end(),0.0f);
+        mTextureCoords.resize(numVerts*2*6);
+        int objIndex = 0;
+        for (iter = mObjects.begin();iter != mObjects.end(); ++iter) {
+            SceneObject so = (*iter).second;
+            QMatrix4x4 objectMatrix = so.mWorldMatrix;
+
+
+            QVector3D size = so.mSize;
+            if (size.length() > 0.0)
+            {
+                objectMatrix.scale(size);
+                objectMatrix = objectMatrix;
+                objectMatrix.scale(1.0f, 1.0f, 0.05f);
+
+                addRect(objectMatrix, objIndex);
+                mIds[iter->first] = objIndex;
+                ++objIndex;
+            }
+        }
+        mNumberRectangles = objIndex;
+
+        qDebug() << mNumberRectangles;
+    }
+    mSceneChanged = false;
 }
 
 void GLWidget::paintGL()
@@ -236,56 +381,46 @@ void GLWidget::paintGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
+    if (mAnimating) {
+        animate();
+    }
+    if (mAnimatingRotation) {
+        animateRotation();
+    }
 
+    mModelView = mProjectionMatrix * mViewMatrix;
+
+    mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
+    mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
+    mModelView.scale(mScale,mScale,1.0);
+
+    mModelView.rotate(mRotationAngleDegrees,0,0,1);
 
     if (mObjects.size()>0) {
-
-        m_uiTexture = bindTexture(mScreenShot);
-        program.bind();
-        mModelView = mProjectionMatrix * mViewMatrix;
-        mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
-        mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
-        mModelView.scale(m_fScale,m_fScale,1.0);
-
+        if (mSceneChanged) {
+            buildScene();
+        }
         int selectionId = 0;
         if (mSelectionIndex < mSelectedIds.size()) {
             selectionId = mSelectedIds[mSelectionIndex];
         }
+        int selectObject = mIds[selectionId];
 
-        std::map<int, SceneObject>::iterator iter;
-        for (iter = mObjects.begin();iter != mObjects.end();iter++) {
-            SceneObject so = (*iter).second;
-            QMatrix4x4 objectMatrix = so.mWorldMatrix;
-
-            QVector3D size = so.mSize;
-            objectMatrix.scale(size);
-            objectMatrix = mModelView * objectMatrix;
-            objectMatrix.scale(1.0f, 1.0f, 0.05f);
-
-            QVector3D tl(-0.5, 0.5,0.0);
-            QVector3D br(0.5, -0.5,0.0);
-            tl = objectMatrix*tl;
-            br = objectMatrix*br;
-            float xpixels = (float)width() * (br.x()-tl.x())/2.0;
-            float xthreshold = 1.0/xpixels;
-            float ypixels = (float)height() * (br.y()-tl.y())/2.0;
-            float ythreshold = 1.0/ypixels;
-
-            program.setUniformValue(drawTextureUniform, mShowScreenShot && (*iter).first == 1);
-            program.setUniformValue(matrixUniform, objectMatrix);
-            program.setUniformValue(selectedUniform, (*iter).first == selectionId);
-            program.setUniformValue(screenShotUniform, mShowScreenShot);
-            program.setUniformValue(xthresholdUniform, xthreshold);
-            program.setUniformValue(ythresholdUniform, ythreshold);
-
-            drawRect();
-
+        if (mShowScreenShot)
+            drawScreenshot();
+        if (selectObject == 0)
+        {
+            drawRects(0,mNumberRectangles, false);
         }
-        program.release();
+        else
+        {
+            drawRects(0,selectObject, false);
+            drawRects(selectObject,1,true);
+            drawRects(selectObject+1,mNumberRectangles-selectObject+1,false);
+        }
     } else {
         drawLogo();
     }
-
 
     glDisable(GL_CULL_FACE);
 }
@@ -295,25 +430,39 @@ void GLWidget::drawLogo() {
     float ratio = (float)mLogo.height()/(float)mLogo.width();
     objectMatrix.scale(1.0f, -ratio, 1.0f);
     m_uiTexture = bindTexture(mLogo);
-    program.bind();
-    program.setUniformValue(drawTextureUniform, true);
-    program.setUniformValue(matrixUniform, objectMatrix);
-    program.setUniformValue(selectedUniform, false);
-    program.setUniformValue(screenShotUniform, true);
-    program.setUniformValue(xthresholdUniform, 0.2f);
-    program.setUniformValue(ythresholdUniform, 0.2f);
 
-    drawRect();
-    program.release();
+    GLfloat fVertices[] = {
+        -0.5, 0.5, 0.5, 0.5, 0.5,0.5,0.5,-0.5,0.5,
+        -0.5, -0.5, 0.5, -0.5,0.5,0.5, 0.5,-0.5,0.5
+    };
+    GLfloat fTexCoord[] = {
+        0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f,
+        0.0f,1.0f, 0.0f,0.0f, 1.0f,1.0f
+    };
+
+    mProgramImage.bind();
+    bindTexture(mScreenShot);
+    mProgramImage.setAttributeArray(VERTEX_ATTR, fVertices, 3);
+    mProgramImage.setAttributeArray(TEXCOORD_ATTR, fTexCoord, 2);
+    mProgramImage.setUniformValue(MATRIX_UNIFORM, objectMatrix );
+    mProgramImage.enableAttributeArray(VERTEX_ATTR, true);
+    mProgramImage.enableAttributeArray(TEXCOORD_ATTR, true);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    mProgramImage.enableAttributeArray(VERTEX_ATTR, false);
+    mProgramImage.enableAttributeArray(TEXCOORD_ATTR, false);
+    mProgramImage.release();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent* event) {
     QPoint currpoint = event->pos();
     if (mDragging) {
         currpoint -= mStartPoint;
-        mDragX = currpoint.x();
-        mDragY = currpoint.y();
-        update();
+
+
+       mDragX = currpoint.x();
+       mDragY = currpoint.y();
+
+       update();
     } else {
         // assume that the first node has the screen size
 
@@ -328,6 +477,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event) {
            QVector3D size = so.mSize;
            objectMatrix.scale(size);
            objectMatrix = mModelView * objectMatrix;
+           objectMatrix.rotate(-mRotationAngleDegrees,0,0,1);
            objectMatrix.scale(1.0f, 1.0f, 0.05f);
            QVector3D tl(-0.5, 0.5,0.0);
            QVector3D br(0.5, -0.5,0.0);
@@ -352,6 +502,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event) {
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *eventPress){
+    endRotationAnimation();
+    endScaleAnimation();
+
     mStartPoint = eventPress->pos();
     mDragging = true;
 }
@@ -373,16 +526,16 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *releaseEvent){
 
 void GLWidget::wheelEvent(QWheelEvent *wheelEvent)
 {
-    const float scrollFactor = 1.1f;
+    const float scrollFactor = 1.05f;
     float xpos = wheelEvent->posF().x()-(size().width()/2.0f);
-    xpos *= m_fScale;
+    xpos *= mScale;
 
     float xposzoom = 0.0f;
-    if (wheelEvent->delta() > 0 ) {
-        m_fScale /= scrollFactor;
+    if (wheelEvent->delta() < 0.0 ) {
+        mScale /= scrollFactor;
         xposzoom = xpos / scrollFactor;
-    }  else if (wheelEvent->delta()<0){
-        m_fScale *= scrollFactor;
+    }  else if (wheelEvent->delta() > 0.0){
+        mScale *= scrollFactor;
         xposzoom = xpos * scrollFactor;
     }
     mTranslateX -= xposzoom - xpos;
@@ -400,6 +553,7 @@ void GLWidget::select(float x, float y) {
         QVector3D size = so.mSize;
         objectMatrix.scale(size);
         objectMatrix = mModelView * objectMatrix;
+        objectMatrix.rotate(-mRotationAngleDegrees,0,0,1);
         objectMatrix.scale(1.0f, 1.0f, 0.05f);
         QVector3D tl(-0.5, 0.5,0.0);
         QVector3D br(0.5, -0.5,0.0);

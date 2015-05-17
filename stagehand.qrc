@@ -26,5 +26,11 @@
         <file>gles_shader.vsh</file>
         <file>settings.png</file>
         <file>information.png</file>
+        <file>shaderLines.fsh</file>
+        <file>shaderLines.vsh</file>
+        <file>shaderImage.fsh</file>
+        <file>shaderImage.vsh</file>
+        <file>sub_black_rotate_ccw.png</file>
+        <file>sub_black_rotate_cw.png</file>
     </qresource>
 </RCC>

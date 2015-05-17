@@ -27,8 +27,10 @@
 #include <QTimer>
 #include <QElapsedTimer>
 #include <map>
+#include <vector>
 
 #include "sceneobject.h"
+#include "glprogram.h"
 
 class Bubble;
 class GLWidget : public QGLWidget {
@@ -47,6 +49,9 @@ public:
     void zoomIn();
     void zoomOut();
 
+    void rotateRight();
+    void rotateLeft();
+
     void setScreenShot(QImage img);
 
     void showScreenShot(bool show){mShowScreenShot=show;update();}
@@ -54,6 +59,9 @@ public:
     void setSelection(int id);
     QImage getScreenShot();
 
+    void drawScreenshot();
+
+    bool sceneLoaded();
 public slots:
     void animate();
 
@@ -70,37 +78,39 @@ protected:
     void mouseReleaseEvent(QMouseEvent *releaseEvent);
     void wheelEvent(QWheelEvent * wheelEvent);
 private:
+    void buildScene();
+    bool mSceneChanged;
+
     GLuint  m_uiTexture;
-    qreal   m_fAngle;
-    float   m_fScale;
-    bool m_showBubbles;
-    void drawRect();
+    double   mScale;
+
+    void drawRects(int startRect, int finRect, bool selected);
+    void addRect(const QMatrix4x4 matrix, int objIndex);
+
 
     QVector<QVector3D> vertices;
     QVector<QVector3D> normals;
 
     QMatrix4x4 mProjectionMatrix;
+    double mRotationAngleDegrees;
     QMatrix4x4 mViewMatrix;
     QMatrix4x4 mModelView;
     double mAspectRatio;
     double mViewportRatio;
     std::map<int, SceneObject> mObjects;
     std::vector<int> mSelectedIds;
+    std::vector<float> mVertices;
+    std::vector<float> mLines;
+    std::vector<float> mTextureCoords;
+    std::map<int,int> mIds;
     unsigned int mSelectionIndex;
+    int mNumberRectangles;
     int frames;
     QTime time;
 
-    QGLShaderProgram program;
-    int vertexAttr;
-    int normalAttr;
-    int texCoordAttr;
-    int matrixUniform;
-    int textureUniform;
-    int selectedUniform;
-    int screenShotUniform;
-    int drawTextureUniform;
-    int xthresholdUniform;
-    int ythresholdUniform;
+    GlProgram mProgram;
+    GlProgram mProgramLines;
+    GlProgram mProgramImage;
 
     QPoint mStartPoint;
     bool mDragging;
@@ -112,11 +122,22 @@ private:
     int mDragY;
     bool mShowScreenShot;
     void select(float x, float y);
-    QTimer mAnimationTimer;
     QElapsedTimer mElapsedTimer;
-    float mStartScale;
-    float mEndScale;
+    QElapsedTimer mRotationTimer;
+    double mStartScale;
+    double mEndScale;
+    double mStartRotation;
+    double mEndRotation;
+
     qint64 mAnimationLengthms;
+    qint64 mRotationAnimationLengthms;
     void drawLogo();
+
+    bool mAnimating;
+    bool mAnimatingRotation;
+
+    void animateRotation();
+    void endScaleAnimation();
+    void endRotationAnimation();
 };
 #endif

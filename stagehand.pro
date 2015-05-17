@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     settingsdialog.cpp \
     performancedialog.cpp \
     circularbuffer.cpp \
-    initialsettingsdialog.cpp
+    initialsettingsdialog.cpp \
+    glprogram.cpp
 
 INCLUDEPATH += $$PWD/extlibs/include/
 
@@ -57,7 +58,8 @@ HEADERS  += mainwindow.h \
     consts.h \
     performancedialog.h \
     circularbuffer.h \
-    initialsettingsdialog.h
+    initialsettingsdialog.h \
+    glprogram.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
@@ -74,7 +76,9 @@ OTHER_FILES += \
     visible.png \
     shader.fsh \
     shader.vsh \
-    android/AndroidManifest.xml
+    android/AndroidManifest.xml \
+    shaderLines.fsh \
+    shaderLines.vsh
 
 RESOURCES += \
     stagehand.qrc
