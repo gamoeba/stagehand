@@ -154,9 +154,15 @@ void MainWindow::updateScene()
 {
     portForward();
     SocketClient client;
-    client.connectSocket(getConnectionHost(), settings[KPortNumber].toUInt());
-    mJsonTxt = client.sendCommandSizedReturn( KDaliCmdDumpScene);
-
+    if (client.connectSocket(getConnectionHost(), settings[KPortNumber].toUInt()))
+    {
+        mJsonTxt = client.sendCommandSizedReturn( KDaliCmdDumpScene);
+    }
+    else
+    {
+        emit showConnectionError();
+        return;
+    }
     if (mJsonTxt.length() > 0 ) {
         mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
 
@@ -165,13 +171,19 @@ void MainWindow::updateScene()
         QtConcurrent::run(this, &MainWindow::takeScreenShot);
         refreshScene();
     } else {
-        QMessageBox msgBox;
-        msgBox.setText("Error");
-        msgBox.setInformativeText("Connection to device failed");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
+        emit showConnectionError();
     }
+}
+
+void MainWindow::showConnectionError()
+{
+    QMessageBox* msgBox = new QMessageBox();
+    msgBox->setText("Error");
+    msgBox->setInformativeText("Connection to device failed");
+    msgBox->setStandardButtons(QMessageBox::Ok);
+    msgBox->setDefaultButton(QMessageBox::Ok);
+    msgBox->exec();
+    delete msgBox;
 }
 
 void MainWindow::refreshScene()

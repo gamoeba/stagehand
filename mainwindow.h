@@ -92,6 +92,7 @@ private slots:
 
     void on_animateButton_clicked();
 
+    void showConnectionError();
 private:
     Ui::MainWindow *ui;
     TreeModel* mTreeModel;
