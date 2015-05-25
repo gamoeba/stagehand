@@ -55,6 +55,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QRect screenSize = desktop.availableGeometry(this);
     QSize sz(screenSize.width() * 0.8f, screenSize.height() * 0.8f);
 
+    setStyleSheet("");
+    QFile file(":/stagehand/blue.qss");
+    if(file.open(QFile::ReadOnly)) {
+       QString StyleSheet = QLatin1String(file.readAll());
+       qApp->setStyleSheet(StyleSheet);
+    }
     ui->setupUi(this);
 
     mGLWidget = new GLWidget();
@@ -72,8 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->verticalHeader()->setVisible(false);
     ui->treeView->header()->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->treeView->header()->setStretchLastSection(false);
+    ui->treeView->header()->setStretchLastSection(true);
     ui->treeView->setHeaderHidden(true);
+    ui->treeView->setAlternatingRowColors(true);
 
     ui->tableViewUpdate->setModel(new QStandardItemModel());
     ui->tableViewUpdate->setAlternatingRowColors(true);

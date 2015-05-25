@@ -184,11 +184,6 @@ void TableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     QTableWidget* tw = getTableWidget(str, false);
     if (tw) {
 
-        tw->setStyleSheet("QTableWidget {background-color: transparent;gridline-color: rgb(200,200,200);border:0px;}"
-                                        "QHeaderView::section {background-color: transparent;}"
-                                        "QHeaderView {background-color: transparent;}"
-                                        "QTableCornerButton::section {background-color: transparent;}");
-
         tw->resize(option.rect.size());
 
 

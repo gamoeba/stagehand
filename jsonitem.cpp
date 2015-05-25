@@ -53,7 +53,7 @@ QVariant JsonItem::data(int role) const
         case Qt::ForegroundRole:
         {
             if (mOverallVisible && mVisible) {
-                return QVariant(QColor(Qt::black));
+                return QVariant(QColor(Qt::white));
             } else {
                 return QVariant(QColor(Qt::lightGray));
             }

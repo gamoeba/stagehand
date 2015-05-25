@@ -45,6 +45,7 @@ void TreeModel::setTreeData(QJsonDocument doc)
     NodeObject node(obj, KDaliNodePropertiesName);
     bool visible = node.getProperty(KDaliNodeVisible).toBoolean();
     QStandardItem* itemx = new JsonItem(obj, visible);
+    itemx->setEditable(false);
     mModel->appendRow(itemx);
     mIndices[id.toInt()] = itemx;
     QJsonValue children = obj.value(KDaliNodeChildrenName);
@@ -90,6 +91,7 @@ void TreeModel::addChildren(QStandardItem* parent, QJsonArray array, bool visibl
             }
 
             QStandardItem* itemx = new JsonItem(obj, nodeVisible);
+            itemx->setEditable(false);
 
             mIndices[idval] = itemx;
             parent->appendRow(itemx);
