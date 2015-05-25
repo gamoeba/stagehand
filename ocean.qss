@@ -1,36 +1,36 @@
 QTreeView {
-    background-color: rgb(80,80,100);
-    gridline-color: rgb(120,120,120);
+    background-color: #505060;
+    gridline-color: #787878;
     color: white;
-    alternate-background-color: rgb(100,100,120);
+    alternate-background-color: #646478;
     border:0px;
-s}
+}
 QTableView {
-    background-color: rgb(80,80,100);
-    gridline-color: rgb(120,120,120);
+    background-color: #505060;
+    gridline-color: #787878;
     color: white;
-    alternate-background-color: rgb(100,100,120);
+    alternate-background-color: #646478;
     border:0px;
 }
 QListView {
-    background-color: rgb(80,80,100);
+    background-color: #505060;
     color: white;
 }
 
-QScrollBar:horizontal {background-color: rgb(40,40,80);border: 2px solid grey;}
+QScrollBar:horizontal {background-color: #282850 ;border: 2px solid grey;}
 QScrollBar::add-page:horizontal { background: none;}
 QScrollBar::sub-page:horizontal { background: none;}
-QScrollBar:vertical {background-color: rgb(40,40,80);border: 2px solid grey;}
+QScrollBar:vertical {background-color: #282850 ;border: 2px solid grey;}
 QScrollBar::add-page:vertical { background: none;}
 QScrollBar::sub-page:vertical { background: none;}
-QMainWindow { background-color: rgb(40,40,60);color: white;}
-QDialog { background-color: rgb(40,40,60);color: white;}
-QLineEdit { background-color: rgb(40,40,60);color: white; border: 2px solid gray;}
-QStatusBar { background-color: rgb(40,40,60);color: white; }
-QStatusBar:item { background-color: rgb(40,40,60);color: white; border: 0px solid black;}
+QMainWindow { background-color: #28283C ;color: white;}
+QDialog { background-color: #28283C ;color: white;}
+QLineEdit { background-color: #28283C ;color: white; border: 2px solid gray;}
+QStatusBar { background-color: #28283C ;color: white; }
+QStatusBar:item { background-color: #28283C ;color: white; border: 0px solid black;}
 QLabel { background-color: none; color: white;}
 QPushButton {
-    background-color: rgb(80,80,140);
+    background-color: #50508C;
     color: white; border 2px solid gray;
     border-radius: 6px;
     min-width: 80px;
@@ -41,13 +41,13 @@ QComboBox {
     border-radius: 0px;
     padding: 1px 18px 1px 3px;
     min-width: 6em;
-    background-color: rgb(40,40,100);color: white;
+    background-color: #282864;color: white;
 }
 
 
 QComboBox:!editable, QComboBox::drop-down:editable {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #202040, stop: 1.0 #202080);
+                                 stop: 0 #28283C, stop: 1.0 #202080);
      color: white;
 }
 
@@ -83,9 +83,15 @@ QHeaderView::section {
     border: 1px solid #6c6c6c;
 }
 
-QHeaderView::section:checked
-{
-    background-color: red;
+QToolBar {
+    background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                stop: 0 #202040, stop: 1.0 #505064);
+    spacing: 3px; /* spacing between items in the tool bar */
+}
+
+GLWidget {
+    background-color: #1A1A34;
+    color: #CCFFFF;
 }
 
 

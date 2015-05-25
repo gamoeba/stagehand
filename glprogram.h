@@ -20,6 +20,8 @@ public:
     void setUniformValue(const std::string& uniformName, const QMatrix4x4 &matrix);
 
     void setUniformValue(const std::string &uniformName, bool value);
+    void setUniformValue(const std::string &uniformName, const QVector3D &vec3);
+    void setUniformValue(const std::string &uniformName, const QVector4D &vec4);
 private:
     int lookupUniform(const std::string &uniformName);
     int lookupAttribute(const std::string& attributeName);

@@ -29,6 +29,7 @@ const QString KAdbDestPortNumber("AdbDestPortNumber");
 const QString KForwardPortDest("ForwardPortDest");
 const QString KFontPointSize("FontPointSize");
 const QString KTargetType("TargetType");
+const QString KColourScheme("ColourScheme");
 const QString KTargetToolsPath("TargetToolsPath");
 const QString KForwardMode("ForwardMode");
 

@@ -32,6 +32,7 @@ Settings::Settings()
     mSettings[KTargetType] = "android";
     mSettings[KTargetToolsPath] = "~/bin";
     mSettings[KForwardMode] = "forward";
+    mSettings[KColourScheme] = "ocean";
     mSettings["perfmode"] = "off";
 
     QMap<QString, QString>::iterator iter;

@@ -59,6 +59,18 @@ void GlProgram::setUniformValue(const string& uniformName, const QMatrix4x4& mat
     mProgram.setUniformValue(uniformIndex, matrix);
 }
 
+void GlProgram::setUniformValue(const string& uniformName, const QVector3D& vec3)
+{
+    int uniformIndex = lookupUniform(uniformName);
+    mProgram.setUniformValue(uniformIndex, vec3);
+}
+
+void GlProgram::setUniformValue(const string &uniformName, const QVector4D &vec4)
+{
+    int uniformIndex = lookupUniform(uniformName);
+    mProgram.setUniformValue(uniformIndex, vec4);
+}
+
 void GlProgram::setUniformValue(const string& uniformName, bool value)
 {
     int uniformIndex = lookupUniform(uniformName);

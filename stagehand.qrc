@@ -32,6 +32,7 @@
         <file>shaderImage.vsh</file>
         <file>sub_black_rotate_ccw.png</file>
         <file>sub_black_rotate_cw.png</file>
-        <file>blue.qss</file>
+        <file>ocean.qss</file>
+        <file>emerald.qss</file>
     </qresource>
 </RCC>

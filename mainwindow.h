@@ -116,6 +116,7 @@ private:
     void runPlatformScript(QString scriptName, QStringList parameters);
     const QString &getConnectionHost();
     bool mFoundCamera;
+    void setColourScheme();
 };
 
 #endif // MAINWINDOW_H

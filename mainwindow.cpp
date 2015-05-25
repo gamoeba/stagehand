@@ -51,31 +51,24 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mChangingProperties(false)
 {
+    setColourScheme();
+
     QDesktopWidget desktop;
     QRect screenSize = desktop.availableGeometry(this);
     QSize sz(screenSize.width() * 0.8f, screenSize.height() * 0.8f);
 
-    setStyleSheet("");
-    QFile file(":/stagehand/blue.qss");
-    if(file.open(QFile::ReadOnly)) {
-       QString StyleSheet = QLatin1String(file.readAll());
-       qApp->setStyleSheet(StyleSheet);
-    }
     ui->setupUi(this);
-
-    mGLWidget = new GLWidget();
-
-    mGLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
 
     mTreeModel = new TreeModel;
     mTableModel = new TableModel(ui->tableView);
+//    mTableModel->model()->setHorizontalHeaderLabels(QStringList() << "property" << "value");
+//    mTableModel->model()->setHorizontalHeaderItem(0,new QStan);
 
-    ui->treeView->setAlternatingRowColors(false);
+    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->updatePanel->setHidden(true);
-    ui->tableView->setAlternatingRowColors(true);
-    ui->tableView->horizontalHeader()->setVisible(false);
-    ui->tableView->verticalHeader()->setVisible(false);
+    //ui->tableView->setAlternatingRowColors(true);
+    //ui->tableView->horizontalHeader()->setVisible(false);
+    //ui->tableView->verticalHeader()->setVisible(false);
     ui->treeView->header()->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->treeView->header()->setStretchLastSection(true);
@@ -87,19 +80,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableViewUpdate->horizontalHeader()->setVisible(false);
     ui->tableViewUpdate->verticalHeader()->setVisible(false);
 
+
     TableDelegate* delegate = new TableDelegate(1);
     ui->tableView->setItemDelegateForColumn(1, delegate);
     TableDelegate* delegateUpdate = new TableDelegate(2);
     ui->tableViewUpdate->setItemDelegateForColumn(2 ,delegateUpdate);
 
     QObject::connect(mTableModel->model(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
-    QObject::connect(mGLWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
-    QObject::connect(mGLWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
+    QObject::connect(ui->glWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
+    QObject::connect(ui->glWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
     QObject::connect(this, SIGNAL(newImage(QImage)), this, SLOT(newImageReceived(QImage)));
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
-    ui->glParent->addWidget(mGLWidget);
 
     QFont font;
     int pointSize = settings[KFontPointSize].toInt();
@@ -111,13 +104,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPerformance->setVisible(settings["perfmode"]=="on");
 
     resize(sz);
-    this->repaint();
-}
+ }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete mGLWidget;
     delete mTreeModel;
     delete mTableModel;
 }
@@ -132,7 +123,7 @@ void MainWindow::loadFile() {
     sa.unzip(fileName);
     mJsonTxt = sa.getSceneData();
     mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
-    mGLWidget->setScreenShot(sa.getScreenShot());
+    ui->glWidget->setScreenShot(sa.getScreenShot());
     refreshScene();
 }
 
@@ -145,18 +136,18 @@ void MainWindow::saveFile()
 
     StagehandArchive sa;
     sa.setSceneData(mJsonTxt);
-    sa.setScreenShot(mGLWidget->getScreenShot());
+    sa.setScreenShot(ui->glWidget->getScreenShot());
     sa.zip(fileName);
 }
 
 void MainWindow::zoomIn()
 {
-    mGLWidget->zoomIn();
+    ui->glWidget->zoomIn();
 }
 
 void MainWindow::zoomOut()
 {
-    mGLWidget->zoomOut();
+    ui->glWidget->zoomOut();
 }
 
 void MainWindow::updateScene()
@@ -170,7 +161,7 @@ void MainWindow::updateScene()
         mDoc = QJsonDocument::fromJson(mJsonTxt.toUtf8());
 
         QImage img;
-        mGLWidget->setScreenShot(img); // set an empty image through to clear any previous images while we wait for the screenshot
+        ui->glWidget->setScreenShot(img); // set an empty image through to clear any previous images while we wait for the screenshot
         QtConcurrent::run(this, &MainWindow::takeScreenShot);
         refreshScene();
     } else {
@@ -202,7 +193,7 @@ void MainWindow::refreshScene()
         RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState, selectedIndex, currentIndex, treePosition);
         //ui->treeView->expandAll();
         addObjects();
-        mGLWidget->repaint();
+        ui->glWidget->repaint();
         resetSearch();
     }
 }
@@ -228,21 +219,21 @@ void MainWindow::mousePositionChanged(int x, int y)
 
 void MainWindow::showScreenShot(bool show)
 {
-    mGLWidget->showScreenShot(show);
+    ui->glWidget->showScreenShot(show);
 }
 
 void MainWindow::rotateLeft()
 {
-    mGLWidget->rotateLeft();
+    ui->glWidget->rotateLeft();
 }
 
 void MainWindow::rotateRight()
 {
-    mGLWidget->rotateRight();
+    ui->glWidget->rotateRight();
 }
 
 void MainWindow::addObjects() {
-    mGLWidget->clear();
+    ui->glWidget->clear();
     mFoundCamera = false;
     QJsonObject obj = mDoc.object();
     addNodeObject(obj);
@@ -262,19 +253,19 @@ bool MainWindow::addNodeObject(QJsonObject obj) {
     bool vis = node.getProperty(KDaliNodeVisible).toBoolean();
     if (!mFoundCamera && value.toString() == KDaliCameraNodeName) {
         DataObject pm = node.getProperty(KDaliCameraNodeProjectionMatrixName);
-        mGLWidget->setProjectionMatrix(pm.get4x4Matrix());
+        ui->glWidget->setProjectionMatrix(pm.get4x4Matrix());
         DataObject vm = node.getProperty(KDaliCameraNodeViewMatrixName);
-        mGLWidget->setViewMatrix(vm.get4x4Matrix());
+        ui->glWidget->setViewMatrix(vm.get4x4Matrix());
 
         double aspectRatio = node.getProperty(KDaliCameraNodeAspectRatioName).toDouble();
-        mGLWidget->setAspectRatio(aspectRatio);
+        ui->glWidget->setAspectRatio(aspectRatio);
         mFoundCamera = true;
     } else {
         QMatrix4x4 wm = node.getProperty(KDaliNodeWorldMatrixName).get4x4Matrix();
         std::vector<double> size = node.getProperty(KDaliNodeSizeName).getVector();
         QVector3D qsize(size[0], size[1], size[2]);
         if (vis) {
-            mGLWidget->addObject(idVal, SceneObject(wm, qsize));
+            ui->glWidget->addObject(idVal, SceneObject(wm, qsize));
         }
     }
     return vis;
@@ -326,7 +317,7 @@ void MainWindow::updateGLView(const QModelIndex &index)
     QVariant var = ui->treeView->model()->data(index, JsonItem::JsonRole);
     QJsonObject obj = var.toJsonObject();
     int id = obj.value(KDaliNodeId).toInt();
-    mGLWidget->setSelection(id);
+    ui->glWidget->setSelection(id);
 }
 
 void MainWindow::updateTableView(const QModelIndex &index)
@@ -337,7 +328,7 @@ void MainWindow::updateTableView(const QModelIndex &index)
     mTableModel->setTableData(obj);
     mChangingProperties = false;
     ui->tableView->setModel(mTableModel->model());
-    ui->tableView->resizeColumnsToContents();
+    //ui->tableView->resizeColumnsToContents();
     ui->tableView->resizeRowsToContents();
 
 }
@@ -478,8 +469,8 @@ void MainWindow::tableItemChanged(QStandardItem * item)
 
 void MainWindow::newImageReceived(QImage img)
 {
-    mGLWidget->setScreenShot(img);
-    mGLWidget->repaint();
+    ui->glWidget->setScreenShot(img);
+    ui->glWidget->repaint();
 }
 
 void MainWindow::aboutStagehand()
@@ -599,11 +590,23 @@ void MainWindow::portForward() {
 
 void MainWindow::editSettings()
 {
-    InitialSettingsDialog d;
+    InitialSettingsDialog d(this);
     d.updateFromSettings(settings);
     int res = d.exec();
     if (res == QDialog::Accepted) {
         d.updateSettings(settings);
+        setColourScheme();
+    }
+}
+
+void MainWindow::setColourScheme()
+{
+    QString scheme = settings[KColourScheme];
+    QString fileName = QString(":/stagehand/").append(scheme).append(".qss");
+    QFile file(fileName);
+    if(file.open(QFile::ReadOnly)) {
+       QString StyleSheet = QLatin1String(file.readAll());
+       qApp->setStyleSheet(StyleSheet);
     }
 }
 

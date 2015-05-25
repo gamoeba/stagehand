@@ -18,7 +18,7 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#include <QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 #include <QtGui/qvector3d.h>
 #include <QtGui/qmatrix4x4.h>
 #include <QtOpenGL/qglshaderprogram.h>
@@ -33,7 +33,7 @@
 #include "glprogram.h"
 
 class Bubble;
-class GLWidget : public QGLWidget {
+class GLWidget : public QOpenGLWidget {
 
     Q_OBJECT
 public:
@@ -62,6 +62,7 @@ public:
     void drawScreenshot();
 
     bool sceneLoaded();
+    void setColors(const QColor &backgroundColor, const QColor &outlineColor);
 public slots:
     void animate();
 
@@ -139,5 +140,9 @@ private:
     void animateRotation();
     void endScaleAnimation();
     void endRotationAnimation();
+
+    bool Inside2(const QVector3D &p0, QVector3D &p1, const QVector3D &p2);
+    QColor mBackgroundColor;
+    QColor mOutlineColor;
 };
 #endif

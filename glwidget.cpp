@@ -28,9 +28,12 @@ const std::string VERTEX_ATTR = "vertex";
 const std::string TEXCOORD_ATTR = "texCoord";
 const std::string MATRIX_UNIFORM = "viewMatrix";
 const std::string SELECTED_UNIFORM = "selected";
+const std::string OUTLINE_UNIFORM = "outline";
 
 GLWidget::GLWidget(QWidget *parent)
-    : QGLWidget(parent)
+    : QOpenGLWidget(parent),
+      mBackgroundColor(0x1A,0x1A,0x34),
+      mOutlineColor(0xCC,0xCC,0xff)
 {
     mSceneChanged = false;
     mNumberRectangles = 0;
@@ -55,7 +58,6 @@ GLWidget::GLWidget(QWidget *parent)
     glf.setSampleBuffers(true);
     glf.setSamples(4);
     QGLFormat::setDefaultFormat(glf);
-
 }
 
 GLWidget::~GLWidget()
@@ -228,7 +230,12 @@ void GLWidget::endRotationAnimation()
 void GLWidget::drawScreenshot()
 {
     mProgramImage.bind();
-    bindTexture(mScreenShot);
+    //QImage img = mScreenShot.toImage();
+
+    glBindTexture(GL_TEXTURE_2D, m_uiTexture);
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, mScreenShot.width(),
+                  mScreenShot.height(),
+                  0, GL_BGRA, GL_UNSIGNED_BYTE, mScreenShot.bits());
     mProgramImage.setAttributeArray(VERTEX_ATTR, &mVertices[0], 3);
     mProgramImage.setAttributeArray(TEXCOORD_ATTR, &mTextureCoords[0], 2);
     mProgramImage.setUniformValue(MATRIX_UNIFORM, mModelView );
@@ -247,13 +254,16 @@ bool GLWidget::sceneLoaded()
 
 void GLWidget::drawRects(int startRect, int count, bool selected)
 {
+    QVector3D outline(mOutlineColor.redF(),mOutlineColor.greenF(),mOutlineColor.blueF());
     if (!mShowScreenShot || selected)
     {
+
         mProgram.bind();
         mProgram.setAttributeArray(VERTEX_ATTR, &mVertices[0], 3);
         mProgram.setAttributeArray(TEXCOORD_ATTR, &mTextureCoords[0], 2);
         mProgram.setUniformValue(MATRIX_UNIFORM, mModelView );
         mProgram.setUniformValue(SELECTED_UNIFORM, selected);
+        mProgram.setUniformValue(OUTLINE_UNIFORM, outline);
         mProgram.enableAttributeArray(VERTEX_ATTR, true);
         mProgram.enableAttributeArray(TEXCOORD_ATTR, true);
         glDrawArrays(GL_TRIANGLES, startRect*6, count*6);
@@ -266,6 +276,8 @@ void GLWidget::drawRects(int startRect, int count, bool selected)
     mProgramLines.setAttributeArray(VERTEX_ATTR, &mLines[0], 3);
     mProgramLines.enableAttributeArray(VERTEX_ATTR, true);
     mProgramLines.setUniformValue(MATRIX_UNIFORM, mModelView );
+    mProgramLines.setUniformValue(OUTLINE_UNIFORM, outline);
+
     glLineWidth(1.0f);
     glDrawArrays(GL_LINES, startRect*8, count*8); // lines takes total vertex count
     mProgramLines.enableAttributeArray(VERTEX_ATTR, false);
@@ -278,8 +290,8 @@ void GLWidget::addRect(const QMatrix4x4 matrix,  int objIndex) {
         -0.5, -0.5, 0.5, -0.5,0.5,0.5, 0.5,-0.5,0.5
     };
     GLfloat fTexCoord[] = {
-        0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f,
-        0.0f,1.0f, 0.0f,0.0f, 1.0f,1.0f
+        0.0f,1.0f, 1.0f,1.0f, 1.0f,0.0f,
+        0.0f,0.0f, 0.0f,1.0f, 1.0f,0.0f
     };
 
     for (int i=0;i<6;i++) {
@@ -349,13 +361,10 @@ void GLWidget::buildScene()
         for (iter = mObjects.begin();iter != mObjects.end(); ++iter) {
             SceneObject so = (*iter).second;
             QMatrix4x4 objectMatrix = so.mWorldMatrix;
-
-
             QVector3D size = so.mSize;
             if (size.length() > 0.0)
             {
                 objectMatrix.scale(size);
-                objectMatrix = objectMatrix;
                 objectMatrix.scale(1.0f, 1.0f, 0.05f);
 
                 addRect(objectMatrix, objIndex);
@@ -370,7 +379,9 @@ void GLWidget::buildScene()
 
 void GLWidget::paintGL()
 {
-    glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+    mBackgroundColor = palette().color(palette().Background);
+    mOutlineColor = palette().color(palette().Foreground);
+    glClearColor(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF(), 1.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -391,10 +402,13 @@ void GLWidget::paintGL()
         animateRotation();
     }
 
-    mModelView = mProjectionMatrix * mViewMatrix;
-
-    mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
+    mModelView = mProjectionMatrix;// * mViewMatrix;
+    mModelView.translate(-(mTranslateX + mDragX) ,mTranslateY + mDragY ,0);
     mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
+    mModelView *= mViewMatrix;
+
+    //mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
+    //mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
     mModelView.scale(mScale,mScale,1.0);
 
     mModelView.rotate(mRotationAngleDegrees,0,0,1);
@@ -432,19 +446,25 @@ void GLWidget::drawLogo() {
     QMatrix4x4 objectMatrix;
     float ratio = (float)mLogo.height()/(float)mLogo.width();
     objectMatrix.scale(1.0f, -ratio, 1.0f);
-    m_uiTexture = bindTexture(mLogo);
+
+    QImage img = mLogo.toImage();
+
+    glBindTexture(GL_TEXTURE_2D, m_uiTexture);
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, mLogo.width(),
+                  mLogo.height(),
+                  0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
+
 
     GLfloat fVertices[] = {
         -0.5, 0.5, 0.5, 0.5, 0.5,0.5,0.5,-0.5,0.5,
         -0.5, -0.5, 0.5, -0.5,0.5,0.5, 0.5,-0.5,0.5
     };
     GLfloat fTexCoord[] = {
-        0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f,
-        0.0f,1.0f, 0.0f,0.0f, 1.0f,1.0f
+        0.0f,1.0f, 1.0f,1.0f, 1.0f,0.0f,
+        0.0f,0.0f, 0.0f,1.0f, 1.0f,0.0f
     };
 
     mProgramImage.bind();
-    bindTexture(mScreenShot);
     mProgramImage.setAttributeArray(VERTEX_ATTR, fVertices, 3);
     mProgramImage.setAttributeArray(TEXCOORD_ATTR, fTexCoord, 2);
     mProgramImage.setUniformValue(MATRIX_UNIFORM, objectMatrix );
@@ -558,12 +578,20 @@ void GLWidget::select(float x, float y) {
         objectMatrix = mModelView * objectMatrix;
         objectMatrix.rotate(-mRotationAngleDegrees,0,0,1);
         objectMatrix.scale(1.0f, 1.0f, 0.05f);
-        QVector3D tl(-0.5, 0.5,0.0);
-        QVector3D br(0.5, -0.5,0.0);
-        tl = objectMatrix*tl;
-        br = objectMatrix*br;
-        if (x >= tl.x() && y >= tl.y() &&
-            x <= br.x() && y <= br.y()) {
+        QVector3D p1(-0.5, -0.5,0.0);
+        QVector3D p2(0.5, -0.5,0.0);
+        QVector3D p3(0.5, 0.5,0.0);
+        QVector3D p4(-0.5, 0.5,0.0);
+        p1 = objectMatrix*p1;
+        p2 = objectMatrix*p2;
+        p3 = objectMatrix*p3;
+        p4 = objectMatrix*p4;
+        QVector3D p(x,y, 0.0);
+
+        if (Inside2(p1,p2, p) &&
+            Inside2(p2, p3, p) &&
+            Inside2(p3, p4, p)  &&
+            Inside2(p4, p1, p)) {
             ids.insert(ids.begin(), (*iter).first);
         }
 
@@ -583,4 +611,11 @@ void GLWidget::select(float x, float y) {
     if (mSelectionIndex < mSelectedIds.size()) {
         emit selectedId(mSelectedIds[mSelectionIndex]);
     }
+}
+
+bool GLWidget::Inside2(const QVector3D &p0, QVector3D &p1, const QVector3D& p2)
+{
+    // use the formula for the determinant of the triangle of the three points to determine if the points are in a clockwise orientation
+    float res = p1.x()*p2.y() - p1.y()*p2.x() -p0.x()*p2.y() + p0.y()*p2.x() + p0.x()*p1.y() - p0.y()*p1.x();
+    return res < 0;
 }

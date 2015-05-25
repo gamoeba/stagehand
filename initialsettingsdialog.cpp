@@ -32,6 +32,10 @@ void InitialSettingsDialog::updateFromSettings(Settings& settings) {
     if (index != -1) {
         ui->targetPlatformSelect->setCurrentIndex(index);
     }
+    int colourScheme = ui->colourSchemeSelect->findText(settings[KColourScheme]);
+    if (colourScheme != -1) {
+        ui->colourSchemeSelect->setCurrentIndex(colourScheme);
+    }
 }
 
 void InitialSettingsDialog::updateSettings(Settings& settings) {
@@ -40,6 +44,7 @@ void InitialSettingsDialog::updateSettings(Settings& settings) {
     settings[KForwardPortDest] = ui->forwardStringEdit->text();
     settings[KTargetToolsPath] = ui->pathEdit->text();
     settings[KTargetType] = ui->targetPlatformSelect->currentText();
+    settings[KColourScheme] = ui->colourSchemeSelect->currentText();
     if (ui->forwardMode->currentIndex()==0) {
         settings[KForwardMode] = "direct";
     } else {
