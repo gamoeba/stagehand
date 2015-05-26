@@ -1,19 +1,19 @@
 QTreeView {
-    background-color: #905050;
+    background-color: #602020;
     gridline-color: #787878;
     color: white;
-    alternate-background-color: #a06464;
+    alternate-background-color: #904040;
     border:0px;
 }
 QTableView {
-    background-color: #905050;
+    background-color: #602020;
     gridline-color: #787878;
     color: white;
-    alternate-background-color: #a06464;
+    alternate-background-color: #904040;
     border:0px;
 }
 QListView {
-    background-color: #905050;
+    background-color: #602020;
     color: white;
 }
 
@@ -85,12 +85,13 @@ QHeaderView::section {
 
 QToolBar {
     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
-                                stop: 0 #902020, stop: 1.0 #905050);
+                                stop: 0 #902020, stop: 1.0 #602020);
     spacing: 3px;
+    border: 0px solid black;
 }
 
 GLWidget {
-    background-color: #905050;
+    background-color: #402020;
     color: #ffcccc;
 }
 

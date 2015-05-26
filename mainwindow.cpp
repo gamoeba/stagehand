@@ -51,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mChangingProperties(false)
 {
+//    setUnifiedTitleAndToolBarOnMac(false);
     setColourScheme();
 
     QDesktopWidget desktop;

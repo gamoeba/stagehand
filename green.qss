@@ -17,10 +17,12 @@ QListView {
     color: white;
 }
 
-QScrollBar:horizontal {background-color: #285028 ;border: 2px solid darkgrey;}
+QScrollBar:horizontal {background-color: #285028 ;border: 1px solid #283C28;}
+QScrollBar:handle:vertical {background: #647864;border-radius:6px;}
 QScrollBar::add-page:horizontal { background: none;}
 QScrollBar::sub-page:horizontal { background: none;}
-QScrollBar:vertical {background-color: #285028 ;border: 2px solid darkgrey;}
+QScrollBar:vertical {background-color: #285028 ;border: 1px solid #283C28;}
+QScrollBar:handle:vertical {background: #647864;border-radius:6px;}
 QScrollBar::add-page:vertical { background: none;}
 QScrollBar::sub-page:vertical { background: none;}
 QMainWindow { background-color: #283C28 ;color: white;}
@@ -87,6 +89,7 @@ QToolBar {
     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                 stop: 0 #204020, stop: 1.0 #506450);
     spacing: 3px;
+    border: 0px solid black;
 }
 
 GLWidget {

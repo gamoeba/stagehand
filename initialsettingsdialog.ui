@@ -123,21 +123,6 @@
     <widget class="QComboBox" name="colourSchemeSelect">
      <item>
       <property name="text">
-       <string>blue</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>rose</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>grey</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>green</string>
       </property>
      </item>
