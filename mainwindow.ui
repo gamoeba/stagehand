@@ -302,7 +302,7 @@
            <enum>Qt::NoPen</enum>
           </property>
           <property name="cornerButtonEnabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <attribute name="horizontalHeaderVisible">
            <bool>false</bool>

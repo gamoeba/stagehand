@@ -18,13 +18,20 @@ QListView {
 }
 
 QScrollBar:horizontal {background-color: #282850 ;border: 1px solid #28283C;}
-QScrollBar:handle:horizontal {background: #646478;border-radius:6px;}
+QScrollBar:handle:horizontal {background: #646478;border-radius:5px;}
 QScrollBar::add-page:horizontal { background: none;}
 QScrollBar::sub-page:horizontal { background: none;}
-QScrollBar:vertical {background-color: #282850 ;border: 1px solid #28283C;}
-QScrollBar:handle:vertical {background: #646478;border-radius:6px;}
+QScrollBar:vertical {background-color: #282850 ;border: 0px solid #28283C;}
+QScrollBar:handle:vertical {background: #646478;border: 1px solid #28283C; border-radius:5px;}
 QScrollBar::add-page:vertical { background: none;}
 QScrollBar::sub-page:vertical { background: none;}
+QScrollBar::add-line:vertical { height: 0px;
+subcontrol-position: right;
+subcontrol-origin: margin;}
+QScrollBar::sub-line:vertical { height: 0px;
+subcontrol-position: right;
+subcontrol-origin: margin;}
+
 QMainWindow { background-color: #28283C ;color: white;}
 QDialog { background-color: #28283C ;color: white;}
 QLineEdit { background-color: #28283C ;color: white; border: 2px solid gray;}

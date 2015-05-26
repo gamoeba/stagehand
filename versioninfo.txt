@@ -1,3 +1,8 @@
+version 0.69
+------------
+Fixed selection and drag after camera rotation
+UI improvements
+
 version 0.68
 ------------
 Improved rendering
@@ -15,34 +20,6 @@ version 0.66
 ------------
 Fix:
 Foward/Direct connection setting was not saved when editing it in settings
-
-version 0.65
-------------
-Added support for 32-bit Ubuntu
-
-version 0.64
-------------
-Improved installer
-Fix for display of inherited invisibility in node tree
-Fix for clicking through all actors covering point
-
-version 0.63
-------------
-Removed
-
-version 0.62
-------------
-Added ubuntu version
-
-version 0.61
-------------
-
-Fixed problem preventing additional path for adb/sdb working
-
-version 0.60
-------------
-New Settings Dialog
-Fix for situation where the incorrect camera is chosen
 
 
 
