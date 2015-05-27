@@ -80,6 +80,18 @@ protected:
     void wheelEvent(QWheelEvent * wheelEvent);
 private:
     void buildScene();
+
+    void applyTranslation(QMatrix4x4 &matrix);
+    void applyRotation(QMatrix4x4 &matrix);
+    void applyAspectRatio(QMatrix4x4 &matrix);
+    void applyScale(QMatrix4x4 &matrix);
+
+    void animateRotation();
+    void endScaleAnimation();
+    void endRotationAnimation();
+
+    bool Inside2(const QVector3D &p0, QVector3D &p1, const QVector3D &p2);
+
     bool mSceneChanged;
 
     GLuint  m_uiTexture;
@@ -98,6 +110,8 @@ private:
     QMatrix4x4 mModelView;
     double mAspectRatio;
     double mViewportRatio;
+    int mViewportWidth;
+    int mViewportHeight;
     std::map<int, SceneObject> mObjects;
     std::vector<int> mSelectedIds;
     std::vector<float> mVertices;
@@ -137,12 +151,9 @@ private:
     bool mAnimating;
     bool mAnimatingRotation;
 
-    void animateRotation();
-    void endScaleAnimation();
-    void endRotationAnimation();
 
-    bool Inside2(const QVector3D &p0, QVector3D &p1, const QVector3D &p2);
     QColor mBackgroundColor;
     QColor mOutlineColor;
+
 };
 #endif

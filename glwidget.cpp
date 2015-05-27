@@ -30,6 +30,17 @@ const std::string MATRIX_UNIFORM = "viewMatrix";
 const std::string SELECTED_UNIFORM = "selected";
 const std::string OUTLINE_UNIFORM = "outline";
 
+float fVertices[] = {
+    -1, 1, 0.0, 1, 1,0.0,1,-1,0.0,
+    -1, -1, 0.0, -1,1,0.0, 1,-1,0.0
+};
+
+float fTexCoord[] = {
+    0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f,
+    0.0f,1.0f, 0.0f,0.0f, 1.0f,1.0f
+};
+
+
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent),
       mBackgroundColor(0x1A,0x1A,0x34),
@@ -39,6 +50,8 @@ GLWidget::GLWidget(QWidget *parent)
     mNumberRectangles = 0;
     mScale = 1.0;
     mViewportRatio = 1.0;
+    mViewportWidth = 1;
+    mViewportHeight = 1;
     mTranslateX = 0;
     mTranslateY = 0;
     mDragX = 0;
@@ -225,20 +238,25 @@ void GLWidget::endRotationAnimation()
 }
 
 
-
-
 void GLWidget::drawScreenshot()
 {
     mProgramImage.bind();
-    //QImage img = mScreenShot.toImage();
+
+    //For the screenshot position, we calculate the destination rectangle that we are targetting for the scene independently
+    //This is because the device surface stays fixed, whereas the scene can be moved by the camera
+    QMatrix4x4 objectMatrix; //Qt initialises to identity
+    applyTranslation(objectMatrix);
+    applyRotation(objectMatrix);
+    applyAspectRatio(objectMatrix);
+    applyScale(objectMatrix);
 
     glBindTexture(GL_TEXTURE_2D, m_uiTexture);
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, mScreenShot.width(),
                   mScreenShot.height(),
                   0, GL_BGRA, GL_UNSIGNED_BYTE, mScreenShot.bits());
-    mProgramImage.setAttributeArray(VERTEX_ATTR, &mVertices[0], 3);
-    mProgramImage.setAttributeArray(TEXCOORD_ATTR, &mTextureCoords[0], 2);
-    mProgramImage.setUniformValue(MATRIX_UNIFORM, mModelView );
+    mProgramImage.setAttributeArray(VERTEX_ATTR, fVertices, 3);
+    mProgramImage.setAttributeArray(TEXCOORD_ATTR, fTexCoord, 2);
+    mProgramImage.setUniformValue(MATRIX_UNIFORM, objectMatrix );
     mProgramImage.enableAttributeArray(VERTEX_ATTR, true);
     mProgramImage.enableAttributeArray(TEXCOORD_ATTR, true);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -285,18 +303,10 @@ void GLWidget::drawRects(int startRect, int count, bool selected)
 }
 
 void GLWidget::addRect(const QMatrix4x4 matrix,  int objIndex) {
-    GLfloat fVertices[] = {
-        -0.5, 0.5, 0.5, 0.5, 0.5,0.5,0.5,-0.5,0.5,
-        -0.5, -0.5, 0.5, -0.5,0.5,0.5, 0.5,-0.5,0.5
-    };
-    GLfloat fTexCoord[] = {
-        0.0f,1.0f, 1.0f,1.0f, 1.0f,0.0f,
-        0.0f,0.0f, 0.0f,1.0f, 1.0f,0.0f
-    };
 
     for (int i=0;i<6;i++) {
         int baseIndex = i*3;
-        QVector3D v(fVertices[baseIndex], fVertices[baseIndex+1], fVertices[baseIndex+2]);
+        QVector3D v(fVertices[baseIndex]*0.5f, fVertices[baseIndex+1]*0.5f, fVertices[baseIndex+2]);
         QVector3D res = matrix * v;
         int outputBaseIndex = objIndex *3 * 6 + i*3;
         mVertices[outputBaseIndex] = res[0];
@@ -343,6 +353,8 @@ void GLWidget::initializeGL ()
 void GLWidget::resizeGL(int width, int height)
  {
      mViewportRatio = (double)height/(double)width;
+     mViewportWidth = width;
+     mViewportHeight = height;
      glViewport(0,0,width,height);
 }
 
@@ -402,16 +414,14 @@ void GLWidget::paintGL()
         animateRotation();
     }
 
-    mModelView = mProjectionMatrix;// * mViewMatrix;
-    mModelView.translate(-(mTranslateX + mDragX) ,mTranslateY + mDragY ,0);
-    mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
+    mModelView.setToIdentity();
+    applyTranslation(mModelView);
+    applyRotation(mModelView);
+    applyAspectRatio(mModelView);
+
+    mModelView *= mProjectionMatrix;
     mModelView *= mViewMatrix;
-
-    //mModelView.translate(mTranslateX + mDragX ,mTranslateY + mDragY ,0);
-    //mModelView.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
-    mModelView.scale(mScale,mScale,1.0);
-
-    mModelView.rotate(mRotationAngleDegrees,0,0,1);
+    applyScale(mModelView);
 
     if (mObjects.size()>0) {
         if (mSceneChanged) {
@@ -445,7 +455,7 @@ void GLWidget::paintGL()
 void GLWidget::drawLogo() {
     QMatrix4x4 objectMatrix;
     float ratio = (float)mLogo.height()/(float)mLogo.width();
-    objectMatrix.scale(1.0f, -ratio, 1.0f);
+    objectMatrix.scale(0.5f, ratio*0.5f, 1.0f);
 
     QImage img = mLogo.toImage();
 
@@ -454,15 +464,6 @@ void GLWidget::drawLogo() {
                   mLogo.height(),
                   0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
 
-
-    GLfloat fVertices[] = {
-        -0.5, 0.5, 0.5, 0.5, 0.5,0.5,0.5,-0.5,0.5,
-        -0.5, -0.5, 0.5, -0.5,0.5,0.5, 0.5,-0.5,0.5
-    };
-    GLfloat fTexCoord[] = {
-        0.0f,1.0f, 1.0f,1.0f, 1.0f,0.0f,
-        0.0f,0.0f, 0.0f,1.0f, 1.0f,0.0f
-    };
 
     mProgramImage.bind();
     mProgramImage.setAttributeArray(VERTEX_ATTR, fVertices, 3);
@@ -619,3 +620,26 @@ bool GLWidget::Inside2(const QVector3D &p0, QVector3D &p1, const QVector3D& p2)
     float res = p1.x()*p2.y() - p1.y()*p2.x() -p0.x()*p2.y() + p0.y()*p2.x() + p0.x()*p1.y() - p0.y()*p1.x();
     return res < 0;
 }
+
+// transform operations for rendering
+void GLWidget::applyTranslation(QMatrix4x4& matrix){
+    float transx = (mTranslateX + mDragX);
+    float transy = -(mTranslateY + mDragY);
+    transx /= mViewportWidth;
+    transy /= mViewportHeight;
+    matrix.translate(transx ,transy ,0);
+}
+
+void GLWidget::applyRotation(QMatrix4x4& matrix){
+    matrix.rotate(-mRotationAngleDegrees,0,0,1);
+}
+
+void GLWidget::applyAspectRatio(QMatrix4x4& matrix){
+    matrix.scale(mAspectRatio * mViewportRatio, 1.0, 1.0);
+}
+
+void GLWidget::applyScale(QMatrix4x4& matrix) {
+    matrix.scale(mScale,mScale,1.0);
+}
+
+
