@@ -70,11 +70,11 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->tableView->setAlternatingRowColors(true);
     //ui->tableView->horizontalHeader()->setVisible(false);
     //ui->tableView->verticalHeader()->setVisible(false);
-    ui->treeView->header()->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-    ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->treeView->header()->setStretchLastSection(true);
-    ui->treeView->setHeaderHidden(true);
-    ui->treeView->setAlternatingRowColors(true);
+    //ui->treeView->header()->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    //ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    //ui->treeView->header()->setStretchLastSection(true);
+    //ui->treeView->setHeaderHidden(true);
+    //ui->treeView->setAlternatingRowColors(true);
 
     ui->tableViewUpdate->setModel(new QStandardItemModel());
     ui->tableViewUpdate->setAlternatingRowColors(true);

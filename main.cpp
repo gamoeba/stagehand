@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     if (argc==2 && strcmp(argv[1],"--version")==0)
     {
-        printf("%g\n", STAGEHAND_VERSION);
+        printf("%.2f\n", STAGEHAND_VERSION);
         exit(0);
     }
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         versioninfo.open(QIODevice::ReadOnly);
         QByteArray ver = versioninfo.readAll();
         QString str(ver);
-        printf("%g\n\n%s\n", STAGEHAND_VERSION, str.toStdString().c_str());
+        printf("%.2f\n\n%s\n", STAGEHAND_VERSION, str.toStdString().c_str());
         exit(0);
     }
 

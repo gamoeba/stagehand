@@ -6,6 +6,11 @@ ui_*
 *.o
 .DS_Store
 scripts/updates
+scripts/*.zip
+scripts/*.deb
+scripts/stagehand*/*
+scripts/Linux_*
+scripts/version_info*
 Makefile
 stagehand
 stagehand.ini
