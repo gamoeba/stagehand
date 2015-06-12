@@ -62,24 +62,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mTreeModel = new TreeModel;
     mTableModel = new TableModel(ui->tableView);
-//    mTableModel->model()->setHorizontalHeaderLabels(QStringList() << "property" << "value");
-//    mTableModel->model()->setHorizontalHeaderItem(0,new QStan);
 
-    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->updatePanel->setHidden(true);
-    //ui->tableView->setAlternatingRowColors(true);
-    //ui->tableView->horizontalHeader()->setVisible(false);
-    //ui->tableView->verticalHeader()->setVisible(false);
-    //ui->treeView->header()->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-    //ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    //ui->treeView->header()->setStretchLastSection(true);
-    //ui->treeView->setHeaderHidden(true);
-    //ui->treeView->setAlternatingRowColors(true);
 
     ui->tableViewUpdate->setModel(new QStandardItemModel());
-    ui->tableViewUpdate->setAlternatingRowColors(true);
-    ui->tableViewUpdate->horizontalHeader()->setVisible(false);
-    ui->tableViewUpdate->verticalHeader()->setVisible(false);
 
 
     TableDelegate* delegate = new TableDelegate(1);
@@ -91,6 +77,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->glWidget, SIGNAL(selectedId(int)), this, SLOT(selectedId(int)));
     QObject::connect(ui->glWidget, SIGNAL(mousePosition(int,int)), this, SLOT(mousePositionChanged(int,int)));
     QObject::connect(this, SIGNAL(newImage(QImage)), this, SLOT(newImageReceived(QImage)));
+
+    ui->treeView->setModel(mTreeModel->model());
+
+
+    QObject::connect(ui->treeView->selectionModel(),
+                     SIGNAL(currentChanged(const QModelIndex&,const QModelIndex&)),
+                     this,
+                     SLOT(treeCurrentItemChanged(const QModelIndex&, const QModelIndex&)));
 
     mSBLabel = new QLabel();
     ui->statusBar->addWidget(mSBLabel);
@@ -197,11 +191,6 @@ void MainWindow::refreshScene()
         GetExpandedState(ui->treeView, mTreeModel->model(), expandedState, selectedIndex, currentIndex, treePosition);
         mTreeModel->setTreeData(mDoc);
         ui->treeView->setModel(mTreeModel->model());
-
-        QObject::connect(ui->treeView->selectionModel(),
-                         SIGNAL(currentChanged(const QModelIndex&,const QModelIndex&)),
-                         this,
-                         SLOT(treeCurrentItemChanged(const QModelIndex&, const QModelIndex&)));
 
         RestoreExpandedState(ui->treeView, mTreeModel->model(),expandedState, selectedIndex, currentIndex, treePosition);
         //ui->treeView->expandAll();

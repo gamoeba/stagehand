@@ -90,12 +90,13 @@ void TableModel::replaceChildren( QJsonArray array) {
             QJsonArray arr = val.toArray();
             QString nameStr = arr.at(0).toString();
             QString valStr = arr.at(1).toString();
-            QStandardItem* name = new QStandardItem(nameStr);
-            name->setFlags(name->flags() ^ Qt::ItemIsEditable);
-            QStandardItem* value = new QStandardItem(valStr);
             QList<QStandardItem*> items;
             QList<QStandardItem*> old = mModel->findItems(nameStr);
             if (old.empty()) {
+                QStandardItem* name = new QStandardItem(nameStr);
+                name->setFlags(name->flags() ^ Qt::ItemIsEditable);
+                QStandardItem* value = new QStandardItem(valStr);
+
                 items.append(name);
                 items.append(value);
                 mModel->appendRow(items);
