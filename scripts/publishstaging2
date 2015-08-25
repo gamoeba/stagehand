@@ -1,0 +1,3 @@
+#!/bin/bash
+scp *.zip kevinbutchart@www.gamoeba.com:~/www.gamoeba.com/web/stagehand_staging2
+scp *.txt kevinbutchart@www.gamoeba.com:~/www.gamoeba.com/web/stagehand_staging2
