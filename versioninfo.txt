@@ -1,3 +1,7 @@
+version 0.72
+------------
+Stability and memory improvements
+
 version 0.71
 ------------
 Better handling of screenshot orientation
@@ -19,11 +23,4 @@ Fix:
 Update data from scene was unreliable - sometimes it failed for no reason
 Feature:
 Enable zoom with scroll wheel
-
-version 0.66
-------------
-Fix:
-Foward/Direct connection setting was not saved when editing it in settings
-
-
 
