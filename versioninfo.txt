@@ -1,3 +1,7 @@
+version 0.73
+------------
+Fix for issue where property values were sometimes not updated after user had tried to edit property
+
 version 0.72
 ------------
 Stability and memory improvements
