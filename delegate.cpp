@@ -61,6 +61,34 @@ void TableDelegate::setEditorData(QWidget *editor,
     QTableWidget* tw = qobject_cast<QTableWidget*>(editor);
     if (tw == NULL) {
         QStyledItemDelegate::setEditorData(editor, index);
+    } else {
+        QString str = index.model()->data(index, Qt::EditRole).toString();
+        DataObject dobj(str);
+
+        if (dobj.isVector()) {
+            std::vector<double> arr = dobj.getVector();
+            int cols = arr.size();
+            tw->setRowCount(1);
+            tw->setColumnCount(cols);
+            for (int i=0;i<cols;i++) {
+                QTableWidgetItem* item  = new QTableWidgetItem();
+                item->setText(QString::number(arr[i]));
+                item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+                tw->setItem(0,i,item);
+            }
+        } else if (dobj.is4x4Matrix()) {
+            tw->setRowCount(4);
+            tw->setColumnCount(4);
+            QMatrix4x4 matrix = dobj.get4x4Matrix();
+            for (int i=0;i<4;i++) {
+                for (int j=0;j<4;j++) {
+                    QTableWidgetItem* item = new QTableWidgetItem();
+                    item->setText(QString::number(matrix(i,j)));
+                    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+                    tw->setItem(j,i,item);
+                }
+            }
+        }
     }
 }
 
