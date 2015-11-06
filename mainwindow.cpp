@@ -254,16 +254,16 @@ bool MainWindow::addNodeObject(QJsonObject obj) {
     NodeObject node(obj, KDaliNodePropertiesName);
     bool vis = node.getProperty(KDaliNodeVisible).toBoolean();
     if (!mFoundCamera && value.toString() == KDaliCameraNodeName) {
-        DataObject pm = node.getProperty(KDaliCameraNodeProjectionMatrixName);
+        DataObject pm = node.getProperty(KDaliCameraNodeProjectionMatrixName, KDaliCameraNodeProjectionMatrixNameOld);
         ui->glWidget->setProjectionMatrix(pm.get4x4Matrix());
-        DataObject vm = node.getProperty(KDaliCameraNodeViewMatrixName);
+        DataObject vm = node.getProperty(KDaliCameraNodeViewMatrixName, KDaliCameraNodeViewMatrixNameOld);
         ui->glWidget->setViewMatrix(vm.get4x4Matrix());
 
-        double aspectRatio = node.getProperty(KDaliCameraNodeAspectRatioName).toDouble();
+        double aspectRatio = node.getProperty(KDaliCameraNodeAspectRatioName, KDaliCameraNodeAspectRatioNameOld).toDouble();
         ui->glWidget->setAspectRatio(aspectRatio);
         mFoundCamera = true;
     } else {
-        QMatrix4x4 wm = node.getProperty(KDaliNodeWorldMatrixName).get4x4Matrix();
+        QMatrix4x4 wm = node.getProperty(KDaliNodeWorldMatrixName, KDaliNodeWorldMatrixNameOld).get4x4Matrix();
         std::vector<double> size = node.getProperty(KDaliNodeSizeName).getVector();
         QVector3D qsize(size[0], size[1], size[2]);
         if (vis) {

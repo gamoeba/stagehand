@@ -29,6 +29,8 @@ public:
     NodeObject(QJsonObject obj, QString propertiesFieldName);
 
     DataObject getProperty(QString propName);
+    // new method to support the properties names that have changed, match against the new and old value
+    DataObject getProperty(QString propName, QString propName2);
 
 private:
     QJsonObject mObject;

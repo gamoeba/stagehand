@@ -36,3 +36,17 @@ DataObject NodeObject::getProperty(QString propName)
     }
     return DataObject("");
 }
+
+DataObject NodeObject::getProperty(QString propName, QString propName2)
+{
+    QJsonArray::iterator iter;
+
+    for (iter=mProperties.begin(); iter != mProperties.end() ; iter++) {
+        QJsonArray prop = (*iter).toArray();
+        QString name = prop.at(0).toString();
+        if (name == propName || name == propName2) {
+            return DataObject(prop.at(1).toString());
+        }
+    }
+    return DataObject("");
+}
