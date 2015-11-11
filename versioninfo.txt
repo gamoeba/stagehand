@@ -1,3 +1,11 @@
+version 0.76
+------------
+Support new Dali property names (Dali version >= 1.1.9)
+
+version 0.75
+------------
+removed (replaced with 0.76)
+
 version 0.73
 ------------
 Fix for issue where property values were sometimes not updated after user had tried to edit property
@@ -5,26 +13,3 @@ Fix for issue where property values were sometimes not updated after user had tr
 version 0.72
 ------------
 Stability and memory improvements
-
-version 0.71
-------------
-Better handling of screenshot orientation
-
-version 0.69
-------------
-Fixed selection and drag after camera rotation
-UI improvements
-
-version 0.68
-------------
-Improved rendering
-Support rotation for viewing landscape scenes
-Support sending animatable properties
-
-version 0.67
-------------
-Fix:
-Update data from scene was unreliable - sometimes it failed for no reason
-Feature:
-Enable zoom with scroll wheel
-
