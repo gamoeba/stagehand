@@ -100,6 +100,10 @@ ios {
 LIBS+= -L$$PWD/extlibs/ios
 }
 
+win32 {
+LIBS+= -L$$PWD/extlibs/win32 -lopengl32
+}
+
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
