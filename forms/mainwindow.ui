@@ -139,7 +139,7 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="GLWidget" name="glWidget"/>
+         <widget class="GLWidget" name="glWidget" native="true"/>
         </item>
        </layout>
       </widget>
@@ -394,7 +394,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoad">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/Open.png</normaloff>:/stagehand/Open.png</iconset>
    </property>
    <property name="text">
@@ -426,7 +426,7 @@
   </action>
   <action name="actionZoom_In">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/ZoomIn.png</normaloff>
      <normalon>../../../Downloads/1404906137_519953-014_ZoomIn.png</normalon>:/stagehand/ZoomIn.png</iconset>
    </property>
@@ -436,7 +436,7 @@
   </action>
   <action name="actionZoom_Out">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/ZoomOut.png</normaloff>:/stagehand/ZoomOut.png</iconset>
    </property>
    <property name="text">
@@ -461,7 +461,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/information.png</normaloff>:/stagehand/information.png</iconset>
    </property>
    <property name="text">
@@ -470,7 +470,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/settings.png</normaloff>
      <normalon>:/stagehand/settings.png</normalon>:/stagehand/settings.png</iconset>
    </property>
@@ -494,7 +494,7 @@
   </action>
   <action name="actionRotate_Right">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/sub_black_rotate_cw.png</normaloff>:/stagehand/sub_black_rotate_cw.png</iconset>
    </property>
    <property name="text">
@@ -503,7 +503,7 @@
   </action>
   <action name="actionRotate_Left">
    <property name="icon">
-    <iconset resource="stagehand.qrc">
+    <iconset resource="../resources/stagehand.qrc">
      <normaloff>:/stagehand/sub_black_rotate_ccw.png</normaloff>:/stagehand/sub_black_rotate_ccw.png</iconset>
    </property>
    <property name="text">
@@ -515,12 +515,12 @@
  <customwidgets>
   <customwidget>
    <class>GLWidget</class>
-   <extends>QOpenGLWidget</extends>
+   <extends>QWidget</extends>
    <header>glwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="stagehand.qrc"/>
+  <include location="../resources/stagehand.qrc"/>
  </resources>
  <connections>
   <connection>

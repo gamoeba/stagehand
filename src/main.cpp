@@ -21,7 +21,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QSplashScreen>
-#include <version.h>
+#include "version.h"
 #include "stagehandupdate.h"
 
 int main(int argc, char *argv[])

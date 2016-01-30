@@ -4,14 +4,16 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl network
+QT       += core gui opengl network widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = stagehand
 TEMPLATE = app
 
-ICON = stagehand.icns
+ICON = resources/stagehand.icns
+
+VPATH += ./src
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -36,8 +38,22 @@ SOURCES += main.cpp\
     initialsettingsdialog.cpp \
     glprogram.cpp
 
+VPATH += extsrc
+
+SOURCES += ioapi.c mztools.c unzip.c zip.c
+HEADERS += unzip.h zip.h
+win32 {
+    SOURCES += iowin32.c
+}
+
+unused {
+    SOURCES += miniunz.c minizip.c
+}
+
+INCLUDEPATH += inc
 INCLUDEPATH += $$PWD/extlibs/include/
 
+VPATH += inc
 HEADERS  += mainwindow.h \
     treemodel.h \
     jsonitem.h \
@@ -61,10 +77,12 @@ HEADERS  += mainwindow.h \
     initialsettingsdialog.h \
     glprogram.h
 
+VPATH += forms
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
     performancedialog.ui \
     initialsettingsdialog.ui
+
 
 OTHER_FILES += \
     folder_invisible.png \
@@ -81,7 +99,7 @@ OTHER_FILES += \
     shaderLines.vsh
 
 RESOURCES += \
-    stagehand.qrc
+    resources/stagehand.qrc
 
 unix:!macx {
 LIBS+= -L$$PWD/extlibs/Linux/$$QMAKE_HOST.arch
@@ -100,10 +118,6 @@ ios {
 LIBS+= -L$$PWD/extlibs/ios
 }
 
-win32 {
-LIBS+= -L$$PWD/extlibs/win32 -lopengl32
-}
-
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
@@ -111,5 +125,7 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
         $$PWD/extlibs/Android/libquazip.so
 }
 
+QMAKE_CXXFLAGS += -isystem extsrc
+DEFINES += NOCRYPT
 
 

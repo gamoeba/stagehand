@@ -24,7 +24,7 @@
 #include <QJsonArray>
 #include <QDebug>
 #include <QApplication>
-#include <jsonitem.h>
+#include "jsonitem.h"
 #include "nodeobject.h"
 #include "mainwindow.h"
 #include "consts.h"
