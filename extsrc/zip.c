@@ -21,6 +21,7 @@
 
 */
 
+#pragma GCC diagnostic ignored "-Wunused-value"
 
 #include <stdio.h>
 #include <stdlib.h>
