@@ -273,6 +273,7 @@ bool GLWidget::sceneLoaded()
 void GLWidget::drawRects(int startRect, int count, bool selected)
 {
     QVector3D outline(mOutlineColor.redF(),mOutlineColor.greenF(),mOutlineColor.blueF());
+    QVector3D outlineBdr(0,0,0);
     if (!mShowScreenShot || selected)
     {
 
@@ -294,12 +295,24 @@ void GLWidget::drawRects(int startRect, int count, bool selected)
     mProgramLines.setAttributeArray(VERTEX_ATTR, &mLines[0], 3);
     mProgramLines.enableAttributeArray(VERTEX_ATTR, true);
     mProgramLines.setUniformValue(MATRIX_UNIFORM, mModelView );
-    mProgramLines.setUniformValue(OUTLINE_UNIFORM, outline);
 
-    glLineWidth(1.0f);
+
+
     glEnable( GL_LINE_SMOOTH );
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+
+    if (mShowScreenShot)
+    {
+        mProgramLines.setUniformValue(OUTLINE_UNIFORM, outline);
+        // if we are showing the screen shot, draw a background for the lines incase the background is light
+        glLineWidth(2.0f);
+        glDrawArrays(GL_LINES, startRect*8, count*8); // lines takes total vertex count
+
+    }
+     mProgramLines.setUniformValue(OUTLINE_UNIFORM, outlineBdr);
+    glLineWidth(1.0f);
     glDrawArrays(GL_LINES, startRect*8, count*8); // lines takes total vertex count
+
     mProgramLines.enableAttributeArray(VERTEX_ATTR, false);
     mProgramLines.release();
 }
