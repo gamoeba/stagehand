@@ -6,7 +6,7 @@ then
 fi
 PLATFORM=`uname`
 ARCH=`uname -m`
-VERSION=1.01
+VERSION=1.02
 
 if [ "$ARCH" == "x86_64" ]
 then

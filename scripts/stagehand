@@ -13,11 +13,4 @@ export LD_LIBRARY_PATH=$DIR/lib
 export QT_PLUGIN_PATH=$DIR/plugins
 export PATH=$DIR/bin:$PATH
 
-UPDATEDIR=$HOME/.stagehand/update
-# apply any updates
-if [ -d "$UPDATEDIR" ]
-then
-  $UPDATEDIR/doUpdate && rm -rf $UPDATEDIR
-fi
-# now run app
 $DIR/bin/stagehand $*

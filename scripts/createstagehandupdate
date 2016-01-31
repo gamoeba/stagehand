@@ -35,13 +35,12 @@ mkdir -p $BASEDIR/usr/share/stagehand/bin/ubuntu
 
 cp deb/Stagehand.desktop $BASEDIR/usr/share/applications/
 cp deb/copyright $BASEDIR/usr/share/doc/stagehand/
-cp ../stagehand.png $BASEDIR/usr/share/stagehand/stagehand.png
+cp ../resources/stagehand.png $BASEDIR/usr/share/stagehand/stagehand.png
 cp stagehand $BASEDIR/usr/share/stagehand/stagehand
 cp $STAGEHAND_BIN_COMPILE_LOCATION/stagehand $BASEDIR/usr/share/stagehand/bin/
 cp -R android $BASEDIR/usr/share/stagehand/bin
 cp -R tizen $BASEDIR/usr/share/stagehand/bin
 cp -R ubuntu $BASEDIR/usr/share/stagehand/bin
-cp ../extlibs/Linux/$ARCH/libquazip.so.1 $BASEDIR/usr/share/stagehand/lib/
 
 chmod -R 755 $BASEDIR
 chmod 644 $BASEDIR/usr/share/applications/Stagehand.desktop
