@@ -4,7 +4,7 @@ uniform mediump vec3 outline;
 
 void main(void)
 {
-    highp float fac =  max(0.5 * ((1.0 - texc.s) * texc.t), 0.2);
+    highp float fac =  0.5 * ((1.0 - texc.s) * texc.t) + 0.5;
 
     if (selected)
         gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);
