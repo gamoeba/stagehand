@@ -4,6 +4,8 @@
 #include <QBuffer>
 #include "stagehandarchive.h"
 
+#include "unzip.h"
+
 StagehandArchive::StagehandArchive()
 {
 
@@ -11,27 +13,27 @@ StagehandArchive::StagehandArchive()
 
 void StagehandArchive::unzip(QString filename)
 {
-    QuaZip zip(filename);
-    zip.open(QuaZip::mdUnzip);
+    char filename_inzip[256];
+    unz_file_info64 file_info;
 
-    QuaZipFile file(&zip);
-
-    for(bool f=zip.goToFirstFile(); f; f=zip.goToNextFile()) {
-        QString fn = file.getActualFileName();
-        QuaZipFileInfo64 info;
-        file.getFileInfo(&info);
-        file.open(QIODevice::ReadOnly);
-        QByteArray byteArray = file.readAll();
-        if (fn.compare("actors.txt")==0) {
-            mSceneData = QString(byteArray);
-        } else if (fn.compare("screenshot.png")==0) {
-            mScreenShot = QImage::fromData(byteArray,"PNG");
+    unzFile uf = unzOpen((voidpf)filename.toStdString().c_str());
+    if (uf) {
+        int err = unzGoToFirstFile(uf);
+        while (err == UNZ_OK) {
+            err = unzGetCurrentFileInfo64(uf,&file_info,filename_inzip,sizeof(filename_inzip)-1,NULL,0,NULL,0);
+            if ( strcmp("actors.txt", filename_inzip)==0 ) {
+                ulong len = file_info.uncompressed_size;
+                char* buf = new char[len];
+                unzOpenCurrentFile(uf);
+                unzReadCurrentFile(uf, buf, len);
+                mSceneData = QString(QByteArray(buf, len));
+                delete[] buf;
+                unzCloseCurrentFile(uf);
+            }
+            err = unzGoToNextFile(uf);
         }
-        //do something with the data
-        file.close();
+        unzClose(uf);
     }
-
-    zip.close();
 }
 
 void StagehandArchive::zip(QString filename)

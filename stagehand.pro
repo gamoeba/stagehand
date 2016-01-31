@@ -51,6 +51,7 @@ unused {
 }
 
 INCLUDEPATH += inc
+INCLUDEPATH += extsrc
 INCLUDEPATH += $$PWD/extlibs/include/
 
 VPATH += inc
