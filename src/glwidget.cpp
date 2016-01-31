@@ -297,6 +297,8 @@ void GLWidget::drawRects(int startRect, int count, bool selected)
     mProgramLines.setUniformValue(OUTLINE_UNIFORM, outline);
 
     glLineWidth(1.0f);
+    glEnable( GL_LINE_SMOOTH );
+    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     glDrawArrays(GL_LINES, startRect*8, count*8); // lines takes total vertex count
     mProgramLines.enableAttributeArray(VERTEX_ATTR, false);
     mProgramLines.release();
