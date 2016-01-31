@@ -22,17 +22,9 @@
 #include <QDir>
 #include <QSplashScreen>
 #include "version.h"
-#include "stagehandupdate.h"
 
 int main(int argc, char *argv[])
 {
-    bool forceUpdate = false;
-
-    if (argc==2 && strcmp(argv[1],"--force-update")==0)
-    {
-        forceUpdate = true;
-    }
-
     if (argc==2 && strcmp(argv[1],"--version")==0)
     {
         printf("%.2f\n", STAGEHAND_VERSION);
@@ -54,7 +46,5 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     w.show();
-    StagehandUpdate updater(w.settings[KBaseUpdateUrl]);
-    updater.checkForUpdates(forceUpdate);
     return a.exec();
 }

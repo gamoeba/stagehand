@@ -6,8 +6,6 @@
 
 QT       += core gui opengl network widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = stagehand
 TEMPLATE = app
 
@@ -30,7 +28,6 @@ SOURCES += main.cpp\
     filedownloader.cpp \
     stagehandarchive.cpp \
     version.cpp \
-    stagehandupdate.cpp \
     utils.cpp \
     settingsdialog.cpp \
     performancedialog.cpp \
@@ -109,22 +106,7 @@ macx {
 LIBS+= -L$$PWD/extlibs/osx
 }
 
-LIBS+= -lquazip -lz
-
-android {
-LIBS+= -L$$PWD/extlibs/Android
-}
-
-ios {
-LIBS+= -L$$PWD/extlibs/ios
-}
-
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-
-contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-    ANDROID_EXTRA_LIBS = \
-        $$PWD/extlibs/Android/libquazip.so
-}
+LIBS+= -lz
 
 QMAKE_CXXFLAGS += -isystem extsrc
 DEFINES += NOCRYPT
