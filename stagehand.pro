@@ -39,9 +39,6 @@ VPATH += extsrc
 
 SOURCES += ioapi.c mztools.c unzip.c zip.c
 HEADERS += unzip.h zip.h
-win32 {
-    SOURCES += iowin32.c
-}
 
 unused {
     SOURCES += miniunz.c minizip.c
@@ -66,7 +63,6 @@ HEADERS  += mainwindow.h \
     filedownloader.h \
     version.h \
     stagehandarchive.h \
-    stagehandupdate.h \
     utils.h \
     settingsdialog.h \
     consts.h \
@@ -104,6 +100,10 @@ LIBS+= -L$$PWD/extlibs/Linux/$$QMAKE_HOST.arch
 }
 macx {
 LIBS+= -L$$PWD/extlibs/osx
+}
+
+win32 {
+LIBS+= -lopengl32
 }
 
 LIBS+= -lz
