@@ -1,0 +1,15 @@
+version 0.76
+------------
+Support new Dali property names (Dali version >= 1.1.9)
+
+version 0.75
+------------
+removed (replaced with 0.76)
+
+version 0.73
+------------
+Fix for issue where property values were sometimes not updated after user had tried to edit property
+
+version 0.72
+------------
+Stability and memory improvements
