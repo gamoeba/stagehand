@@ -1,18 +1,22 @@
 #!/bin/bash
 export QT5_ROOT=$QT5_32ROOT
-mkdir -p output/bin
-mkdir -p output/plugins/platforms
+mkdir -p tmp/bin
+mkdir -p tmp/plugins/platforms
+mkdir output
 
-cp win32/release/stagehand.exe output/bin
-cp ../platform_scripts/stagehand.bat output
-cp -R ../platform_scripts/android output/bin/
-cp -R ../platform_scripts/tizen output/bin/
-cp -R ../platform_scripts/ubuntu output/bin/
+cp win32/release/stagehand.exe tmp/bin
+cp ../platform_scripts/stagehand.bat tmp
+cp ../../resources/stagehand.ico tmp
+cp -R ../platform_scripts/android tmp/bin/
+cp -R ../platform_scripts/tizen tmp/bin/
+cp -R ../platform_scripts/ubuntu tmp/bin/
 
 while read -r line
 do
-  cp $QT5_ROOT/$line output/$line
+  cp $QT5_ROOT/$line tmp/$line
 done < qtdeps 
 # makensis from the NSIS package must be in the path
+export VERSION=`tmp/bin/stagehand --version`
+export WIN_VERSION=0.0.$VERSION
 makensis stagehand.nsi
 

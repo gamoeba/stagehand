@@ -104,6 +104,7 @@ LIBS+= -L$$PWD/extlibs/osx
 
 win32 {
 LIBS+= -lopengl32
+RC_FILE = resources/stagehand.rc
 }
 
 LIBS+= -lz

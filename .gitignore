@@ -9,6 +9,7 @@ scripts/linux_build/linux32
 scripts/linux_build/linux64
 scripts/linux_build/output
 scripts/windows_build/win32
+scripts/windows_build/tmp
 scripts/windows_build/output
 stagehand
 stagehand.ini
