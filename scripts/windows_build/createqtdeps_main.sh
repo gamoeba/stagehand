@@ -1,19 +1,16 @@
 #!/bin/bash
-BASEDIR=output/stagehand-qtdeps_${VERSION}_${ARCH}
-mkdir -p $BASEDIR/DEBIAN
-cp deb/qtdeps_control $BASEDIR/DEBIAN/control
-echo "Architecture: "$ARCH >> $BASEDIR/DEBIAN/control
-echo "Version: "$VERSION >> $BASEDIR/DEBIAN/control
+export QT5_ROOT=$QT5_32ROOT
+mkdir -p output/bin
+mkdir -p output/plugins/platforms
 
-mkdir -p $BASEDIR/usr/share/stagehand/lib
-mkdir -p $BASEDIR/usr/share/stagehand/plugins/platforms
-mkdir -p $BASEDIR/usr/share/stagehand/plugins/xcbglintegrations
+cp win32/release/stagehand.exe output/bin
+cp -R ../platform_scripts/stagehand output
+cp -R ../platform_scripts/android output/bin/
+cp -R ../platform_scripts/tizen output/bin/
+cp -R ../platform_scripts/ubuntu output/bin/
 
 while read -r line
 do
-  cp $QT5_ROOT/$line $BASEDIR/usr/share/stagehand/$line
+  cp $QT5_ROOT/$line output/$line
 done < qtdeps 
 
-echo "Installed-Size: "`du -s -k $BASEDIR | awk '{ print $1 }'` >> $BASEDIR/DEBIAN/control
-
-fakeroot dpkg-deb --build $BASEDIR

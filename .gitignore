@@ -13,7 +13,8 @@ scripts/Linux_*
 scripts/linux_build/linux32
 scripts/linux_build/linux64
 scripts/linux_build/output
-scripts/version_info*
+scripts/windows_build/win32
+scripts/windows_build/output
 Makefile
 stagehand
 stagehand.ini
