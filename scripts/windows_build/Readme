@@ -1,0 +1,5 @@
+32 bit build additional libraries
+
+sudo apt-get install gcc-4.8-multilib g++-4.8-multilib
+sudo ln -s /usr/include/x86_64-linux-gnu/zconf.h /usr/include
+sudo apt-get install zlib1g:i386-dev
