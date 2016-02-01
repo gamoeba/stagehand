@@ -5,17 +5,11 @@ qrc_*
 ui_*
 *.o
 .DS_Store
-scripts/updates
-scripts/*.zip
-scripts/*.deb
-scripts/stagehand*/*
-scripts/Linux_*
 scripts/linux_build/linux32
 scripts/linux_build/linux64
 scripts/linux_build/output
 scripts/windows_build/win32
 scripts/windows_build/output
-Makefile
 stagehand
 stagehand.ini
 *.backup
