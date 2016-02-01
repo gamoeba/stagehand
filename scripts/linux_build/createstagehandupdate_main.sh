@@ -1,22 +1,8 @@
 #!/bin/bash
-if [ -z "$STAGEHAND_BIN_COMPILE_LOCATION" ] 
-then
-  echo "Must set STAGEHAND_BIN_COMPILE_LOCATION"
-  exit 1
-fi
-PLATFORM=`uname`
-ARCH=`uname -m`
-VERSION=`$STAGEHAND_BIN_COMPILE_LOCATION/stagehand --version`
+STAGEHAND_BIN=$1
+VERSION=`$STAGEHAND_BIN/stagehand --version`
 
-ARCHNAME=$ARCH
-if [ "$ARCHNAME" == "x86_64" ]
-then
-   ARCHNAME=amd64
-else
-   ARCHNAME=i386
-fi
-
-BASEDIR=stagehand_${VERSION}_${ARCHNAME}
+BASEDIR=output/stagehand_${VERSION}_${ARCHNAME}
 mkdir -p $BASEDIR/DEBIAN
 cp deb/control $BASEDIR/DEBIAN
 cp deb/postrm $BASEDIR/DEBIAN
@@ -35,12 +21,12 @@ mkdir -p $BASEDIR/usr/share/stagehand/bin/ubuntu
 
 cp deb/Stagehand.desktop $BASEDIR/usr/share/applications/
 cp deb/copyright $BASEDIR/usr/share/doc/stagehand/
-cp ../resources/stagehand.png $BASEDIR/usr/share/stagehand/stagehand.png
-cp stagehand $BASEDIR/usr/share/stagehand/stagehand
-cp $STAGEHAND_BIN_COMPILE_LOCATION/stagehand $BASEDIR/usr/share/stagehand/bin/
-cp -R android $BASEDIR/usr/share/stagehand/bin
-cp -R tizen $BASEDIR/usr/share/stagehand/bin
-cp -R ubuntu $BASEDIR/usr/share/stagehand/bin
+cp ../../resources/stagehand.png $BASEDIR/usr/share/stagehand/stagehand.png
+cp ../stagehand $BASEDIR/usr/share/stagehand/stagehand
+cp $STAGEHAND_BIN/stagehand $BASEDIR/usr/share/stagehand/bin/
+cp -R ../android $BASEDIR/usr/share/stagehand/bin
+cp -R ../tizen $BASEDIR/usr/share/stagehand/bin
+cp -R ../ubuntu $BASEDIR/usr/share/stagehand/bin
 
 chmod -R 755 $BASEDIR
 chmod 644 $BASEDIR/usr/share/applications/Stagehand.desktop
@@ -50,5 +36,5 @@ echo "Installed-Size: "`du -s -k $BASEDIR | awk '{ print $1 }'` >> $BASEDIR/DEBI
 
 fakeroot dpkg-deb --build $BASEDIR
 
-zip -r --symlinks "${PLATFORM}_${ARCHNAME}_update$VERSION.zip" $BASEDIR.deb doUpdate
-$STAGEHAND_BIN_COMPILE_LOCATION/stagehand --versioninfo > version_info_${PLATFORM}_${ARCHNAME}.txt
+zip -r --symlinks "output/${PLATFORM}_${ARCHNAME}_update$VERSION.zip" $BASEDIR.deb
+$STAGEHAND_BIN/stagehand --versioninfo > output/version_info_${PLATFORM}_${ARCHNAME}.txt

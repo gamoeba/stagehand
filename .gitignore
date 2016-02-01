@@ -10,6 +10,9 @@ scripts/*.zip
 scripts/*.deb
 scripts/stagehand*/*
 scripts/Linux_*
+scripts/linux_build/linux32
+scripts/linux_build/linux64
+scripts/linux_build/output
 scripts/version_info*
 Makefile
 stagehand

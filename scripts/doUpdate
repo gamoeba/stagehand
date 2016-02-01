@@ -1,8 +1,0 @@
-#!/bin/bash
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-which gdebi-gtk && {
-  gdebi-gtk --auto-close $DIR/stagehand*.deb
-  exit 0
-}
-software-center $DIR/stagehand*.deb
-exit 0

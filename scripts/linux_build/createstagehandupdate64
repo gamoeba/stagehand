@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ -z linux64/stagehand ] 
+then
+  echo "Must build first before creating package" 
+  exit 1
+fi
+PLATFORM=`uname`
+ARCH=x86_64
+ARCHNAME=amd64
+
+. ./createstagehandupdate_main.sh linux64
