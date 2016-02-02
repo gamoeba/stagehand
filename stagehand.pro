@@ -46,7 +46,6 @@ unused {
 
 INCLUDEPATH += inc
 INCLUDEPATH += extsrc
-INCLUDEPATH += $$PWD/extlibs/include/
 
 VPATH += inc
 HEADERS  += mainwindow.h \
@@ -94,13 +93,6 @@ OTHER_FILES += \
 
 RESOURCES += \
     resources/stagehand.qrc
-
-unix:!macx {
-LIBS+= -L$$PWD/extlibs/Linux/$$QMAKE_HOST.arch
-}
-macx {
-LIBS+= -L$$PWD/extlibs/osx
-}
 
 win32 {
 LIBS+= -lopengl32
