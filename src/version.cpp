@@ -12,7 +12,7 @@ const char* archType = "i386";
 const char* versionSuffix = "Linux";
 #elif defined Q_OS_DARWIN
 const char* versionSuffix = "Darwin";
-#elif defined Q_OS_WINDOWS
+#elif defined Q_OS_WIN32
 const char* versionSuffix = "Windows";
 #else
 const char* versionSuffix = "Unknown";

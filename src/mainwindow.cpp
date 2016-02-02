@@ -623,13 +623,19 @@ void MainWindow::performanceViewer()
 
 void MainWindow::runPlatformScript(QString scriptName, QStringList parameters)
 {
-
+    QString scriptSuffix="";
+    QString pathListSep=":";
+#ifdef Q_OS_WIN32
+    scriptSuffix = ".bat";
+    pathListSep=";";
+#endif
+    scriptName.append(scriptSuffix);
     QString scriptlocation = appendPath(qApp->applicationDirPath(), settings[KTargetType]);
     QString scriptfullpath = appendPath(scriptlocation, scriptName);
 
     QProcess process;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    QString newPath = env.value("PATH") + ":" + settings[KTargetToolsPath];
+    QString newPath = env.value("PATH") + pathListSep + settings[KTargetToolsPath];
     env.insert("PATH", newPath);
     env.insert("DALI_HOST", settings[KHostName]);
     env.insert("DALI_PORT", settings[KPortNumber]);
