@@ -1,0 +1,10 @@
+#!/bin/bash
+mkdir -p tmp 
+mkdir -p output
+
+cp -R osx/stagehand.app tmp
+cp -R ../platform_scripts/android tmp/stagehand.app/Contents/MacOS/
+cp -R ../platform_scripts/tizen tmp/stagehand.app/Contents/MacOS/
+cp -R ../platform_scripts/ubuntu tmp/stagehand.app/Contents/MacOS/
+macdeployqt tmp/stagehand.app
+hdiutil create output/stagehand.dmg -volname "Stagehand" -srcfolder ./tmp 
