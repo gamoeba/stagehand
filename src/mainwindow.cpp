@@ -93,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent) :
     int pointSize = settings[KFontPointSize].toInt();
     font.setPointSize(pointSize);
     ui->tableView->setFont(font);
+    ui->tableView->horizontalHeader()->setSectionsClickable(false);
     ui->tableViewUpdate->setFont(font);
     ui->treeView->setFont(font);
 
