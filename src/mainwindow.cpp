@@ -652,27 +652,3 @@ const QString& MainWindow::getConnectionHost() {
         return settings[KHostName];
     }
 }
-
-void MainWindow::on_animateButton_clicked()
-{
-    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->tableViewUpdate->model());
-    int rows = model->rowCount();
-    QString command = " |";
-    for (int i=0;i<rows;i++) {
-        int currid = model->data(model->index(i,0), Qt::DisplayRole).toInt();
-        QString currname = model->data(model->index(i,1), Qt::DisplayRole).toString();
-        QString currvalue = model->data(model->index(i,2), Qt::DisplayRole).toString();
-        QString duration = ui->durationEdit->text();
-        command += QString::number(currid) + ";" + currname + ";" + currvalue+";" +duration;
-        if (i!= rows -1) {
-            command += "|";
-        }
-    }
-    portForward();
-    SocketClient client;
-    client.connectSocket(getConnectionHost(), settings[KPortNumber].toUInt());
-    client.sendCommand( KDaliCmdAnimProperties + command);
-
-    // after sending, clear the data
-    on_clearButton_clicked();
-}
