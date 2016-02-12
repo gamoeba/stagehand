@@ -36,6 +36,7 @@ TableModel::TableModel(QTableView* table) :
     QObject(NULL), mTable(table)
 {
     mModel = new QStandardItemModel;
+    mModel->setHorizontalHeaderLabels(QStringList() << "Property Name" << "Value");
 }
 
 void TableModel::setTableData(QJsonObject obj)

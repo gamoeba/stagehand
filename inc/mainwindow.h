@@ -90,8 +90,6 @@ private slots:
 
     void treeCurrentItemChanged(const QModelIndex &current, const QModelIndex &);
 
-    void on_animateButton_clicked();
-
     void showConnectionError();
 private:
     Ui::MainWindow *ui;
