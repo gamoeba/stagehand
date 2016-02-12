@@ -69,9 +69,14 @@ QString SocketClient::sendCommandSizedReturn(QString command)
 
     int read = -1;
     while (len > 0 && read !=0) {
-        client.waitForReadyRead();
+        client.waitForReadyRead(50);
         read = client.read(ptr, len);
-
+        if (read==0) {
+            // wait for ready read sometimes blocks unnecessarily
+            // so try with a longer timeout if reading has failed
+            client.waitForReadyRead(1000);
+            read = client.read(ptr, len);
+        }
         len -= read;
         ptr += read;
     }
