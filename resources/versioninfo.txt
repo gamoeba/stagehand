@@ -1,3 +1,8 @@
+version 0.78
+------------
+Fix for intermittant delays updating scene
+Allow resizing of property table columns (allowing longer names to be viewed)
+
 version 0.77
 ------------
 Improved outline drawing when showing screenshot
